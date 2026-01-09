@@ -16,12 +16,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   TextField,
-  MenuItem,
   Alert,
   CircularProgress,
   Collapse,
@@ -46,9 +41,7 @@ import PageLayout from '../components/PageLayout';
 import { 
   getMyInvestments,
   getDashboardStats, 
-  createInvestment, 
-  withdrawInvestment,
-  getAllCryptos 
+  withdrawInvestment
 } from '../services/apiService';
 import { deposit, withdraw } from '../services/walletService';
 import { getToken } from '../utils/auth';
@@ -125,12 +118,8 @@ export default function DashboardPage() {
     recentTransactions: [],
   });
   const [investments, setInvestments] = useState([]);
-  const [cryptos, setCryptos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [tabValue, setTabValue] = useState(0);
-  const [investmentDialog, setInvestmentDialog] = useState(false);
-  const [selectedCrypto, setSelectedCrypto] = useState('');
-  const [investmentAmount, setInvestmentAmount] = useState('');
   const [depositAmount, setDepositAmount] = useState('');
   const [withdrawAmount, setWithdrawAmount] = useState('');
   const [walletLoading, setWalletLoading] = useState(false);
@@ -144,12 +133,10 @@ export default function DashboardPage() {
       Promise.all([
         getDashboardStats(token),
         getMyInvestments(token),
-        getAllCryptos(token),
       ])
-        .then(([statsRes, invRes, cryptoRes]) => {
+        .then(([statsRes, invRes]) => {
           setStats(statsRes);
           setInvestments(Array.isArray(invRes) ? invRes : invRes.data || []);
-          setCryptos(Array.isArray(cryptoRes) ? cryptoRes : cryptoRes.data || []);
           
           // Calcular total sacado
           const transactions = statsRes.recentTransactions || [];
@@ -163,24 +150,6 @@ export default function DashboardPage() {
         .catch(() => setLoading(false));
     }
   }, [token]);
-
-  const handleInvest = async () => {
-    if (!selectedCrypto || !investmentAmount) return;
-
-    try {
-      await createInvestment({ cryptoId: selectedCrypto, amount: Number(investmentAmount) }, token);
-      setInvestmentDialog(false);
-      setSelectedCrypto('');
-      setInvestmentAmount('');
-      // Refresh
-      const newStats = await getDashboardStats(token);
-      const newInvestments = await getMyInvestments(token);
-      setStats(newStats);
-      setInvestments(newInvestments);
-    } catch (err) {
-      alert(err.response?.data?.error || 'Erro ao investir');
-    }
-  };
 
   const handleWithdraw = async (investmentId) => {
     if (!window.confirm('Deseja fazer o resgate deste investimento?')) return;
@@ -1185,43 +1154,6 @@ export default function DashboardPage() {
         </Card>
       </Container>
 
-      {/* Investment Dialog */}
-      <Dialog open={investmentDialog} onClose={() => setInvestmentDialog(false)}>
-        <DialogTitle sx={{ background: theme.darkLight, color: theme.text }}>
-          Novo Investimento
-        </DialogTitle>
-        <DialogContent sx={{ background: theme.darkLight }}>
-          <Stack spacing={3} sx={{ pt: 2 }}>
-            <TextField
-              select
-              fullWidth
-              label="Selecione uma Criptmoeda"
-              value={selectedCrypto}
-              onChange={(e) => setSelectedCrypto(e.target.value)}
-            >
-              {cryptos.map((c) => (
-                <MenuItem key={c._id} value={c._id}>
-                  {c.name} ({c.symbol}) - R$ {(Number(c.price) || 0).toFixed(2)}
-                </MenuItem>
-              ))}
-            </TextField>
-            <TextField
-              fullWidth
-              label="Valor (R$)"
-              type="number"
-              value={investmentAmount}
-              onChange={(e) => setInvestmentAmount(e.target.value)}
-              inputProps={{ step: 0.01, min: 0 }}
-            />
-          </Stack>
-        </DialogContent>
-        <DialogActions sx={{ background: theme.darkLight }}>
-          <Button onClick={() => setInvestmentDialog(false)}>Cancelar</Button>
-          <Button variant="contained" onClick={handleInvest}>
-            Investir
-          </Button>
-        </DialogActions>
-      </Dialog>
     </PageLayout>
   );
 }
