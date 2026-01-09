@@ -34,6 +34,9 @@ const cryptoRoutes = require('./routes/cryptoRoutes');
 const investmentRoutes = require('./routes/investmentRoutes');
 const walletRoutes = require('./routes/walletRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const transactionRoutes = require('./routes/transactionRoutes');
+const referralRoutes = require('./routes/referralRoutes');
+const imovelRoutes = require('./routes/imovelRoutes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
@@ -41,6 +44,9 @@ app.use('/api/cryptos', cryptoRoutes);
 app.use('/api/investments', investmentRoutes);
 app.use('/api/wallet', walletRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/transactions', transactionRoutes);
+app.use('/api/referrals', referralRoutes);
+app.use('/api/imovels', imovelRoutes);
 
 // MongoDB connection
 mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/acapulco', {
