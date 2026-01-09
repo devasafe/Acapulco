@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -27,6 +27,23 @@ import {
   Collapse,
   LinearProgress,
 } from '@mui/material';
+import {
+  LineChart,
+  Line,
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
 import PageLayout from '../components/PageLayout';
 import { 
   getMyInvestments,
@@ -607,7 +624,7 @@ export default function DashboardPage() {
                                   <Box>
                                     <Box sx={{ mb: 2 }}>
                                       <Typography variant="caption" sx={{ color: theme.textTertiary, textTransform: 'uppercase', fontSize: '0.65rem', fontWeight: 700, letterSpacing: 1 }}>
-                                        📊 Resumo do Investimento
+                                        📋 Resumo do Investimento
                                       </Typography>
                                     </Box>
                                     <Grid container spacing={2}>
@@ -653,7 +670,7 @@ export default function DashboardPage() {
                                     <Box sx={{ mb: 2 }}>
                                       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                         <Typography variant="caption" sx={{ color: theme.textTertiary, textTransform: 'uppercase', fontSize: '0.65rem', fontWeight: 700, letterSpacing: 1 }}>
-                                          📈 Progresso
+                                          📊 Progresso
                                         </Typography>
                                         <Typography variant="caption" sx={{ color: theme.primary, fontWeight: 700, fontSize: '0.85rem' }}>
                                           {remainingTime?.percentage || 0}%
@@ -731,7 +748,7 @@ export default function DashboardPage() {
                                   <Box>
                                     <Box sx={{ mb: 2 }}>
                                       <Typography variant="caption" sx={{ color: theme.textTertiary, textTransform: 'uppercase', fontSize: '0.65rem', fontWeight: 700, letterSpacing: 1 }}>
-                                        💼 Detalhes Financeiros
+                                        💳 Detalhes Financeiros
                                       </Typography>
                                     </Box>
                                     <Grid container spacing={2}>
@@ -814,7 +831,7 @@ export default function DashboardPage() {
                                       }
                                     }}
                                   >
-                                    🔓 Resgatar Agora
+                                    💸 Resgatar Agora
                                   </Button>
                                 </Stack>
                               </Box>
@@ -986,3 +1003,5 @@ export default function DashboardPage() {
     </PageLayout>
   );
 }
+
+

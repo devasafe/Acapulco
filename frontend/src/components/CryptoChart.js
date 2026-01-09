@@ -140,7 +140,7 @@ export default function CryptoChart({ symbol }) {
             weight: 'bold',
             family: "'Segoe UI', 'Roboto', sans-serif"
           },
-          color: '#333',
+          color: '#fff',
           padding: 15,
           usePointStyle: true,
           pointStyle: 'circle'

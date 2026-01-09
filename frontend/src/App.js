@@ -7,6 +7,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
+import DashboardChartsPage from './pages/DashboardChartsPage';
 import ProfilePage from './pages/ProfilePage';
 import AdminPage from './pages/AdminPage';
 import CryptoAdminPage from './pages/CryptoAdminPage';
@@ -49,6 +50,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/charts"
+            element={
+              <ProtectedRoute>
+                <DashboardChartsPage />
               </ProtectedRoute>
             }
           />
