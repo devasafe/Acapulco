@@ -37,9 +37,6 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
-import { ResponsiveGridLayout } from 'react-grid-layout';
-import 'react-grid-layout/css/styles.css';
-import 'react-resizable/css/styles.css';
 import PageLayout from '../components/PageLayout';
 import { 
   getMyInvestments,
@@ -130,14 +127,6 @@ export default function DashboardPage() {
   const [walletSuccess, setWalletSuccess] = useState('');
   const [totalWithdrawn, setTotalWithdrawn] = useState(0);
   const [expandedInvestment, setExpandedInvestment] = useState(null);
-  const [gridLayout, setGridLayout] = useState([
-    { x: 0, y: 0, w: 4, h: 3, i: '1' },
-    { x: 4, y: 0, w: 4, h: 3, i: '2' },
-    { x: 8, y: 0, w: 4, h: 3, i: '3' },
-    { x: 0, y: 3, w: 4, h: 3, i: '4' },
-    { x: 4, y: 3, w: 4, h: 3, i: '5' },
-    { x: 8, y: 3, w: 4, h: 3, i: '6' },
-  ]);
 
   useEffect(() => {
     if (token) {
@@ -941,37 +930,24 @@ export default function DashboardPage() {
 
             {/* Tab 4: Gráficos */}
             {tabValue === 4 && (
-              <Box sx={{ width: '100%', height: '100%' }}>
+              <Box>
                 <Typography variant="h6" sx={{ color: theme.text, fontWeight: 700, mb: 3 }}>
-                  📊 Análise de Dados (Arraste e redimensione os gráficos)
+                  📊 Análise de Dados
                 </Typography>
-                <ResponsiveGridLayout
-                  className="layout"
-                  layouts={{ lg: gridLayout }}
-                  onLayoutChange={(layout) => setGridLayout(layout)}
-                  cols={{ lg: 12, md: 10, sm: 6, xs: 1 }}
-                  rowHeight={60}
-                  isDraggable={true}
-                  isResizable={true}
-                  compactType="vertical"
-                  preventCollision={false}
-                  containerPadding={[0, 0]}
-                  margin={[12, 12]}
-                  useCSSTransforms={true}
-                >
+                <Grid container spacing={3}>
                   {/* Gráfico 1: Evolução da Carteira */}
-                  <div key="1" style={{ backgroundColor: theme.darkLight, borderRadius: '12px', border: `1px solid rgba(59, 91, 219, 0.1)` }}>
-                    <Card sx={{ p: 2, backgroundColor: theme.darkLight, height: '100%', display: 'flex', flexDirection: 'column' }}>
-                      <Typography variant="h6" sx={{ mb: 2, fontSize: '0.9rem', color: theme.textTertiary }}>
+                  <Grid item xs={12} sm={6} lg={4}>
+                    <Card sx={{ p: 3, backgroundColor: theme.darkLight, border: `1px solid rgba(59, 91, 219, 0.1)`, borderRadius: '12px', height: '100%' }}>
+                      <Typography variant="h6" sx={{ mb: 2, fontSize: '0.95rem', color: theme.text, fontWeight: 700 }}>
                         📈 Evolução da Carteira
                       </Typography>
-                      <ResponsiveContainer width="100%" height="100%">
+                      <ResponsiveContainer width="100%" height={250}>
                         <AreaChart 
                           data={[
                             { month: 'Inicial', value: 0 },
                             { month: 'Atual', value: Number(stats.wallet) || 0 },
                           ]} 
-                          margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+                          margin={{ top: 10, right: 20, left: 0, bottom: 10 }}
                         >
                           <defs>
                             <linearGradient id="colorCarteira" x1="0" y1="0" x2="0" y2="1">
@@ -980,9 +956,9 @@ export default function DashboardPage() {
                             </linearGradient>
                           </defs>
                           <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                          <XAxis dataKey="month" stroke="#9CA3AF" />
-                          <YAxis stroke="#9CA3AF" />
-                          <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '4px' }} />
+                          <XAxis dataKey="month" stroke="#9CA3AF" style={{ fontSize: '12px' }} />
+                          <YAxis stroke="#9CA3AF" style={{ fontSize: '12px' }} />
+                          <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }} />
                           <Area
                             type="monotone"
                             dataKey="value"
@@ -990,27 +966,27 @@ export default function DashboardPage() {
                             fillOpacity={1}
                             fill="url(#colorCarteira)"
                             strokeWidth={2}
-                            dot={{ fill: '#10B981', r: 3 }}
-                            activeDot={{ r: 5 }}
+                            dot={{ fill: '#10B981', r: 4 }}
+                            activeDot={{ r: 6 }}
                           />
                         </AreaChart>
                       </ResponsiveContainer>
                     </Card>
-                  </div>
+                  </Grid>
 
-                  {/* Gráfico 2: Ganhos ao Longo do Tempo */}
-                  <div key="2" style={{ backgroundColor: theme.darkLight, borderRadius: '12px', border: `1px solid rgba(59, 91, 219, 0.1)` }}>
-                    <Card sx={{ p: 2, backgroundColor: theme.darkLight, height: '100%', display: 'flex', flexDirection: 'column' }}>
-                      <Typography variant="h6" sx={{ mb: 2, fontSize: '0.9rem', color: theme.textTertiary }}>
+                  {/* Gráfico 2: Ganhos Totais */}
+                  <Grid item xs={12} sm={6} lg={4}>
+                    <Card sx={{ p: 3, backgroundColor: theme.darkLight, border: `1px solid rgba(59, 91, 219, 0.1)`, borderRadius: '12px', height: '100%' }}>
+                      <Typography variant="h6" sx={{ mb: 2, fontSize: '0.95rem', color: theme.text, fontWeight: 700 }}>
                         💰 Ganhos Totais
                       </Typography>
-                      <ResponsiveContainer width="100%" height="100%">
+                      <ResponsiveContainer width="100%" height={250}>
                         <AreaChart 
                           data={[
                             { month: 'Inicial', ganho: 0 },
                             { month: 'Atual', ganho: Number(stats.totalExpectedProfit) || 0 },
                           ]} 
-                          margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+                          margin={{ top: 10, right: 20, left: 0, bottom: 10 }}
                         >
                           <defs>
                             <linearGradient id="colorGanhos" x1="0" y1="0" x2="0" y2="1">
@@ -1019,9 +995,9 @@ export default function DashboardPage() {
                             </linearGradient>
                           </defs>
                           <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                          <XAxis dataKey="month" stroke="#9CA3AF" />
-                          <YAxis stroke="#9CA3AF" />
-                          <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '4px' }} />
+                          <XAxis dataKey="month" stroke="#9CA3AF" style={{ fontSize: '12px' }} />
+                          <YAxis stroke="#9CA3AF" style={{ fontSize: '12px' }} />
+                          <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }} />
                           <Area
                             type="monotone"
                             dataKey="ganho"
@@ -1029,21 +1005,21 @@ export default function DashboardPage() {
                             fillOpacity={1}
                             fill="url(#colorGanhos)"
                             strokeWidth={2}
-                            dot={{ fill: '#F59E0B', r: 3 }}
-                            activeDot={{ r: 5 }}
+                            dot={{ fill: '#F59E0B', r: 4 }}
+                            activeDot={{ r: 6 }}
                           />
                         </AreaChart>
                       </ResponsiveContainer>
                     </Card>
-                  </div>
+                  </Grid>
 
-                  {/* Gráfico 3: Composição de Investimentos (Donut) */}
-                  <div key="3" style={{ backgroundColor: theme.darkLight, borderRadius: '12px', border: `1px solid rgba(59, 91, 219, 0.1)` }}>
-                    <Card sx={{ p: 2, backgroundColor: theme.darkLight, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-                      <Typography variant="h6" sx={{ mb: 2, fontSize: '0.9rem', color: theme.textTertiary, width: '100%', textAlign: 'center' }}>
+                  {/* Gráfico 3: Moedas Investidas */}
+                  <Grid item xs={12} sm={6} lg={4}>
+                    <Card sx={{ p: 3, backgroundColor: theme.darkLight, border: `1px solid rgba(59, 91, 219, 0.1)`, borderRadius: '12px', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                      <Typography variant="h6" sx={{ mb: 2, fontSize: '0.95rem', color: theme.text, fontWeight: 700, width: '100%', textAlign: 'center' }}>
                         💎 Moedas Investidas
                       </Typography>
-                      <ResponsiveContainer width="100%" height="100%">
+                      <ResponsiveContainer width="100%" height={250}>
                         <PieChart>
                           <Pie
                             data={(() => {
@@ -1056,11 +1032,11 @@ export default function DashboardPage() {
                             })()}
                             cx="50%"
                             cy="50%"
-                            innerRadius={40}
-                            outerRadius={60}
-                            paddingAngle={8}
+                            innerRadius={50}
+                            outerRadius={75}
+                            paddingAngle={5}
                             dataKey="value"
-                            cornerRadius={12}
+                            cornerRadius={8}
                             stroke="none"
                           >
                             <Cell fill="#3B5BDB" />
@@ -1069,19 +1045,19 @@ export default function DashboardPage() {
                             <Cell fill="#EF4444" />
                             <Cell fill="#7C3AED" />
                           </Pie>
-                          <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '4px' }} />
+                          <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }} />
                         </PieChart>
                       </ResponsiveContainer>
                     </Card>
-                  </div>
+                  </Grid>
 
                   {/* Gráfico 4: Resumo de Transações */}
-                  <div key="4" style={{ backgroundColor: theme.darkLight, borderRadius: '12px', border: `1px solid rgba(59, 91, 219, 0.1)` }}>
-                    <Card sx={{ p: 2, backgroundColor: theme.darkLight, height: '100%', display: 'flex', flexDirection: 'column' }}>
-                      <Typography variant="h6" sx={{ mb: 2, fontSize: '0.9rem', color: theme.textTertiary }}>
+                  <Grid item xs={12} sm={6} lg={4}>
+                    <Card sx={{ p: 3, backgroundColor: theme.darkLight, border: `1px solid rgba(59, 91, 219, 0.1)`, borderRadius: '12px', height: '100%' }}>
+                      <Typography variant="h6" sx={{ mb: 2, fontSize: '0.95rem', color: theme.text, fontWeight: 700 }}>
                         📊 Resumo de Transações
                       </Typography>
-                      <ResponsiveContainer width="100%" height="100%">
+                      <ResponsiveContainer width="100%" height={250}>
                         <BarChart 
                           data={[
                             { 
@@ -1094,58 +1070,58 @@ export default function DashboardPage() {
                                 .reduce((acc, t) => acc + (Number(t.amount) || 0), 0),
                             }
                           ]} 
-                          margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+                          margin={{ top: 10, right: 20, left: 0, bottom: 10 }}
                         >
                           <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                          <XAxis dataKey="tipo" stroke="#9CA3AF" />
-                          <YAxis stroke="#9CA3AF" />
-                          <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '4px' }} />
+                          <XAxis dataKey="tipo" stroke="#9CA3AF" style={{ fontSize: '12px' }} />
+                          <YAxis stroke="#9CA3AF" style={{ fontSize: '12px' }} />
+                          <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }} />
                           <Legend />
-                          <Bar dataKey="entrada" fill="#10B981" radius={[8, 8, 0, 0]} />
-                          <Bar dataKey="saida" fill="#EF4444" radius={[8, 8, 0, 0]} />
+                          <Bar dataKey="entrada" name="Entrada" fill="#10B981" radius={[8, 8, 0, 0]} />
+                          <Bar dataKey="saida" name="Saída" fill="#EF4444" radius={[8, 8, 0, 0]} />
                         </BarChart>
                       </ResponsiveContainer>
                     </Card>
-                  </div>
+                  </Grid>
 
-                  {/* Gráfico 5: Investidores por Status */}
-                  <div key="5" style={{ backgroundColor: theme.darkLight, borderRadius: '12px', border: `1px solid rgba(59, 91, 219, 0.1)` }}>
-                    <Card sx={{ p: 2, backgroundColor: theme.darkLight, height: '100%', display: 'flex', flexDirection: 'column' }}>
-                      <Typography variant="h6" sx={{ mb: 2, fontSize: '0.9rem', color: theme.textTertiary }}>
+                  {/* Gráfico 5: Investimentos por Status */}
+                  <Grid item xs={12} sm={6} lg={4}>
+                    <Card sx={{ p: 3, backgroundColor: theme.darkLight, border: `1px solid rgba(59, 91, 219, 0.1)`, borderRadius: '12px', height: '100%' }}>
+                      <Typography variant="h6" sx={{ mb: 2, fontSize: '0.95rem', color: theme.text, fontWeight: 700 }}>
                         👥 Investimentos por Status
                       </Typography>
-                      <ResponsiveContainer width="100%" height="100%">
+                      <ResponsiveContainer width="100%" height={250}>
                         <BarChart 
                           data={[
                             { status: 'Ativos', count: stats.activeInvestments || 0 },
                             { status: 'Completos', count: stats.completedInvestments || 0 },
                             { status: 'Resgatados', count: stats.withdrawnInvestments || 0 },
                           ]}
-                          margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+                          margin={{ top: 10, right: 20, left: 0, bottom: 10 }}
                         >
                           <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                          <XAxis dataKey="status" stroke="#9CA3AF" />
-                          <YAxis stroke="#9CA3AF" />
-                          <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '4px' }} />
+                          <XAxis dataKey="status" stroke="#9CA3AF" style={{ fontSize: '12px' }} />
+                          <YAxis stroke="#9CA3AF" style={{ fontSize: '12px' }} />
+                          <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }} />
                           <Bar dataKey="count" fill="#3B5BDB" radius={[8, 8, 0, 0]} />
                         </BarChart>
                       </ResponsiveContainer>
                     </Card>
-                  </div>
+                  </Grid>
 
                   {/* Gráfico 6: Investimento Total */}
-                  <div key="6" style={{ backgroundColor: theme.darkLight, borderRadius: '12px', border: `1px solid rgba(59, 91, 219, 0.1)` }}>
-                    <Card sx={{ p: 2, backgroundColor: theme.darkLight, height: '100%', display: 'flex', flexDirection: 'column' }}>
-                      <Typography variant="h6" sx={{ mb: 2, fontSize: '0.9rem', color: theme.textTertiary }}>
+                  <Grid item xs={12} sm={6} lg={4}>
+                    <Card sx={{ p: 3, backgroundColor: theme.darkLight, border: `1px solid rgba(59, 91, 219, 0.1)`, borderRadius: '12px', height: '100%' }}>
+                      <Typography variant="h6" sx={{ mb: 2, fontSize: '0.95rem', color: theme.text, fontWeight: 700 }}>
                         💵 Investimento Total
                       </Typography>
-                      <ResponsiveContainer width="100%" height="100%">
+                      <ResponsiveContainer width="100%" height={250}>
                         <AreaChart 
                           data={[
                             { label: 'Inicial', total: 0 },
                             { label: 'Investido', total: Number(stats.totalInvested) || 0 },
                           ]}
-                          margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+                          margin={{ top: 10, right: 20, left: 0, bottom: 10 }}
                         >
                           <defs>
                             <linearGradient id="colorInvestimento" x1="0" y1="0" x2="0" y2="1">
@@ -1154,9 +1130,9 @@ export default function DashboardPage() {
                             </linearGradient>
                           </defs>
                           <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                          <XAxis dataKey="label" stroke="#9CA3AF" />
-                          <YAxis stroke="#9CA3AF" />
-                          <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '4px' }} />
+                          <XAxis dataKey="label" stroke="#9CA3AF" style={{ fontSize: '12px' }} />
+                          <YAxis stroke="#9CA3AF" style={{ fontSize: '12px' }} />
+                          <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }} />
                           <Area
                             type="monotone"
                             dataKey="total"
@@ -1164,63 +1140,19 @@ export default function DashboardPage() {
                             fillOpacity={1}
                             fill="url(#colorInvestimento)"
                             strokeWidth={2}
-                            dot={{ fill: '#7C3AED', r: 3 }}
-                            activeDot={{ r: 5 }}
+                            dot={{ fill: '#7C3AED', r: 4 }}
+                            activeDot={{ r: 6 }}
                           />
                         </AreaChart>
                       </ResponsiveContainer>
                     </Card>
-                  </div>
-                </ResponsiveGridLayout>
+                  </Grid>
+                </Grid>
               </Box>
             )}
           </Box>
         </Card>
       </Container>
-
-      <style jsx>{`
-        .react-grid-layout {
-          background: transparent;
-        }
-        
-        .react-grid-item {
-          border-radius: 12px;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-          transition: all 0.3s ease;
-        }
-        
-        .react-grid-item.react-grid-placeholder {
-          background: rgba(59, 91, 219, 0.2);
-          border-radius: 12px;
-          opacity: 0.5;
-        }
-        
-        .react-grid-item > .resizing {
-          background: rgba(59, 91, 219, 0.1);
-          z-index: 1000;
-        }
-        
-        .react-grid-item > .react-resizable-handle {
-          background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI/Pg08IS0tIEdlbmVyYXRvcjogQWRvYmUgRmlyZXdvcmtzIENTNiwgRXhwb3J0IFNWRyBFeHRlbnNpb24gYnkgQWFyb24gQmVhbGwgKGh0dHA6Ly9maXJld29ya3MuYWJlYWxsLmNvbSkgLiBWZXJzaW9uOiAwLjYuMSAgLS0+DTohRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+DTxzdmcgaWQ9IlVudGl0bGVkIFBhZ2UlMjAxIiB2aWV3Qm94PSIwIDAgNiA2IiBzdHlsZT0iYmFja2dyb3VuZC1jb2xvcjojZmZmZmZmMDAiIHZlcnNpb249IjEuMSINCXhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHhtbDpzcGFjZT0icHJlc2VydmUiDQl4PSIwcHgiIHk9IjBweCIgd2lkdGg9IjZweCIgaGVpZ2h0PSI2cHgiDT4NCTxnIG9wYWNpdHk9IjAuMyI+DTwvZz4NCjwvc3ZnPg==');
-          background-position: bottom right;
-          padding: 0 8px 8px 0;
-          background-repeat: no-repeat;
-          background-origin: content-box;
-          box-sizing: border-box;
-          cursor: se-resize;
-        }
-
-        .react-grid-item > .react-resizable-handle::after {
-          content: "";
-          position: absolute;
-          right: 3px;
-          bottom: 3px;
-          width: 5px;
-          height: 5px;
-          border-right: 2px solid rgba(0, 0, 0, 0.4);
-          border-bottom: 2px solid rgba(0, 0, 0, 0.4);
-        }
-      `}</style>
 
     </PageLayout>
   );
