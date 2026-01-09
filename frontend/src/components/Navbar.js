@@ -42,7 +42,6 @@ export default function Navbar({ user, onLogout }) {
 
   const menuItems = [
     { label: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
-    { label: 'Gráficos', icon: <AssignmentIcon />, path: '/dashboard/charts' },
     { label: 'Perfil', icon: <PersonIcon />, path: '/profile' },
     { label: 'Referências', icon: <ShareIcon />, path: '/referrals' },
     ...(user?.isAdmin ? [

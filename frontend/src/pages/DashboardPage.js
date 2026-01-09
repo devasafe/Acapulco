@@ -967,7 +967,7 @@ export default function DashboardPage() {
                 </Typography>
                 <Grid container spacing={3} sx={{ justifyContent: 'center' }}>
                   {/* Gráfico 1: Evolução da Carteira */}
-                  <Grid item xs={12} lg={4}>
+                  <Grid item xs={12} md={10}>
                     <Card sx={{ p: 2, backgroundColor: theme.darkLight, height: '240px' }}>
                       <Typography variant="h6" sx={{ mb: 2, fontSize: '0.9rem', color: theme.textTertiary }}>
                         📈 Evolução da Carteira
@@ -1006,7 +1006,7 @@ export default function DashboardPage() {
                   </Grid>
 
                   {/* Gráfico 2: Ganhos ao Longo do Tempo */}
-                  <Grid item xs={12} lg={4}>
+                  <Grid item xs={12} md={10}>
                     <Card sx={{ p: 2, backgroundColor: theme.darkLight, height: '240px' }}>
                       <Typography variant="h6" sx={{ mb: 2, fontSize: '0.9rem', color: theme.textTertiary }}>
                         � Ganhos Totais
@@ -1045,7 +1045,7 @@ export default function DashboardPage() {
                   </Grid>
 
                   {/* Gráfico 3: Composição de Investimentos (Donut) */}
-                  <Grid item xs={12} lg={4}>
+                  <Grid item xs={12} md={10}>
                     <Card sx={{ p: 2, backgroundColor: theme.darkLight, height: '240px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
                       <Typography variant="h6" sx={{ mb: 2, fontSize: '0.9rem', color: theme.textTertiary, width: '100%', textAlign: 'center' }}>
                         🥧 Status dos Investimentos
@@ -1078,7 +1078,7 @@ export default function DashboardPage() {
                   </Grid>
 
                   {/* Gráfico 4: Resumo de Transações */}
-                  <Grid item xs={12} lg={4}>
+                  <Grid item xs={12} md={10}>
                     <Card sx={{ p: 2, backgroundColor: theme.darkLight, height: '240px' }}>
                       <Typography variant="h6" sx={{ mb: 2, fontSize: '0.9rem', color: theme.textTertiary }}>
                         📊 Resumo de Transações
@@ -1111,7 +1111,7 @@ export default function DashboardPage() {
                   </Grid>
 
                   {/* Gráfico 5: Investidores por Status */}
-                  <Grid item xs={12} lg={4}>
+                  <Grid item xs={12} md={10}>
                     <Card sx={{ p: 2, backgroundColor: theme.darkLight, height: '240px' }}>
                       <Typography variant="h6" sx={{ mb: 2, fontSize: '0.9rem', color: theme.textTertiary }}>
                         👥 Investimentos por Status
@@ -1136,7 +1136,7 @@ export default function DashboardPage() {
                   </Grid>
 
                   {/* Gráfico 6: Investimento Total */}
-                  <Grid item xs={12} lg={4}>
+                  <Grid item xs={12} md={10}>
                     <Card sx={{ p: 2, backgroundColor: theme.darkLight, height: '240px' }}>
                       <Typography variant="h6" sx={{ mb: 2, fontSize: '0.9rem', color: theme.textTertiary }}>
                         💵 Investimento Total
