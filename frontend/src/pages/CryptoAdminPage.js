@@ -22,7 +22,6 @@ import {
 } from '@mui/material';
 import PageLayout from '../components/PageLayout';
 import {
-  getAllCryptos,
   getAllCryptosAdmin,
   createCrypto,
   updateCrypto,

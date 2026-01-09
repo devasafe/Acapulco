@@ -21,7 +21,6 @@ import { getWallet } from '../services/walletService';
 import CryptoChart from '../components/CryptoChart';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import CurrencyBitcoinIcon from '@mui/icons-material/CurrencyBitcoin';
 
 const theme = {
   primary: '#3B5BDB',
