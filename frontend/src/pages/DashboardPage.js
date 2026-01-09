@@ -967,20 +967,19 @@ export default function DashboardPage() {
                 </Typography>
                 <Grid container spacing={3} sx={{ justifyContent: 'center' }}>
                   {/* Gráfico 1: Evolução da Carteira */}
-                  <Grid item xs={12} sm={6} md={4}>
+                  <Grid item xs={12} lg={4}>
                     <Card sx={{ p: 2, backgroundColor: theme.darkLight, height: '240px' }}>
                       <Typography variant="h6" sx={{ mb: 2, fontSize: '0.9rem', color: theme.textTertiary }}>
                         📈 Evolução da Carteira
                       </Typography>
                       <ResponsiveContainer width="100%" height={200}>
-                        <AreaChart data={[
-                          { month: 'Jan', value: 5000 },
-                          { month: 'Fev', value: 7500 },
-                          { month: 'Mar', value: 6800 },
-                          { month: 'Abr', value: 9200 },
-                          { month: 'Mai', value: 10500 },
-                          { month: 'Jun', value: 12000 },
-                        ]} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                        <AreaChart 
+                          data={[
+                            { month: 'Inicial', value: 0 },
+                            { month: 'Atual', value: Number(stats.wallet) || 0 },
+                          ]} 
+                          margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+                        >
                           <defs>
                             <linearGradient id="colorCarteira" x1="0" y1="0" x2="0" y2="1">
                               <stop offset="5%" stopColor="#10B981" stopOpacity={0.8} />
@@ -1007,20 +1006,19 @@ export default function DashboardPage() {
                   </Grid>
 
                   {/* Gráfico 2: Ganhos ao Longo do Tempo */}
-                  <Grid item xs={12} sm={6} md={4}>
+                  <Grid item xs={12} lg={4}>
                     <Card sx={{ p: 2, backgroundColor: theme.darkLight, height: '240px' }}>
                       <Typography variant="h6" sx={{ mb: 2, fontSize: '0.9rem', color: theme.textTertiary }}>
-                        📈 Ganhos ao Longo do Tempo
+                        � Ganhos Totais
                       </Typography>
                       <ResponsiveContainer width="100%" height={200}>
-                        <AreaChart data={[
-                          { month: 'Jan', ganho: 100 },
-                          { month: 'Fev', ganho: 250 },
-                          { month: 'Mar', ganho: 180 },
-                          { month: 'Abr', ganho: 450 },
-                          { month: 'Mai', ganho: 700 },
-                          { month: 'Jun', ganho: 1000 },
-                        ]} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                        <AreaChart 
+                          data={[
+                            { month: 'Inicial', ganho: 0 },
+                            { month: 'Atual', ganho: Number(stats.totalExpectedProfit) || 0 },
+                          ]} 
+                          margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+                        >
                           <defs>
                             <linearGradient id="colorGanhos" x1="0" y1="0" x2="0" y2="1">
                               <stop offset="5%" stopColor="#F59E0B" stopOpacity={0.8} />
@@ -1047,19 +1045,19 @@ export default function DashboardPage() {
                   </Grid>
 
                   {/* Gráfico 3: Composição de Investimentos (Donut) */}
-                  <Grid item xs={12} sm={6} md={4}>
+                  <Grid item xs={12} lg={4}>
                     <Card sx={{ p: 2, backgroundColor: theme.darkLight, height: '240px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
                       <Typography variant="h6" sx={{ mb: 2, fontSize: '0.9rem', color: theme.textTertiary, width: '100%', textAlign: 'center' }}>
-                        🥧 Composição de Investimentos
+                        🥧 Status dos Investimentos
                       </Typography>
                       <ResponsiveContainer width="100%" height={180}>
                         <PieChart>
                           <Pie
                             data={[
-                              { name: 'Criptomoedas', value: 35 },
-                              { name: 'Imóveis', value: 40 },
-                              { name: 'Outros', value: 25 },
-                            ]}
+                              { name: 'Ativos', value: stats.activeInvestments || 0 },
+                              { name: 'Completados', value: stats.completedInvestments || 0 },
+                              { name: 'Resgatados', value: stats.withdrawnInvestments || 0 },
+                            ].filter(d => d.value > 0)}
                             cx="50%"
                             cy="50%"
                             innerRadius={50}
@@ -1070,8 +1068,8 @@ export default function DashboardPage() {
                             stroke="none"
                           >
                             <Cell fill="#3B5BDB" />
-                            <Cell fill="#7C3AED" />
                             <Cell fill="#10B981" />
+                            <Cell fill="#F59E0B" />
                           </Pie>
                           <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '4px' }} />
                         </PieChart>
@@ -1079,23 +1077,29 @@ export default function DashboardPage() {
                     </Card>
                   </Grid>
 
-                  {/* Gráfico 4: Movimentação Mensal */}
-                  <Grid item xs={12} sm={6} md={4}>
+                  {/* Gráfico 4: Resumo de Transações */}
+                  <Grid item xs={12} lg={4}>
                     <Card sx={{ p: 2, backgroundColor: theme.darkLight, height: '240px' }}>
                       <Typography variant="h6" sx={{ mb: 2, fontSize: '0.9rem', color: theme.textTertiary }}>
-                        📊 Movimentação Mensal
+                        📊 Resumo de Transações
                       </Typography>
                       <ResponsiveContainer width="100%" height={200}>
-                        <BarChart data={[
-                          { month: 'Jan', entrada: 5000, saida: 2000 },
-                          { month: 'Fev', entrada: 3000, saida: 1000 },
-                          { month: 'Mar', entrada: 4000, saida: 1500 },
-                          { month: 'Abr', entrada: 6000, saida: 2000 },
-                          { month: 'Mai', entrada: 5500, saida: 1800 },
-                          { month: 'Jun', entrada: 7000, saida: 2500 },
-                        ]} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                        <BarChart 
+                          data={[
+                            { 
+                              tipo: 'Total', 
+                              entrada: (stats.recentTransactions || [])
+                                .filter(t => ['deposit', 'referral_bonus'].includes(t.type))
+                                .reduce((acc, t) => acc + (Number(t.amount) || 0), 0),
+                              saida: (stats.recentTransactions || [])
+                                .filter(t => ['withdrawal', 'investment'].includes(t.type))
+                                .reduce((acc, t) => acc + (Number(t.amount) || 0), 0),
+                            }
+                          ]} 
+                          margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+                        >
                           <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                          <XAxis dataKey="month" stroke="#9CA3AF" />
+                          <XAxis dataKey="tipo" stroke="#9CA3AF" />
                           <YAxis stroke="#9CA3AF" />
                           <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '4px' }} />
                           <Legend />
@@ -1107,16 +1111,20 @@ export default function DashboardPage() {
                   </Grid>
 
                   {/* Gráfico 5: Investidores por Status */}
-                  <Grid item xs={12} sm={6} md={4}>
+                  <Grid item xs={12} lg={4}>
                     <Card sx={{ p: 2, backgroundColor: theme.darkLight, height: '240px' }}>
                       <Typography variant="h6" sx={{ mb: 2, fontSize: '0.9rem', color: theme.textTertiary }}>
-                        👥 Investidores por Status
+                        👥 Investimentos por Status
                       </Typography>
                       <ResponsiveContainer width="100%" height={200}>
-                        <BarChart data={[
-                          { status: 'Ativos', count: 8 },
-                          { status: 'Completados', count: 5 },
-                        ]} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                        <BarChart 
+                          data={[
+                            { status: 'Ativos', count: stats.activeInvestments || 0 },
+                            { status: 'Completos', count: stats.completedInvestments || 0 },
+                            { status: 'Resgatados', count: stats.withdrawnInvestments || 0 },
+                          ]}
+                          margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+                        >
                           <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                           <XAxis dataKey="status" stroke="#9CA3AF" />
                           <YAxis stroke="#9CA3AF" />
@@ -1127,37 +1135,36 @@ export default function DashboardPage() {
                     </Card>
                   </Grid>
 
-                  {/* Gráfico 6: Indicações Acumuladas */}
-                  <Grid item xs={12} sm={6} md={4}>
+                  {/* Gráfico 6: Investimento Total */}
+                  <Grid item xs={12} lg={4}>
                     <Card sx={{ p: 2, backgroundColor: theme.darkLight, height: '240px' }}>
                       <Typography variant="h6" sx={{ mb: 2, fontSize: '0.9rem', color: theme.textTertiary }}>
-                        🎯 Indicações Acumuladas
+                        💵 Investimento Total
                       </Typography>
                       <ResponsiveContainer width="100%" height={200}>
-                        <AreaChart data={[
-                          { month: 'Jan', acumulado: 2 },
-                          { month: 'Fev', acumulado: 5 },
-                          { month: 'Mar', acumulado: 8 },
-                          { month: 'Abr', acumulado: 12 },
-                          { month: 'Mai', acumulado: 18 },
-                          { month: 'Jun', acumulado: 25 },
-                        ]} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                        <AreaChart 
+                          data={[
+                            { label: 'Inicial', total: 0 },
+                            { label: 'Investido', total: Number(stats.totalInvested) || 0 },
+                          ]}
+                          margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+                        >
                           <defs>
-                            <linearGradient id="colorIndicacoes" x1="0" y1="0" x2="0" y2="1">
+                            <linearGradient id="colorInvestimento" x1="0" y1="0" x2="0" y2="1">
                               <stop offset="5%" stopColor="#7C3AED" stopOpacity={0.8} />
                               <stop offset="95%" stopColor="#7C3AED" stopOpacity={0} />
                             </linearGradient>
                           </defs>
                           <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                          <XAxis dataKey="month" stroke="#9CA3AF" />
+                          <XAxis dataKey="label" stroke="#9CA3AF" />
                           <YAxis stroke="#9CA3AF" />
                           <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '4px' }} />
                           <Area
                             type="monotone"
-                            dataKey="acumulado"
+                            dataKey="total"
                             stroke="#7C3AED"
                             fillOpacity={1}
-                            fill="url(#colorIndicacoes)"
+                            fill="url(#colorInvestimento)"
                             strokeWidth={2}
                             dot={{ fill: '#7C3AED', r: 3 }}
                             activeDot={{ r: 5 }}
