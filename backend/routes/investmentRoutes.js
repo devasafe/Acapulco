@@ -1,10 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const investmentController = require('../controllers/investmentController');
-const auth = require('../utils/auth');
+const { authenticateToken } = require('../middleware/auth');
 
-router.get('/my', auth, investmentController.getUserInvestments);
-router.post('/invest', auth, investmentController.invest);
-router.post('/sell', auth, investmentController.sell);
+router.get('/', authenticateToken, investmentController.getMyInvestments);
+router.post('/', authenticateToken, investmentController.createInvestment);
+router.post('/crypto', authenticateToken, investmentController.investInCrypto);
+router.post('/withdraw', authenticateToken, investmentController.withdrawInvestment);
 
 module.exports = router;

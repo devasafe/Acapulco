@@ -6,6 +6,12 @@ export const sellInvestment = async (investmentId, token) => {
   });
 };
 
+export const investInCrypto = async (cryptoId, amount, period, token) => {
+  return axios.post('/investments/crypto', { cryptoId, amount, period }, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+};
+
 export const investInImovel = async (imovelId, token) => {
   return axios.post('/investments/invest', { imovelId }, {
     headers: { Authorization: `Bearer ${token}` }

@@ -1,13 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
-const auth = require('../utils/auth');
-const isAdmin = require('../utils/isAdmin');
+const { authenticateToken } = require('../middleware/auth');
+const isAdmin = require('../middleware/isAdmin');
 
-router.get('/referral-profits', auth, adminController.getReferralProfits);
+// Admin middleware
+const adminAuth = [authenticateToken, isAdmin];
 
-// Settings: get/set referral percentage
-router.get('/settings/referral-percentage', auth, isAdmin, adminController.getReferralPercentage);
-router.post('/settings/referral-percentage', auth, isAdmin, adminController.setReferralPercentage);
+router.get('/users', ...adminAuth, adminController.getAllUsers);
+router.get('/stats', ...adminAuth, adminController.getAdminStats);
+router.get('/referral-settings', ...adminAuth, adminController.getReferralSettings);
+router.put('/referral-settings', ...adminAuth, adminController.updateReferralSettings);
+router.get('/referral-profits', ...adminAuth, adminController.getReferralProfits);
+router.get('/referral-bonus-details', ...adminAuth, adminController.getReferralBonusDetails);
 
 module.exports = router;

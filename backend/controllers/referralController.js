@@ -2,7 +2,7 @@ const User = require('../models/User');
 
 exports.getReferrals = async (req, res) => {
   try {
-    const user = await User.findById(req.userId).populate('referrals');
+    const user = await User.findById(req.user.userId).populate('referrals');
     res.json(user.referrals);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -12,7 +12,7 @@ exports.getReferrals = async (req, res) => {
 exports.addReferral = async (req, res) => {
   try {
     const { referralId } = req.body;
-    const user = await User.findById(req.userId);
+    const user = await User.findById(req.user.userId);
     user.referrals.push(referralId);
     await user.save();
     res.json(user.referrals);
@@ -20,3 +20,4 @@ exports.addReferral = async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 };
+

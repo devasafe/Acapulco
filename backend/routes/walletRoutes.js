@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const walletController = require('../controllers/walletController');
+const { authenticateToken } = require('../middleware/auth');
 
-// Middleware de autenticação
-const auth = require('../utils/auth');
-
-router.get('/', auth, walletController.getWallet);
-router.post('/deposit', auth, walletController.deposit);
+router.get('/', authenticateToken, walletController.getWallet);
+router.post('/deposit', authenticateToken, walletController.deposit);
+router.post('/withdraw', authenticateToken, walletController.withdraw);
+router.get('/transactions', authenticateToken, walletController.getTransactions);
 
 module.exports = router;

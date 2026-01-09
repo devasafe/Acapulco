@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Seed Criptos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1f2e;
+            color: #fff;
+        }
+        button {
+            background: #3B5BDB;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #2a40b0;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #0F1117;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .loading {
+            color: #FFD700;
+        }
+        .success {
+            color: #10B981;
+        }
+        .error {
+            color: #EF4444;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 Seed Criptos</h1>
+    <p>Clique no botão para criar criptos de teste:</p>
+    <button onclick="seedCryptos()">Criar Criptos</button>
+    
+    <div id="result"></div>
+
+    <script>
+        async function seedCryptos() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = 'loading';
+            resultDiv.textContent = '⏳ Criando criptos...';
+
+            try {
+                const response = await fetch('http://localhost:5000/api/cryptos/seed/init', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    resultDiv.className = 'success';
+                    resultDiv.textContent = '✅ Sucesso!\n\n' + JSON.stringify(data, null, 2);
+                } else {
+                    resultDiv.className = 'error';
+                    resultDiv.textContent = '❌ Erro:\n\n' + JSON.stringify(data, null, 2);
+                }
+            } catch (err) {
+                resultDiv.className = 'error';
+                resultDiv.textContent = '❌ Erro de conexão:\n\n' + err.message;
+            }
+        }
+    </script>
+</body>
+</html>

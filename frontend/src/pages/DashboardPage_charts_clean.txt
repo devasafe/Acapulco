@@ -1,0 +1,144 @@
+        {/* Seção Gráficos */}
+        <Box sx={{ mb: 5 }}>
+          <Typography variant="h6" fontWeight={800} sx={{ mb: 3, color: '#e8eaed', letterSpacing: '0.5px' }}>
+            📊 Visualizações de Investimentos
+          </Typography>
+
+          <Grid container spacing={2} sx={{ width: '100%' }}>
+            {chartData.dates.length > 0 && (
+              <>
+                {/* Gráfico de Transações */}
+                <Grid item xs={12} sm={6} lg={4} sx={{ display: 'flex', flexDirection: 'column' }}>
+                  <Paper sx={{
+                    p: 2,
+                    borderRadius: 2,
+                    boxShadow: '0 2px 8px rgba(255,255,255,0.08)',
+                    background: 'linear-gradient(135deg, rgba(66, 99, 235, 0.06) 0%, rgba(66, 133, 244, 0.04) 100%), #1a1f36',
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    transition: 'all 0.3s ease',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: '100%',
+                    '&:hover': {
+                      boxShadow: '0 4px 16px rgba(66, 99, 235, 0.15)',
+                      transform: 'translateY(-2px)',
+                      border: '1px solid rgba(66, 133, 244, 0.2)',
+                    }
+                  }}>
+                    <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 2, color: '#4285f4' }}>
+                      💳 Transações
+                    </Typography>
+                    <Box sx={{ flex: 1, minHeight: 220 }}>
+                      <Chart
+                        type="area"
+                        series={[
+                          { name: 'Depósitos', data: chartData.deposits },
+                          { name: 'Saques', data: chartData.withdrawals },
+                        ]}
+                        options={{
+                          chart: { type: 'area', stacked: false, fontFamily: 'Roboto', background: 'transparent' },
+                          xaxis: { categories: chartData.dates, labels: { style: { colors: '#9aa0a6', fontSize: '11px' } } },
+                          colors: ['#34a853', '#ea4335'],
+                          stroke: { curve: 'smooth', width: 2 },
+                          fill: { type: 'gradient', colors: ['rgba(52, 168, 83, 0.15)', 'rgba(234, 67, 53, 0.15)'] },
+                          tooltip: { theme: 'dark', style: { backgroundColor: '#202124', textColor: '#e8eaed', borderColor: '#4285f4' }, marker: { fillColors: ['#34a853', '#ea4335'] } },
+                          grid: { borderColor: 'rgba(255, 255, 255, 0.08)', strokeDashArray: 3 },
+                          legend: { position: 'bottom', labels: { colors: '#9aa0a6', fontSize: 11 } },
+                        }}
+                        height={220}
+                      />
+                    </Box>
+                  </Paper>
+                </Grid>
+
+                {/* Gráfico de Evolução do Saldo */}
+                <Grid item xs={12} sm={6} lg={4} sx={{ display: 'flex', flexDirection: 'column' }}>
+                  <Paper sx={{
+                    p: 2,
+                    borderRadius: 2,
+                    boxShadow: '0 2px 8px rgba(255,255,255,0.08)',
+                    background: 'linear-gradient(135deg, rgba(251, 188, 4, 0.06) 0%, rgba(251, 192, 45, 0.04) 100%), #1a1f36',
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    transition: 'all 0.3s ease',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: '100%',
+                    '&:hover': {
+                      boxShadow: '0 4px 16px rgba(251, 188, 4, 0.15)',
+                      transform: 'translateY(-2px)',
+                      border: '1px solid rgba(251, 188, 4, 0.2)',
+                    }
+                  }}>
+                    <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 2, color: '#fbbc04' }}>
+                      📈 Evolução do Saldo
+                    </Typography>
+                    <Box sx={{ flex: 1, minHeight: 220 }}>
+                      <Chart
+                        type="line"
+                        series={[{ name: 'Saldo', data: chartData.saldoEvolucao }]}
+                        options={{
+                          chart: { type: 'line', fontFamily: 'Roboto', background: 'transparent' },
+                          xaxis: { categories: chartData.dates, labels: { style: { colors: '#9aa0a6', fontSize: '11px' } } },
+                          colors: ['#fbbc04'],
+                          dataLabels: { enabled: false },
+                          stroke: { curve: 'smooth', width: 2.5 },
+                          fill: { type: 'gradient', colors: ['rgba(251, 188, 4, 0.15)'] },
+                          tooltip: { theme: 'dark', style: { backgroundColor: '#202124', textColor: '#e8eaed', borderColor: '#fbbc04' }, marker: { fillColors: ['#fbbc04'] } },
+                          grid: { borderColor: 'rgba(255, 255, 255, 0.08)', strokeDashArray: 3 },
+                          legend: { position: 'bottom', labels: { colors: '#9aa0a6', fontSize: 11 } },
+                        }}
+                        height={220}
+                      />
+                    </Box>
+                  </Paper>
+                </Grid>
+
+                {/* Gráfico de Distribuição */}
+                <Grid item xs={12} sm={6} lg={4} sx={{ display: 'flex', flexDirection: 'column' }}>
+                  <Paper sx={{
+                    p: 2,
+                    borderRadius: 2,
+                    boxShadow: '0 2px 8px rgba(255,255,255,0.08)',
+                    background: 'linear-gradient(135deg, rgba(156, 39, 176, 0.06) 0%, rgba(156, 39, 176, 0.04) 100%), #1a1f36',
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    transition: 'all 0.3s ease',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: '100%',
+                    '&:hover': {
+                      boxShadow: '0 4px 16px rgba(156, 39, 176, 0.15)',
+                      transform: 'translateY(-2px)',
+                      border: '1px solid rgba(156, 39, 176, 0.2)',
+                    }
+                  }}>
+                    <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 2, color: '#9c27b0' }}>
+                      🍕 Distribuição
+                    </Typography>
+                    <Box sx={{ flex: 1, minHeight: 220, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      {donutData && donutData.series.length > 0 ? (
+                        <Chart
+                          type="donut"
+                          series={donutData.series}
+                          options={{
+                            labels: donutData.labels,
+                            colors: ['#4285f4', '#34a853', '#fbbc04', '#ea4335', '#9c27b0'],
+                            legend: { position: 'bottom', fontFamily: 'Roboto', labels: { colors: '#9aa0a6' }, fontSize: 11 },
+                            dataLabels: { enabled: true, style: { fontSize: '12px', fontWeight: 700, colors: ['#fff'] }, background: { enabled: true, foreColor: '#202124', borderRadius: 2, padding: 3 } },
+                            tooltip: { theme: 'dark', style: { backgroundColor: '#202124', textColor: '#e8eaed', borderColor: '#4285f4' } },
+                            plotOptions: { pie: { donut: { size: '60%' } } },
+                          }}
+                          height={220}
+                        />
+                      ) : (
+                        <Typography sx={{ color: '#9aa0a6' }}>Nenhum investimento</Typography>
+                      )}
+                    </Box>
+                  </Paper>
+                </Grid>
+              </>
+            )}
+          </Grid>
+        </Box>

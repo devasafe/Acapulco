@@ -1,6 +1,6 @@
 import axios from '../api';
 
-const API_URL = '/users';
+const API_URL = '/auth';
 
 export const register = async (name, email, password, indicadoPor) => {
   return axios.post(`${API_URL}/register`, { name, email, password, indicadoPor });

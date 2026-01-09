@@ -2,30 +2,45 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const path = require('path');
 
 const app = express();
-app.use(cors());
+
+// ✓ CORS FIRST
+app.use(cors({
+  origin: ['http://localhost:3000', 'http://localhost:5000'],
+  credentials: true
+}));
+
+// ✓ JSON parser
 app.use(express.json());
 
-// Import routes
-const path = require('path');
-// Servir arquivos estáticos da pasta uploads
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-const userRoutes = require('./routes/userRoutes');
-const imovelRoutes = require('./routes/imovelRoutes');
-const walletRoutes = require('./routes/walletRoutes');
-const referralRoutes = require('./routes/referralRoutes');
-const transactionRoutes = require('./routes/transactionRoutes');
-const adminRoutes = require('./routes/adminRoutes');
-const investmentRoutes = require('./routes/investmentRoutes');
+// ✓ Servir uploads ANTES de tudo com headers CORS corretos
+app.use('/uploads', (req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  res.header('Cache-Control', 'public, max-age=3600');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+}, express.static(path.join(__dirname, 'uploads')));
 
+
+const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
+const cryptoRoutes = require('./routes/cryptoRoutes');
+const investmentRoutes = require('./routes/investmentRoutes');
+const walletRoutes = require('./routes/walletRoutes');
+const adminRoutes = require('./routes/adminRoutes');
+
+app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/imoveis', imovelRoutes);
-app.use('/api/wallet', walletRoutes);
-app.use('/api/referrals', referralRoutes);
-app.use('/api/transactions', transactionRoutes);
-app.use('/api/admin', adminRoutes);
+app.use('/api/cryptos', cryptoRoutes);
 app.use('/api/investments', investmentRoutes);
+app.use('/api/wallet', walletRoutes);
+app.use('/api/admin', adminRoutes);
 
 // MongoDB connection
 mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/acapulco', {
