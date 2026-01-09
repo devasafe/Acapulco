@@ -1048,16 +1048,19 @@ export default function DashboardPage() {
                   <Grid item xs={12} md={10}>
                     <Card sx={{ p: 2, backgroundColor: theme.darkLight, height: '240px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
                       <Typography variant="h6" sx={{ mb: 2, fontSize: '0.9rem', color: theme.textTertiary, width: '100%', textAlign: 'center' }}>
-                        🥧 Status dos Investimentos
+                        � Moedas Investidas
                       </Typography>
                       <ResponsiveContainer width="100%" height={180}>
                         <PieChart>
                           <Pie
-                            data={[
-                              { name: 'Ativos', value: stats.activeInvestments || 0 },
-                              { name: 'Completados', value: stats.completedInvestments || 0 },
-                              { name: 'Resgatados', value: stats.withdrawnInvestments || 0 },
-                            ].filter(d => d.value > 0)}
+                            data={(() => {
+                              const cryptoMap = {};
+                              investments.forEach(inv => {
+                                const cryptoName = inv.cryptoId?.symbol || inv.cryptoName || 'Outro';
+                                cryptoMap[cryptoName] = (cryptoMap[cryptoName] || 0) + (Number(inv.amount) || 0);
+                              });
+                              return Object.entries(cryptoMap).map(([name, value]) => ({ name, value })).filter(d => d.value > 0);
+                            })()}
                             cx="50%"
                             cy="50%"
                             innerRadius={50}
@@ -1070,6 +1073,8 @@ export default function DashboardPage() {
                             <Cell fill="#3B5BDB" />
                             <Cell fill="#10B981" />
                             <Cell fill="#F59E0B" />
+                            <Cell fill="#EF4444" />
+                            <Cell fill="#7C3AED" />
                           </Pie>
                           <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '4px' }} />
                         </PieChart>
