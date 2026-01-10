@@ -1148,10 +1148,10 @@ export default function DashboardPage() {
                           { 
                             tipo: 'Total', 
                             entrada: (stats.recentTransactions || [])
-                              .filter(t => ['deposit', 'referral_bonus'].includes(t.type))
+                              .filter(t => t.type === 'deposit')
                               .reduce((acc, t) => acc + (Number(t.amount) || 0), 0),
                             saida: (stats.recentTransactions || [])
-                              .filter(t => ['withdrawal', 'investment'].includes(t.type))
+                              .filter(t => t.type === 'withdrawal')
                               .reduce((acc, t) => acc + (Number(t.amount) || 0), 0),
                           }
                         ]} 
@@ -1162,8 +1162,8 @@ export default function DashboardPage() {
                         <YAxis stroke="#9CA3AF" style={{ fontSize: '12px' }} />
                         <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }} formatter={(value) => `R$ ${value.toFixed(2)}`} />
                         <Legend />
-                        <Bar dataKey="entrada" name="Entrada" fill="#10B981" radius={[8, 8, 0, 0]} />
-                        <Bar dataKey="saida" name="Saída" fill="#EF4444" radius={[8, 8, 0, 0]} />
+                        <Bar dataKey="entrada" name="Depósito" fill="#10B981" radius={[8, 8, 0, 0]} />
+                        <Bar dataKey="saida" name="Saque" fill="#EF4444" radius={[8, 8, 0, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
                   </ChartCard>
