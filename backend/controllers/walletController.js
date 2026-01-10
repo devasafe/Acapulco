@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const Transaction = require('../models/Transaction');
 const Setting = require('../models/Setting');
+const { updateUserStats } = require('../utils/updateUserStats');
 
 exports.getWallet = async (req, res) => {
   try {
@@ -35,6 +36,9 @@ exports.deposit = async (req, res) => {
     });
     await transaction.save();
 
+    // Atualizar stats do usuário
+    await updateUserStats(user._id);
+
     // If first deposit and user has a referrer, calculate bonus
     if (!previousDeposits && user.referredBy) {
       try {
@@ -55,6 +59,9 @@ exports.deposit = async (req, res) => {
             description: `Bônus de referência - ${user.name} fez primeiro depósito de R$ ${Number(amount).toFixed(2)}`
           });
           await bonusTransaction.save();
+
+          // Atualizar stats do referrer
+          await updateUserStats(referrer._id);
         }
       } catch (bonusErr) {
         console.error('Error processing referral bonus:', bonusErr);
@@ -88,6 +95,9 @@ exports.withdraw = async (req, res) => {
       description: 'Saque de carteira'
     });
     await transaction.save();
+
+    // Atualizar stats do usuário
+    await updateUserStats(user._id);
 
     res.json({ wallet: user.wallet });
   } catch (err) {

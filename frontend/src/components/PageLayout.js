@@ -61,6 +61,13 @@ export default function PageLayout({ children }) {
           <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
             <Button
               color="inherit"
+              onClick={() => navigate('/')}
+              sx={{ color: theme.textSecondary, '&:hover': { color: theme.primary } }}
+            >
+              Início
+            </Button>
+            <Button
+              color="inherit"
               onClick={() => navigate('/dashboard')}
               sx={{ color: theme.textSecondary, '&:hover': { color: theme.primary } }}
             >

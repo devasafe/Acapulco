@@ -2,6 +2,7 @@ const Investment = require('../models/Investment');
 const User = require('../models/User');
 const Transaction = require('../models/Transaction');
 const Crypto = require('../models/Crypto');
+const { updateUserStats } = require('../utils/updateUserStats');
 
 // Get user's investments
 exports.getMyInvestments = async (req, res) => {
@@ -64,6 +65,9 @@ exports.createInvestment = async (req, res) => {
     });
     await transaction.save();
 
+    // Atualizar stats do usuário
+    await updateUserStats(req.user.userId);
+
     res.status(201).json(investment);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -104,6 +108,9 @@ exports.withdrawInvestment = async (req, res) => {
       relatedInvestment: investment._id
     });
     await redemptionTransaction.save();
+
+    // Atualizar stats do usuário
+    await updateUserStats(req.user.userId);
 
     res.json({ message: 'Investment withdrawn', totalReturn });
   } catch (err) {

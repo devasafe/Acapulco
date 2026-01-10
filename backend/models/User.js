@@ -10,6 +10,12 @@ const userSchema = new mongoose.Schema({
   isActive: { type: Boolean, default: true },
   wallet: { type: Number, default: 0 },
   
+  // Histórico de valores
+  totalInvested: { type: Number, default: 0 },
+  totalRealizedProfit: { type: Number, default: 0 },
+  totalWithdrawn: { type: Number, default: 0 },
+  totalReferralBonus: { type: Number, default: 0 },
+  
   // Referral System
   referralCode: { 
     type: String, 

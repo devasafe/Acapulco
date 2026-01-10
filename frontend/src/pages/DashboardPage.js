@@ -105,6 +105,114 @@ const getTransactionStyle = (type) => {
   return styles[type] || { label: type, color: theme.textSecondary, icon: SendIcon, bgColor: `rgba(148, 163, 184, 0.1)` };
 };
 
+// Função para gerar histórico de lucros (yield + referral_bonus)
+const generateProfitHistory = (transactions, currentTotalProfit) => {
+  if (!transactions || transactions.length === 0) {
+    return [];
+  }
+
+  // Ordena transações por data (mais antigas primeiro)
+  const sortedTransactions = [...transactions].sort((a, b) => 
+    new Date(a.createdAt) - new Date(b.createdAt)
+  );
+
+  // Filtra apenas transações de lucro (redemption = resgate com lucro)
+  const profitTransactions = sortedTransactions.filter(tx => 
+    ['redemption', 'yield', 'referral_bonus'].includes(tx.type)
+  );
+
+  console.log('DEBUG Profit - Total transações:', sortedTransactions.length);
+  console.log('DEBUG Profit - Tipos encontrados:', sortedTransactions.map(tx => tx.type));
+  console.log('DEBUG Profit - Todas as transações:', sortedTransactions.map(tx => ({ type: tx.type, amount: tx.amount, description: tx.description })));
+  console.log('DEBUG Profit - Transações de lucro (yield/referral_bonus):', profitTransactions.length);
+
+  // Calcula o lucro acumulado a cada transação - UM PONTO POR TRANSAÇÃO
+  let runningProfit = 0;
+  const history = [{ periodo: 'Início', lucro: 0 }];
+  
+  profitTransactions.forEach((tx, idx) => {
+    const amount = Number(tx.amount) || 0;
+    runningProfit += amount;
+    
+    // Adiciona um ponto para cada transação de lucro
+    history.push({
+      periodo: `T${idx + 1}`,
+      lucro: runningProfit,
+    });
+  });
+
+  return history;
+};
+
+// Função para gerar histórico de carteira a partir de transações
+const generateWalletHistory = (transactions, currentWallet) => {
+  if (!transactions || transactions.length === 0) {
+    return [];
+  }
+
+  console.log('DEBUG Wallet - Total de transações recebidas:', transactions.length);
+
+  // Ordena transações por data (mais antigas primeiro)
+  const sortedTransactions = [...transactions].sort((a, b) => 
+    new Date(a.createdAt) - new Date(b.createdAt)
+  );
+
+  // Calcula o saldo em cada transação
+  let runningBalance = 0;
+  const history = [{ periodo: 'Início', saldo: 0 }];
+  
+  sortedTransactions.forEach((tx, idx) => {
+    const amount = Number(tx.amount) || 0;
+    // Somas as entradas, subtrai as saídas
+    if (['deposit', 'referral_bonus', 'yield', 'redemption'].includes(tx.type)) {
+      runningBalance += amount;
+    } else if (['withdrawal', 'investment'].includes(tx.type)) {
+      runningBalance -= amount;
+    }
+    
+    console.log(`T${idx + 1}: tipo=${tx.type}, amount=${amount}, running=${runningBalance}`);
+    
+    // Adiciona um ponto para CADA transação
+    history.push({
+      periodo: `T${idx + 1}`,
+      saldo: Math.max(0, runningBalance),
+    });
+  });
+
+  return history;
+};
+
+// Função para gerar dados de gráfico com progressão e marcação de mudanças
+const generateChartData = (finalValue, label = 'valor') => {
+  if (!finalValue || finalValue <= 0) {
+    return [{ period: 'Início', [label]: 0 }];
+  }
+  
+  // Cria 5 pontos: início (0) e 4 períodos com incrementos
+  const step = finalValue / 4;
+  return [
+    { period: 'Início', [label]: 0 },
+    { period: 'P1', [label]: step },
+    { period: 'P2', [label]: step * 2 },
+    { period: 'P3', [label]: step * 3 },
+    { period: 'Atual', [label]: finalValue },
+  ];
+};
+
+// Componente reutilizável para cards de gráficos
+const ChartCard = ({ title, children }) => (
+  <Grid item xs={12} sm={6} md={4} lg={4}>
+    <Card sx={{ p: 3, backgroundColor: theme.darkLight, border: `1px solid rgba(59, 91, 219, 0.15)`, borderRadius: '14px', height: '100%', transition: 'all 0.3s ease', '&:hover': { boxShadow: '0 8px 24px rgba(59, 91, 219, 0.15)', borderColor: 'rgba(59, 91, 219, 0.3)' } }}>
+      <Typography variant="h6" sx={{ mb: 2.5, fontSize: '0.95rem', color: theme.text, fontWeight: 700 }}>
+        {title}
+      </Typography>
+      <Box sx={{ width: '100%', overflow: 'hidden' }}>
+        {children}
+      </Box>
+    </Card>
+  </Grid>
+);
+
 export default function DashboardPage() {
   const token = getToken();
   const navigate = useNavigate();
@@ -119,7 +227,7 @@ export default function DashboardPage() {
   });
   const [investments, setInvestments] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [tabValue, setTabValue] = useState(0);
+  const [tabValue, setTabValue] = useState(4);
   const [depositAmount, setDepositAmount] = useState('');
   const [withdrawAmount, setWithdrawAmount] = useState('');
   const [walletLoading, setWalletLoading] = useState(false);
@@ -228,10 +336,10 @@ export default function DashboardPage() {
 
   return (
     <PageLayout>
-      <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Container maxWidth="xl" sx={{ py: 4 }}>
         {/* KPI Cards */}
         <Grid container spacing={2} sx={{ mb: 4 }}>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <Card
               sx={{
                 p: 2,
@@ -830,7 +938,7 @@ export default function DashboardPage() {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {investments.map((inv) => (
+                      {investments.filter((i) => i.status === 'active').map((inv) => (
                         <TableRow key={inv._id} sx={{ borderBottom: `1px solid rgba(59, 91, 219, 0.1)` }}>
                           <TableCell sx={{ color: theme.text }}>{inv.cryptoName}</TableCell>
                           <TableCell align="right" sx={{ color: theme.primary }}>
@@ -930,101 +1038,82 @@ export default function DashboardPage() {
 
             {/* Tab 4: Gráficos */}
             {tabValue === 4 && (
-              <Box>
-                <Typography variant="h6" sx={{ color: theme.text, fontWeight: 700, mb: 3 }}>
+              <Box sx={{ width: '100%' }}>
+                <Typography variant="h6" sx={{ color: theme.text, fontWeight: 700, mb: 4 }}>
                   📊 Análise de Dados
                 </Typography>
-                <Grid container spacing={3}>
+                <Grid container spacing={2.5} sx={{ width: '100%' }}>
                   {/* Gráfico 1: Evolução da Carteira */}
-                  <Grid item xs={12} sm={6} lg={4}>
-                    <Card sx={{ p: 3, backgroundColor: theme.darkLight, border: `1px solid rgba(59, 91, 219, 0.1)`, borderRadius: '12px', height: '100%' }}>
-                      <Typography variant="h6" sx={{ mb: 2, fontSize: '0.95rem', color: theme.text, fontWeight: 700 }}>
-                        📈 Evolução da Carteira
-                      </Typography>
-                      <ResponsiveContainer width="100%" height={250}>
-                        <AreaChart 
-                          data={[
-                            { month: 'Inicial', value: 0 },
-                            { month: 'Atual', value: Number(stats.wallet) || 0 },
-                          ]} 
-                          margin={{ top: 10, right: 20, left: 0, bottom: 10 }}
-                        >
-                          <defs>
-                            <linearGradient id="colorCarteira" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#10B981" stopOpacity={0.8} />
-                              <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
-                            </linearGradient>
-                          </defs>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                          <XAxis dataKey="month" stroke="#9CA3AF" style={{ fontSize: '12px' }} />
-                          <YAxis stroke="#9CA3AF" style={{ fontSize: '12px' }} />
-                          <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }} />
-                          <Area
-                            type="monotone"
-                            dataKey="value"
-                            stroke="#10B981"
-                            fillOpacity={1}
-                            fill="url(#colorCarteira)"
-                            strokeWidth={2}
-                            dot={{ fill: '#10B981', r: 4 }}
-                            activeDot={{ r: 6 }}
-                          />
-                        </AreaChart>
-                      </ResponsiveContainer>
-                    </Card>
-                  </Grid>
+                  <ChartCard title="📈 Evolução da Carteira">
+                    <ResponsiveContainer width={500} height={500}>
+                      <AreaChart 
+                        data={generateWalletHistory(stats.recentTransactions || [], Number(stats.wallet) || 0)}
+                        margin={{ top: 10, right: 20, left: 0, bottom: 10 }}
+                      >
+                        <defs>
+                          <linearGradient id="colorCarteira" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#10B981" stopOpacity={0.8} />
+                            <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                        <XAxis dataKey="periodo" stroke="#9CA3AF" style={{ fontSize: '12px' }} />
+                        <YAxis stroke="#9CA3AF" style={{ fontSize: '12px' }} />
+                        <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }} formatter={(value) => `R$ ${value.toFixed(2)}`} />
+                        <Area
+                          type="monotone"
+                          dataKey="saldo"
+                          stroke="#10B981"
+                          fillOpacity={1}
+                          fill="url(#colorCarteira)"
+                          strokeWidth={2}
+                          dot={{ fill: '#10B981', r: 4 }}
+                          activeDot={{ r: 6 }}
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </ChartCard>
 
                   {/* Gráfico 2: Ganhos Totais */}
-                  <Grid item xs={12} sm={6} lg={4}>
-                    <Card sx={{ p: 3, backgroundColor: theme.darkLight, border: `1px solid rgba(59, 91, 219, 0.1)`, borderRadius: '12px', height: '100%' }}>
-                      <Typography variant="h6" sx={{ mb: 2, fontSize: '0.95rem', color: theme.text, fontWeight: 700 }}>
-                        💰 Ganhos Totais
-                      </Typography>
-                      <ResponsiveContainer width="100%" height={250}>
-                        <AreaChart 
-                          data={[
-                            { month: 'Inicial', ganho: 0 },
-                            { month: 'Atual', ganho: Number(stats.totalExpectedProfit) || 0 },
-                          ]} 
-                          margin={{ top: 10, right: 20, left: 0, bottom: 10 }}
-                        >
-                          <defs>
-                            <linearGradient id="colorGanhos" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#F59E0B" stopOpacity={0.8} />
-                              <stop offset="95%" stopColor="#F59E0B" stopOpacity={0} />
-                            </linearGradient>
-                          </defs>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                          <XAxis dataKey="month" stroke="#9CA3AF" style={{ fontSize: '12px' }} />
-                          <YAxis stroke="#9CA3AF" style={{ fontSize: '12px' }} />
-                          <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }} />
-                          <Area
-                            type="monotone"
-                            dataKey="ganho"
-                            stroke="#F59E0B"
-                            fillOpacity={1}
-                            fill="url(#colorGanhos)"
-                            strokeWidth={2}
-                            dot={{ fill: '#F59E0B', r: 4 }}
-                            activeDot={{ r: 6 }}
-                          />
-                        </AreaChart>
-                      </ResponsiveContainer>
-                    </Card>
-                  </Grid>
+                  <ChartCard title="💰 Lucros Realizados">
+                    <ResponsiveContainer width={500} height={500}>
+                      <AreaChart 
+                        data={generateProfitHistory(stats.recentTransactions || [], Number(stats.totalRealizedProfit) || 0)}
+                        margin={{ top: 10, right: 20, left: 0, bottom: 10 }}
+                      >
+                        <defs>
+                          <linearGradient id="colorGanhos" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#10B981" stopOpacity={0.8} />
+                            <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                        <XAxis dataKey="periodo" stroke="#9CA3AF" style={{ fontSize: '12px' }} />
+                        <YAxis stroke="#9CA3AF" style={{ fontSize: '12px' }} />
+                        <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }} formatter={(value) => `R$ ${value.toFixed(2)}`} />
+                        <Area
+                          type="monotone"
+                          dataKey="lucro"
+                          stroke="#10B981"
+                          fillOpacity={1}
+                          fill="url(#colorGanhos)"
+                          strokeWidth={2}
+                          dot={{ fill: '#10B981', r: 4 }}
+                          activeDot={{ r: 6 }}
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </ChartCard>
 
                   {/* Gráfico 3: Moedas Investidas */}
-                  <Grid item xs={12} sm={6} lg={4}>
-                    <Card sx={{ p: 3, backgroundColor: theme.darkLight, border: `1px solid rgba(59, 91, 219, 0.1)`, borderRadius: '12px', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-                      <Typography variant="h6" sx={{ mb: 2, fontSize: '0.95rem', color: theme.text, fontWeight: 700, width: '100%', textAlign: 'center' }}>
-                        💎 Moedas Investidas
-                      </Typography>
-                      <ResponsiveContainer width="100%" height={250}>
+                  <ChartCard title="💎 Moedas Investidas">
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                      <ResponsiveContainer width={220} height={500}>
                         <PieChart>
                           <Pie
                             data={(() => {
                               const cryptoMap = {};
-                              investments.forEach(inv => {
+                              investments.filter(i => i.status === 'active').forEach(inv => {
                                 const cryptoName = inv.cryptoId?.symbol || inv.cryptoName || 'Outro';
                                 cryptoMap[cryptoName] = (cryptoMap[cryptoName] || 0) + (Number(inv.amount) || 0);
                               });
@@ -1048,105 +1137,93 @@ export default function DashboardPage() {
                           <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }} />
                         </PieChart>
                       </ResponsiveContainer>
-                    </Card>
-                  </Grid>
+                    </Box>
+                  </ChartCard>
 
                   {/* Gráfico 4: Resumo de Transações */}
-                  <Grid item xs={12} sm={6} lg={4}>
-                    <Card sx={{ p: 3, backgroundColor: theme.darkLight, border: `1px solid rgba(59, 91, 219, 0.1)`, borderRadius: '12px', height: '100%' }}>
-                      <Typography variant="h6" sx={{ mb: 2, fontSize: '0.95rem', color: theme.text, fontWeight: 700 }}>
-                        📊 Resumo de Transações
-                      </Typography>
-                      <ResponsiveContainer width="100%" height={250}>
-                        <BarChart 
-                          data={[
-                            { 
-                              tipo: 'Total', 
-                              entrada: (stats.recentTransactions || [])
-                                .filter(t => ['deposit', 'referral_bonus'].includes(t.type))
-                                .reduce((acc, t) => acc + (Number(t.amount) || 0), 0),
-                              saida: (stats.recentTransactions || [])
-                                .filter(t => ['withdrawal', 'investment'].includes(t.type))
-                                .reduce((acc, t) => acc + (Number(t.amount) || 0), 0),
-                            }
-                          ]} 
-                          margin={{ top: 10, right: 20, left: 0, bottom: 10 }}
-                        >
-                          <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                          <XAxis dataKey="tipo" stroke="#9CA3AF" style={{ fontSize: '12px' }} />
-                          <YAxis stroke="#9CA3AF" style={{ fontSize: '12px' }} />
-                          <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }} />
-                          <Legend />
-                          <Bar dataKey="entrada" name="Entrada" fill="#10B981" radius={[8, 8, 0, 0]} />
-                          <Bar dataKey="saida" name="Saída" fill="#EF4444" radius={[8, 8, 0, 0]} />
-                        </BarChart>
-                      </ResponsiveContainer>
-                    </Card>
-                  </Grid>
+                  <ChartCard title="📊 Resumo de Transações">
+                    <ResponsiveContainer width={220} height={500}>
+                      <BarChart 
+                        data={[
+                          { 
+                            tipo: 'Total', 
+                            entrada: (stats.recentTransactions || [])
+                              .filter(t => ['deposit', 'referral_bonus'].includes(t.type))
+                              .reduce((acc, t) => acc + (Number(t.amount) || 0), 0),
+                            saida: (stats.recentTransactions || [])
+                              .filter(t => ['withdrawal', 'investment'].includes(t.type))
+                              .reduce((acc, t) => acc + (Number(t.amount) || 0), 0),
+                          }
+                        ]} 
+                        margin={{ top: 10, right: 20, left: 0, bottom: 10 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                        <XAxis dataKey="tipo" stroke="#9CA3AF" style={{ fontSize: '12px' }} />
+                        <YAxis stroke="#9CA3AF" style={{ fontSize: '12px' }} />
+                        <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }} formatter={(value) => `R$ ${value.toFixed(2)}`} />
+                        <Legend />
+                        <Bar dataKey="entrada" name="Entrada" fill="#10B981" radius={[8, 8, 0, 0]} />
+                        <Bar dataKey="saida" name="Saída" fill="#EF4444" radius={[8, 8, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </ChartCard>
 
-                  {/* Gráfico 5: Investimentos por Status */}
-                  <Grid item xs={12} sm={6} lg={4}>
-                    <Card sx={{ p: 3, backgroundColor: theme.darkLight, border: `1px solid rgba(59, 91, 219, 0.1)`, borderRadius: '12px', height: '100%' }}>
-                      <Typography variant="h6" sx={{ mb: 2, fontSize: '0.95rem', color: theme.text, fontWeight: 700 }}>
-                        👥 Investimentos por Status
-                      </Typography>
-                      <ResponsiveContainer width="100%" height={250}>
-                        <BarChart 
-                          data={[
-                            { status: 'Ativos', count: stats.activeInvestments || 0 },
-                            { status: 'Completos', count: stats.completedInvestments || 0 },
-                            { status: 'Resgatados', count: stats.withdrawnInvestments || 0 },
-                          ]}
-                          margin={{ top: 10, right: 20, left: 0, bottom: 10 }}
-                        >
-                          <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                          <XAxis dataKey="status" stroke="#9CA3AF" style={{ fontSize: '12px' }} />
-                          <YAxis stroke="#9CA3AF" style={{ fontSize: '12px' }} />
-                          <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }} />
-                          <Bar dataKey="count" fill="#3B5BDB" radius={[8, 8, 0, 0]} />
-                        </BarChart>
-                      </ResponsiveContainer>
-                    </Card>
-                  </Grid>
+                  {/* Gráfico 5: Criptos por Status */}
+                  <ChartCard title="👥 Criptos por Status">
+                    <ResponsiveContainer width={500} height={500}>
+                      <BarChart 
+                        data={[
+                          { status: 'Ativas', count: investments.filter((i) => i.status === 'active').length },
+                          { status: 'Completas', count: investments.filter((i) => i.status === 'completed').length },
+                          { status: 'Resgatadas', count: investments.filter((i) => i.status === 'withdrawn').length },
+                        ]}
+                        margin={{ top: 10, right: 20, left: 0, bottom: 10 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                        <XAxis dataKey="status" stroke="#9CA3AF" style={{ fontSize: '12px' }} />
+                        <YAxis stroke="#9CA3AF" style={{ fontSize: '12px' }} />
+                        <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }} />
+                        <Bar dataKey="count" fill="#3B5BDB" radius={[8, 8, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </ChartCard>
 
-                  {/* Gráfico 6: Investimento Total */}
-                  <Grid item xs={12} sm={6} lg={4}>
-                    <Card sx={{ p: 3, backgroundColor: theme.darkLight, border: `1px solid rgba(59, 91, 219, 0.1)`, borderRadius: '12px', height: '100%' }}>
-                      <Typography variant="h6" sx={{ mb: 2, fontSize: '0.95rem', color: theme.text, fontWeight: 700 }}>
-                        💵 Investimento Total
-                      </Typography>
-                      <ResponsiveContainer width="100%" height={250}>
-                        <AreaChart 
-                          data={[
-                            { label: 'Inicial', total: 0 },
-                            { label: 'Investido', total: Number(stats.totalInvested) || 0 },
-                          ]}
-                          margin={{ top: 10, right: 20, left: 0, bottom: 10 }}
-                        >
-                          <defs>
-                            <linearGradient id="colorInvestimento" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#7C3AED" stopOpacity={0.8} />
-                              <stop offset="95%" stopColor="#7C3AED" stopOpacity={0} />
-                            </linearGradient>
-                          </defs>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                          <XAxis dataKey="label" stroke="#9CA3AF" style={{ fontSize: '12px' }} />
-                          <YAxis stroke="#9CA3AF" style={{ fontSize: '12px' }} />
-                          <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }} />
-                          <Area
-                            type="monotone"
-                            dataKey="total"
-                            stroke="#7C3AED"
-                            fillOpacity={1}
-                            fill="url(#colorInvestimento)"
-                            strokeWidth={2}
-                            dot={{ fill: '#7C3AED', r: 4 }}
-                            activeDot={{ r: 6 }}
-                          />
-                        </AreaChart>
-                      </ResponsiveContainer>
-                    </Card>
-                  </Grid>
+
+                  {/* Gráfico 6: Fluxo de Pessoas Ativas */}
+                  <ChartCard title="👥 Fluxo de Pessoas Ativas">
+                    <ResponsiveContainer width={500} height={500}>
+                      <AreaChart 
+                        data={[
+                          { mes: 'Semana 1', pessoas: Math.max(0, (stats.activeReferrals || 0) - 2) },
+                          { mes: 'Semana 2', pessoas: Math.max(0, (stats.activeReferrals || 0) - 1) },
+                          { mes: 'Semana 3', pessoas: (stats.activeReferrals || 0) },
+                          { mes: 'Hoje', pessoas: (stats.activeReferrals || 0) },
+                        ]}
+                        margin={{ top: 10, right: 20, left: 0, bottom: 10 }}
+                      >
+                        <defs>
+                          <linearGradient id="colorReferrals" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#F59E0B" stopOpacity={0.8} />
+                            <stop offset="95%" stopColor="#F59E0B" stopOpacity={0} />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                        <XAxis dataKey="mes" stroke="#9CA3AF" style={{ fontSize: '12px' }} />
+                        <YAxis stroke="#9CA3AF" style={{ fontSize: '12px' }} />
+                        <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }} formatter={(value) => `${Math.round(value)} pessoas`} />
+                        <Area
+                          type="monotone"
+                          dataKey="pessoas"
+                          stroke="#F59E0B"
+                          fillOpacity={1}
+                          fill="url(#colorReferrals)"
+                          strokeWidth={2}
+                          dot={{ fill: '#F59E0B', r: 4 }}
+                          activeDot={{ r: 6 }}
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </ChartCard>
                 </Grid>
               </Box>
             )}

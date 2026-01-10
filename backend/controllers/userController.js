@@ -77,37 +77,19 @@ exports.getDashboardStats = async (req, res) => {
     const investments = await Investment.find({ userId });
     const transactions = await Transaction.find({ userId });
 
-    // Calcular totais
-    const totalInvested = investments
-      .filter(inv => inv.status === 'active')
-      .reduce((sum, inv) => sum + (Number(inv.amount) || 0), 0);
-    
-    const totalDeposits = transactions
-      .filter(t => t.type === 'deposit')
-      .reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
-    
-    // Lucro realizado = soma dos lucros esperados dos investimentos já resgatados
-    const completedInvestments = investments.filter(inv => inv.status === 'withdrawn');
-    const totalRealizedProfit = completedInvestments
-      .reduce((sum, inv) => sum + (Number(inv.expectedProfit) || 0), 0);
-
     // Contar usuários indicados ativos
     const activeReferrals = (user.referrals && Array.isArray(user.referrals)) 
       ? user.referrals.filter(ref => ref && ref.isActive === true).length 
       : 0;
 
-    // Calcular total recebido por referência
-    const referralBonuses = transactions.filter(t => t.type === 'referral_bonus');
-    const totalReferralBonus = referralBonuses.reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
-
     res.json({
       wallet: user.wallet,
-      totalInvested,
-      totalDeposits,
-      totalRealizedProfit,
+      totalInvested: user.totalInvested || 0,
+      totalRealizedProfit: user.totalRealizedProfit || 0,
+      totalWithdrawn: user.totalWithdrawn || 0,
+      totalReferralBonus: user.totalReferralBonus || 0,
       activeReferrals,
-      totalReferralBonus,
-      recentTransactions: transactions.sort((a, b) => b.createdAt - a.createdAt).slice(0, 10)
+      recentTransactions: transactions.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
     });
   } catch (error) {
     res.status(500).json({ error: error.message });

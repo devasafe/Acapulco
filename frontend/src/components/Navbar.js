@@ -19,6 +19,7 @@ import {
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import LogoutIcon from '@mui/icons-material/Logout';
+import HomeIcon from '@mui/icons-material/Home';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import CurrencyBitcoinIcon from '@mui/icons-material/CurrencyBitcoin';
@@ -41,6 +42,7 @@ export default function Navbar({ user, onLogout }) {
   const handleMenuClose = () => setAnchorEl(null);
 
   const menuItems = [
+    { label: 'Início', icon: <HomeIcon />, path: '/' },
     { label: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
     { label: 'Perfil', icon: <PersonIcon />, path: '/profile' },
     { label: 'Referências', icon: <ShareIcon />, path: '/referrals' },
@@ -49,6 +51,14 @@ export default function Navbar({ user, onLogout }) {
     ] : []),
   ];
 
+  // Menu items visíveis sem estar logado
+  const publicMenuItems = [
+    { label: 'Início', icon: <HomeIcon />, path: '/' },
+  ];
+
+  // Items para renderizar baseado em login
+  const displayMenuItems = user ? menuItems : publicMenuItems;
+
   const handleLogoutClick = () => {
     handleMenuClose();
     onLogout();
@@ -56,7 +66,7 @@ export default function Navbar({ user, onLogout }) {
 
   const renderMenuItems = () => (
     <>
-      {menuItems.map((item) => (
+      {displayMenuItems.map((item) => (
         <ListItem key={item.path} disablePadding>
           <ListItemButton
             onClick={() => {
@@ -95,7 +105,7 @@ export default function Navbar({ user, onLogout }) {
       >
         {/* Logo */}
         <Box
-          onClick={() => navigate('/dashboard')}
+          onClick={() => navigate('/')}
           sx={{
             cursor: 'pointer',
             fontWeight: 700,
@@ -119,7 +129,7 @@ export default function Navbar({ user, onLogout }) {
         {/* Desktop Menu */}
         {!isMobile && (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {menuItems.map((item) => (
+            {displayMenuItems.map((item) => (
               <Button
                 key={item.path}
                 onClick={() => navigate(item.path)}
