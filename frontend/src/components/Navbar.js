@@ -28,6 +28,8 @@ import PersonIcon from '@mui/icons-material/Person';
 import NetworkCheckIcon from '@mui/icons-material/NetworkCheck';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import ShareIcon from '@mui/icons-material/Share';
+import EmailIcon from '@mui/icons-material/Email';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
 
@@ -41,23 +43,9 @@ export default function Navbar({ user, onLogout }) {
   const handleMenuOpen = (e) => setAnchorEl(e.currentTarget);
   const handleMenuClose = () => setAnchorEl(null);
 
-  const menuItems = [
-    { label: 'Início', icon: <HomeIcon />, path: '/' },
-    { label: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
-    { label: 'Perfil', icon: <PersonIcon />, path: '/profile' },
-    { label: 'Referências', icon: <ShareIcon />, path: '/referrals' },
-    ...(user?.isAdmin ? [
-      { label: 'Painel Admin', icon: <AdminPanelSettingsIcon />, path: '/admin' },
-    ] : []),
-  ];
-
-  // Menu items visíveis sem estar logado
-  const publicMenuItems = [
-    { label: 'Início', icon: <HomeIcon />, path: '/' },
-  ];
 
   // Items para renderizar baseado em login
-  const displayMenuItems = user ? menuItems : publicMenuItems;
+  const displayMenuItems = user ? [...alwaysVisibleItems, ...userOnlyItems] : alwaysVisibleItems;
 
   const handleLogoutClick = () => {
     handleMenuClose();

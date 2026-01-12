@@ -16,6 +16,8 @@ import CryptoDetailPage from './pages/CryptoDetailPage';
 import ReferralNetworkPage from './pages/ReferralNetworkPage';
 import AdminReferralSettingsPage from './pages/AdminReferralSettingsPage';
 import AdminReferralProfitsPage from './pages/AdminReferralProfitsPage';
+import ContactPage from './pages/ContactPage';
+import AboutPage from './pages/AboutPage';
 
 // Components
 import ProtectedRoute from './components/ProtectedRoute';
@@ -44,6 +46,8 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/about" element={<AboutPage />} />
 
           {/* Protected Routes */}
           <Route

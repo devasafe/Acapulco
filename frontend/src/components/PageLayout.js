@@ -87,6 +87,25 @@ export default function PageLayout({ children }) {
             >
               Perfil
             </Button>
+
+
+            <Button
+              color="inherit"
+              onClick={() => navigate('/about')}
+              sx={{ color: theme.textSecondary, '&:hover': { color: theme.primary } }}
+            >
+              Sobre
+            </Button>
+
+            <Button
+              color="inherit"
+              onClick={() => navigate('/contact')}
+              sx={{ color: theme.textSecondary, '&:hover': { color: theme.primary } }}
+            >
+              Contato
+            </Button>
+
+
             {user?.isAdmin && (
               <Button
                 color="inherit"

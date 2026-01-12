@@ -938,7 +938,7 @@ export default function DashboardPage() {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {investments.filter((i) => i.status === 'active').map((inv) => (
+                      {investments.map((inv) => (
                         <TableRow key={inv._id} sx={{ borderBottom: `1px solid rgba(59, 91, 219, 0.1)` }}>
                           <TableCell sx={{ color: theme.text }}>{inv.cryptoName}</TableCell>
                           <TableCell align="right" sx={{ color: theme.primary }}>

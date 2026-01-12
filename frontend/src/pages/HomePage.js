@@ -17,14 +17,14 @@ import LanguageIcon from '@mui/icons-material/Language';
 import PageLayout from '../components/PageLayout';
 
 const theme = {
-  primary: '#3B5BDB',
+  primary: '#7C3AED',
   secondary: '#6B46C1',
   success: '#10B981',
   error: '#EF4444',
   warning: '#F59E0B',
-  dark: '#0F1117',
-  darkLight: '#1A1F2E',
-  darker: '#252D3D',
+  dark: '#0a0e27',
+  darkLight: 'rgba(26, 26, 77, 0.6)',
+  darker: 'rgba(45, 27, 78, 0.6)',
   text: '#F1F5F9',
   textSecondary: '#CBD5E1',
   textTertiary: '#94A3B8',
@@ -33,26 +33,26 @@ const theme = {
 const FeatureCard = ({ icon: Icon, title, description }) => (
   <Card
     sx={{
-      p: 3,
+      p: 1.5,
       backgroundColor: theme.darkLight,
-      border: `1px solid rgba(59, 91, 219, 0.15)`,
+      border: `1px solid rgba(124, 58, 237, 0.2)`,
       borderRadius: '14px',
       textAlign: 'center',
       transition: 'all 0.3s ease',
       '&:hover': {
         transform: 'translateY(-8px)',
-        boxShadow: '0 8px 24px rgba(59, 91, 219, 0.2)',
-        borderColor: 'rgba(59, 91, 219, 0.3)',
+        boxShadow: '0 8px 24px rgba(124, 58, 237, 0.2)',
+        borderColor: 'rgba(124, 58, 237, 0.4)',
       },
     }}
   >
-    <Box sx={{ mb: 2 }}>
-      <Icon sx={{ fontSize: 48, color: theme.primary }} />
+    <Box sx={{ mb: 1 }}>
+      <Icon sx={{ fontSize: 32, color: theme.primary }} />
     </Box>
-    <Typography variant="h6" sx={{ mb: 1, color: theme.text, fontWeight: 700 }}>
+    <Typography variant="body2" sx={{ mb: 0.6, color: theme.text, fontWeight: 700, fontSize: '0.9rem' }}>
       {title}
     </Typography>
-    <Typography sx={{ color: theme.textSecondary, fontSize: '0.95rem' }}>
+    <Typography sx={{ color: theme.textSecondary, fontSize: '0.75rem' }}>
       {description}
     </Typography>
   </Card>
@@ -78,6 +78,23 @@ const StatCard = ({ value, label }) => (
 
 export default function HomePage() {
   const navigate = useNavigate();
+  const token = localStorage.getItem('token');
+
+  const handleComecaAgora = () => {
+    if (token) {
+      navigate('/cryptos');
+    } else {
+      navigate('/login');
+    }
+  };
+
+  const handleCriarConta = () => {
+    if (token) {
+      navigate('/dashboard');
+    } else {
+      navigate('/register');
+    }
+  };
 
   return (
     <PageLayout>
@@ -85,29 +102,39 @@ export default function HomePage() {
         {/* Hero Section */}
         <Box
           sx={{
-            background: `linear-gradient(135deg, ${theme.primary} 0%, ${theme.secondary} 100%)`,
+            background: `
+              linear-gradient(135deg, #0a0e27 0%, #1a1a4d 15%, #2d1b4e 30%, #3d2e5f 45%, #2a1f4d 60%, #1a1a3e 75%, #0f172a 100%)
+            `,
             py: 12,
             position: 'relative',
             overflow: 'hidden',
             '&::before': {
               content: '""',
               position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: 'radial-gradient(circle at 20% 50%, rgba(59, 91, 219, 0.2) 0%, transparent 50%)',
+              top: '0',
+              left: '0',
+              right: '0',
+              bottom: '0',
+              background: `
+                radial-gradient(circle at 15% 25%, rgba(124, 58, 237, 0.25) 0%, transparent 40%),
+                radial-gradient(circle at 85% 75%, rgba(59, 91, 219, 0.2) 0%, transparent 45%),
+                radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 20% 80%, rgba(99, 102, 241, 0.15) 0%, transparent 40%)
+              `,
+              mixBlendMode: 'overlay',
               pointerEvents: 'none',
+              zIndex: 1,
             },
             '&::after': {
               content: '""',
               position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: 'radial-gradient(circle at 80% 80%, rgba(107, 70, 193, 0.2) 0%, transparent 50%)',
+              top: '0',
+              left: '0',
+              right: '0',
+              bottom: '0',
+              backdropFilter: 'brightness(0.95)',
               pointerEvents: 'none',
+              zIndex: 0.5,
             },
           }}
         >
@@ -140,7 +167,7 @@ export default function HomePage() {
                     <Button
                       variant="contained"
                       size="large"
-                      onClick={() => navigate('/dashboard')}
+                      onClick={handleComecaAgora}
                       sx={{
                         bgcolor: 'white',
                         color: theme.primary,
@@ -157,6 +184,7 @@ export default function HomePage() {
                     <Button
                       variant="outlined"
                       size="large"
+                      onClick={() => navigate('/about')}
                       sx={{
                         borderColor: 'white',
                         color: 'white',
@@ -177,12 +205,23 @@ export default function HomePage() {
               <Grid item xs={12} md={6}>
                 <Box
                   sx={{
-                    fontSize: '4rem',
+                    fontSize: '5rem',
                     textAlign: 'center',
-                    color: 'rgba(255, 255, 255, 0.2)',
+                    color: 'rgba(255, 255, 255, 0.3)',
+                    animation: 'pulse 3s ease-in-out infinite',
+                    '@keyframes pulse': {
+                      '0%, 100%': { 
+                        transform: 'scale(1)',
+                        opacity: 0.3,
+                      },
+                      '50%': { 
+                        transform: 'scale(1.1)',
+                        opacity: 0.8,
+                      },
+                    },
                   }}
                 >
-                  💰
+                  ₿
                 </Box>
               </Grid>
             </Grid>
@@ -191,18 +230,18 @@ export default function HomePage() {
 
         {/* Stats Section */}
         <Container maxWidth="xl" sx={{ py: 8 }}>
-          <Grid container spacing={4} sx={{ mb: 4 }}>
+          <Grid container spacing={30} sx={{ mb: 4 }} justifyContent="center">
             <Grid item xs={12} sm={6} md={3}>
-              <StatCard value="10K+" label="Usuários Ativos" />
+              <StatCard value="2K+" label="Usuários Ativos" />
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
-              <StatCard value="$50M+" label="Volume Investido" />
+              <StatCard value="$1M+" label="Volume Investido" />
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
               <StatCard value="24/7" label="Suporte Disponível" />
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
-              <StatCard value="+15%" label="Retorno Médio" />
+              <StatCard value="+20%/m" label="Retorno Médio" />
             </Grid>
           </Grid>
         </Container>
@@ -243,7 +282,7 @@ export default function HomePage() {
                 aspectRatio: '16 / 9',
                 bgcolor: theme.darker,
                 borderRadius: '14px',
-                border: `2px dashed rgba(59, 91, 219, 0.3)`,
+                border: `2px dashed rgba(124, 58, 237, 0.3)`,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -251,7 +290,7 @@ export default function HomePage() {
                 transition: 'all 0.3s ease',
                 '&:hover': {
                   borderColor: theme.primary,
-                  bgcolor: 'rgba(59, 91, 219, 0.05)',
+                  bgcolor: 'rgba(124, 58, 237, 0.05)',
                 },
               }}
             >
@@ -291,7 +330,7 @@ export default function HomePage() {
             Somos a plataforma mais segura e fácil para investir em criptomoedas
           </Typography>
 
-          <Grid container spacing={3}>
+          <Grid container spacing={2} justifyContent="center">
             <Grid item xs={12} sm={6} md={3}>
               <FeatureCard
                 icon={TrendingUpIcon}
@@ -326,71 +365,83 @@ export default function HomePage() {
         {/* Benefits Section */}
         <Box sx={{ bgcolor: theme.darkLight, py: 12 }}>
           <Container maxWidth="xl">
-            <Grid container spacing={6} alignItems="center">
-              <Grid item xs={12} md={6}>
-                <Typography
-                  sx={{
-                    fontSize: { xs: '1.8rem', md: '2.2rem' },
-                    fontWeight: 700,
-                    color: theme.text,
-                    mb: 3,
-                  }}
-                >
-                  Rendimento Automático
-                </Typography>
-                <Stack spacing={2}>
-                  {[
-                    { label: 'Mês 1', value: 5 },
-                    { label: 'Mês 2', value: 10 },
-                    { label: 'Mês 3', value: 15 },
-                  ].map((item) => (
-                    <Box key={item.label}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                        <Typography sx={{ color: theme.text, fontWeight: 600 }}>
-                          {item.label}
-                        </Typography>
-                        <Typography sx={{ color: theme.primary, fontWeight: 700 }}>
-                          +{item.value}%
-                        </Typography>
+            <Grid container spacing={30} alignItems="center" justifyContent="center">
+              <Grid item xs={12} md={6} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+                  <Typography
+                    sx={{
+                      fontSize: { xs: '1.8rem', md: '2.2rem' },
+                      fontWeight: 700,
+                      color: theme.text,
+                      mb: 3,
+                      textAlign: 'center',
+                    }}
+                  >
+                    Rendimento Automático
+                  </Typography>
+                  <Stack spacing={2} sx={{ maxWidth: 300, width: '100%', alignItems: 'center' }}>
+                    {[
+                      { label: 'Indicação', value: 5 },
+                      { label: '15 Dias', value: 10 },
+                      { label: '30 Dias', value: 15},
+                    ].map((item) => (
+                      <Box key={item.label} sx={{ width: '100%' }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                          <Typography sx={{ color: theme.text, fontWeight: 600 }}>
+                            {item.label}
+                          </Typography>
+                          <Typography sx={{ color: theme.primary, fontWeight: 700 }}>
+                            +{item.value}%
+                          </Typography>
+                        </Box>
+                        <LinearProgress
+                          variant="determinate"
+                          value={Math.min(item.value * 6.67, 100)}
+                          sx={{
+                            height: 8,
+                            borderRadius: '4px',
+                            bgcolor: theme.darker,
+                            '& .MuiLinearProgress-bar': {
+                              background: `linear-gradient(90deg, ${theme.primary} 0%, ${theme.secondary} 100%)`,
+                            },
+                          }}
+                        />
                       </Box>
-                      <LinearProgress
-                        variant="determinate"
-                        value={item.value * 6.67}
-                        sx={{
-                          height: 8,
-                          borderRadius: '4px',
-                          bgcolor: theme.darker,
-                          '& .MuiLinearProgress-bar': {
-                            background: `linear-gradient(90deg, ${theme.primary} 0%, ${theme.secondary} 100%)`,
-                          },
-                        }}
-                      />
-                    </Box>
-                  ))}
-                </Stack>
+                    ))}
+                  </Stack>
+                </Box>
               </Grid>
-              <Grid item xs={12} md={6}>
+              <Grid item xs={12} md={6} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Box
                   sx={{
                     display: 'grid',
                     gridTemplateColumns: '1fr 1fr',
                     gap: 2,
+                    maxWidth: 400,
+                    margin: '0 auto',
+                    justifyItems: 'center',
                   }}
                 >
                   {[
-                    { emoji: '🎯', text: 'Metas Personalizadas' },
+                    { emoji: '🎯', text: 'Lucros Personalizados' },
                     { emoji: '📊', text: 'Análise em Tempo Real' },
                     { emoji: '🤝', text: 'Programa de Referência' },
-                    { emoji: '📱', text: 'App Mobile' },
+                    { emoji: '📱', text: 'Responsivo para Mobile' },
                   ].map((item, idx) => (
                     <Card
                       key={idx}
                       sx={{
                         p: 2,
                         bgcolor: theme.darker,
-                        border: `1px solid rgba(59, 91, 219, 0.15)`,
+                        border: `1px solid rgba(124, 58, 237, 0.2)`,
                         borderRadius: '12px',
                         textAlign: 'center',
+                        transition: 'all 0.3s ease',
+                        '&:hover': {
+                          transform: 'translateY(-8px)',
+                          boxShadow: '0 8px 24px rgba(124, 58, 237, 0.2)',
+                          borderColor: 'rgba(124, 58, 237, 0.4)',
+                        },
                       }}
                     >
                       <Typography sx={{ fontSize: '2rem', mb: 1 }}>
@@ -431,7 +482,7 @@ export default function HomePage() {
           <Button
             variant="contained"
             size="large"
-            onClick={() => navigate('/dashboard')}
+            onClick={handleCriarConta}
             sx={{
               bgcolor: theme.primary,
               color: 'white',

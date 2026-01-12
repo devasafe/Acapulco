@@ -4,9 +4,9 @@ const darkTheme = createTheme({
   palette: {
     mode: 'dark',
     primary: { 
-      main: '#3B5BDB',
-      light: '#6B7FEA',
-      dark: '#2D47B6',
+      main: '#7C3AED',
+      light: '#A78BFA',
+      dark: '#6B21A8',
       contrastText: '#F1F5F9'
     },
     secondary: { 
@@ -20,8 +20,8 @@ const darkTheme = createTheme({
     warning: { main: '#F59E0B' },
     info: { main: '#06B6D4' },
     background: { 
-      default: '#0F1117',
-      paper: '#1A1F2E'
+      default: '#0a0e27',
+      paper: 'rgba(26, 26, 77, 0.6)'
     },
     text: { 
       primary: '#F1F5F9',
@@ -34,10 +34,10 @@ const darkTheme = createTheme({
       styleOverrides: {
         root: {
           backgroundImage: 'none',
-          background: 'linear-gradient(135deg, #1A1F2E 0%, #252D3D 100%)',
+          background: 'linear-gradient(135deg, rgba(26, 26, 77, 0.6) 0%, rgba(45, 27, 78, 0.6) 100%)',
           borderRadius: '12px',
-          border: '1px solid rgba(241, 245, 249, 0.1)',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)'
+          border: '1px solid rgba(124, 58, 237, 0.2)',
+          boxShadow: '0 4px 12px rgba(124, 58, 237, 0.1)'
         }
       }
     },
@@ -50,20 +50,21 @@ const darkTheme = createTheme({
           transition: 'all 200ms cubic-bezier(0.4, 0, 0.2, 1)',
           '&:hover': {
             transform: 'translateY(-2px)',
-            boxShadow: '0 8px 20px rgba(59, 91, 219, 0.3)'
+            boxShadow: '0 8px 20px rgba(124, 58, 237, 0.4)'
           }
         },
         contained: {
           background: 'linear-gradient(135deg, #3B5BDB 0%, #6B46C1 100%)',
           '&:hover': {
-            background: 'linear-gradient(135deg, #2D47B6 0%, #553399 100%)'
+            background: 'linear-gradient(135deg, #2D47B6 0%, #553399 100%)',
+            boxShadow: '0 8px 24px rgba(124, 58, 237, 0.4)'
           }
         },
         outlined: {
-          borderColor: 'rgba(241, 245, 249, 0.2)',
+          borderColor: 'rgba(124, 58, 237, 0.3)',
           '&:hover': {
-            borderColor: '#3B5BDB',
-            backgroundColor: 'rgba(59, 91, 219, 0.05)'
+            borderColor: '#7C3AED',
+            backgroundColor: 'rgba(124, 58, 237, 0.1)'
           }
         }
       }
@@ -73,16 +74,16 @@ const darkTheme = createTheme({
         root: {
           '& .MuiOutlinedInput-root': {
             borderRadius: '8px',
-            backgroundColor: 'rgba(26, 31, 46, 0.8)',
+            backgroundColor: 'rgba(26, 26, 77, 0.4)',
             '& fieldset': {
-              borderColor: 'rgba(241, 245, 249, 0.1)'
+              borderColor: 'rgba(124, 58, 237, 0.2)'
             },
             '&:hover fieldset': {
-              borderColor: 'rgba(241, 245, 249, 0.2)'
+              borderColor: 'rgba(124, 58, 237, 0.3)'
             },
             '&.Mui-focused fieldset': {
-              borderColor: '#3B5BDB',
-              boxShadow: '0 0 0 3px rgba(59, 91, 219, 0.1)'
+              borderColor: '#7C3AED',
+              boxShadow: '0 0 0 3px rgba(124, 58, 237, 0.15)'
             }
           }
         }
@@ -92,9 +93,9 @@ const darkTheme = createTheme({
       styleOverrides: {
         root: {
           backgroundImage: 'none',
-          background: 'linear-gradient(135deg, #0F1117 0%, #1A1F2E 100%)',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
-          borderBottom: '1px solid rgba(241, 245, 249, 0.05)'
+          background: 'linear-gradient(135deg, #0a0e27 0%, #1a1a4d 100%)',
+          boxShadow: '0 4px 12px rgba(124, 58, 237, 0.15)',
+          borderBottom: '1px solid rgba(124, 58, 237, 0.1)'
         }
       }
     },
@@ -102,10 +103,10 @@ const darkTheme = createTheme({
       styleOverrides: {
         root: {
           backgroundImage: 'none',
-          background: 'linear-gradient(135deg, #1A1F2E 0%, #252D3D 100%)',
+          background: 'linear-gradient(135deg, rgba(26, 26, 77, 0.6) 0%, rgba(45, 27, 78, 0.6) 100%)',
           borderRadius: '12px',
-          border: '1px solid rgba(241, 245, 249, 0.1)',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)'
+          border: '1px solid rgba(124, 58, 237, 0.2)',
+          boxShadow: '0 4px 12px rgba(124, 58, 237, 0.1)'
         }
       }
     },
