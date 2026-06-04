@@ -1,43 +1,171 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="Web site created using create-react-app"
-    />
+    <meta name="theme-color" content="#0b2239" />
+    <meta name="description" content="Acapulco Financial — investimentos em criptoativos com segurança institucional." />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-    <!--
-      manifest.json provides metadata used when your web app is installed on a
-      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-    -->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <!--
-      Notice the use of %PUBLIC_URL% in the tags above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
+    <title>Acapulco Financial</title>
 
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
-    <title>React App</title>
+    <!-- Evita flash de tema errado: aplica .dark antes da pintura -->
+    <script>
+      (function () {
+        try {
+          var t = localStorage.theme || ((window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light');
+          document.documentElement.classList.toggle('dark', t === 'dark');
+        } catch (e) {}
+      })();
+    </script>
+
+    <!-- Fontes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet" />
+
+    <!-- Tailwind (CDN, igual ao Stitch) -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              'background': 'var(--background)',
+              'on-background': 'var(--on-background)',
+              'surface': 'var(--surface)',
+              'surface-bright': 'var(--surface-bright)',
+              'surface-dim': 'var(--surface-dim)',
+              'surface-container-lowest': 'var(--surface-container-lowest)',
+              'surface-container-low': 'var(--surface-container-low)',
+              'surface-container': 'var(--surface-container)',
+              'surface-container-high': 'var(--surface-container-high)',
+              'surface-container-highest': 'var(--surface-container-highest)',
+              'surface-variant': 'var(--surface-variant)',
+              'on-surface': 'var(--on-surface)',
+              'on-surface-variant': 'var(--on-surface-variant)',
+              'outline': 'var(--outline)',
+              'outline-variant': 'var(--outline-variant)',
+              'primary': 'var(--primary)',
+              'on-primary': 'var(--on-primary)',
+              'primary-container': 'var(--primary-container)',
+              'on-primary-container': 'var(--on-primary-container)',
+              'primary-fixed-dim': 'var(--primary-fixed-dim)',
+              'secondary': 'var(--secondary)',
+              'secondary-container': 'var(--secondary-container)',
+              'on-secondary-container': 'var(--on-secondary-container)',
+              'secondary-fixed-dim': 'var(--secondary-fixed-dim)',
+              'tertiary-fixed-dim': 'var(--tertiary-fixed-dim)',
+              'surface-tint': 'var(--surface-tint)',
+              'inverse-surface': 'var(--inverse-surface)',
+              'inverse-on-surface': 'var(--inverse-on-surface)',
+              'success': 'var(--success)',
+              'danger': 'var(--danger)',
+              'gold': 'var(--gold)',
+              'error': '#ba1a1a',
+            },
+            borderRadius: { DEFAULT: '0.25rem', lg: '0.5rem', xl: '0.75rem', full: '9999px' },
+            spacing: { 'margin-mobile': '16px', gutter: '24px', 'margin-desktop': '40px', unit: '8px', 'container-max': '1280px' },
+            fontFamily: {
+              'body-md': ['Inter'], 'body-lg': ['Inter'], 'body-sm': ['Inter'], 'label-caps': ['Inter'], 'data-mono': ['Inter'],
+              'headline-md': ['Manrope'], 'headline-lg': ['Manrope'], 'headline-xl': ['Manrope'],
+            },
+            fontSize: {
+              'body-md': ['16px', { lineHeight: '24px', fontWeight: '400' }],
+              'body-lg': ['18px', { lineHeight: '28px', fontWeight: '400' }],
+              'body-sm': ['14px', { lineHeight: '20px', fontWeight: '400' }],
+              'label-caps': ['12px', { lineHeight: '16px', letterSpacing: '0.05em', fontWeight: '600' }],
+              'data-mono': ['14px', { lineHeight: '20px', fontWeight: '500' }],
+              'headline-md': ['24px', { lineHeight: '32px', fontWeight: '600' }],
+              'headline-lg': ['32px', { lineHeight: '40px', letterSpacing: '-0.01em', fontWeight: '600' }],
+              'headline-xl': ['40px', { lineHeight: '48px', letterSpacing: '-0.02em', fontWeight: '700' }],
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      /* Paleta — claro */
+      :root {
+        --background: #fbf9fb;
+        --on-background: #1b1c1d;
+        --surface: #fbf9fb;
+        --surface-bright: #fbf9fb;
+        --surface-dim: #dbd9dc;
+        --surface-container-lowest: #ffffff;
+        --surface-container-low: #f5f3f5;
+        --surface-container: #efedef;
+        --surface-container-high: #e9e7ea;
+        --surface-container-highest: #e3e2e4;
+        --surface-variant: #e3e2e4;
+        --on-surface: #1b1c1d;
+        --on-surface-variant: #43474d;
+        --outline: #74777e;
+        --outline-variant: #c4c6cd;
+        --primary: #0b2239;
+        --on-primary: #ffffff;
+        --primary-container: #0b2239;
+        --on-primary-container: #758aa6;
+        --primary-fixed-dim: #b3c8e6;
+        --secondary: #3d6183;
+        --secondary-container: #b4d8ff;
+        --on-secondary-container: #3a5e80;
+        --secondary-fixed-dim: #a6caf1;
+        --tertiary-fixed-dim: #ebbe94;
+        --surface-tint: #4b607a;
+        --inverse-surface: #303032;
+        --inverse-on-surface: #f2f0f2;
+        --success: #2E7D32;
+        --danger: #c0392b;
+        --gold: #C8A24B;
+      }
+      /* Paleta — escuro */
+      .dark {
+        --background: #0a1722;
+        --on-background: #e6edf3;
+        --surface: #0e2030;
+        --surface-bright: #13283a;
+        --surface-dim: #0a1722;
+        --surface-container-lowest: #13283a;
+        --surface-container-low: #0e2030;
+        --surface-container: #13283a;
+        --surface-container-high: #15324b;
+        --surface-container-highest: #15324b;
+        --surface-variant: #15324b;
+        --on-surface: #e6edf3;
+        --on-surface-variant: #93a4b3;
+        --outline: #3a4a5a;
+        --outline-variant: #1e3a52;
+        --primary: #b3c8e6;
+        --on-primary: #0a1722;
+        --primary-container: #0b1f33;
+        --on-primary-container: #9db4cc;
+        --primary-fixed-dim: #b3c8e6;
+        --secondary: #6e97be;
+        --secondary-container: #15324b;
+        --on-secondary-container: #b3c8e6;
+        --secondary-fixed-dim: #b3c8e6;
+        --tertiary-fixed-dim: #ebbe94;
+        --surface-tint: #4b7bb0;
+        --inverse-surface: #e6edf3;
+        --inverse-on-surface: #0e2030;
+        --success: #1fb57e;
+        --danger: #e5705c;
+        --gold: #c8a24b;
+      }
+
+      .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+      .tabular-nums { font-variant-numeric: tabular-nums; }
+      .glass-panel { background: color-mix(in srgb, var(--surface) 75%, transparent); backdrop-filter: blur(12px); border: 1px solid color-mix(in srgb, var(--outline-variant) 50%, transparent); }
+      .timeline-line::before { content: ''; position: absolute; left: 50%; transform: translateX(-50%); width: 2px; height: 100%; background-color: var(--outline-variant); z-index: 0; }
+      body { background-color: var(--background); }
+    </style>
   </head>
   <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <noscript>Você precisa habilitar o JavaScript para usar este site.</noscript>
     <div id="root"></div>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
-
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
-
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
   </body>
 </html>

@@ -1,254 +1,141 @@
 import React, { useState } from 'react';
-import {
-  Box,
-  Container,
-  Typography,
-  Button,
-  TextField,
-  Stack,
-  Paper,
-} from '@mui/material';
-import SendIcon from '@mui/icons-material/Send';
-import EmailIcon from '@mui/icons-material/Email';
-import PhoneIcon from '@mui/icons-material/Phone';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import PageLayout from '../components/PageLayout';
+import SiteNav from '../components/marketing/SiteNav';
+import SiteFooter from '../components/marketing/SiteFooter';
 
-const theme = {
-  primary: '#7C3AED',
-  secondary: '#6B46C1',
-  dark: '#0a0e27',
-  darkLight: 'rgba(26, 26, 77, 0.6)',
-  text: '#F1F5F9',
-  textSecondary: '#CBD5E1',
-};
+const channels = [
+  ['mail', 'E-MAIL', 'suporte@acapulco.com.br'],
+  ['chat', 'WHATSAPP BUSINESS', '+55 11 99999-0000'],
+  ['call', 'TELEFONE CENTRAL', '0800 777 5555'],
+];
+
+const operational = [
+  ['schedule', 'HORÁRIO', 'Segunda a Sexta, 09h às 18h'],
+  ['speed', 'TEMPO DE RESPOSTA', 'Máximo de 4 horas para tickets'],
+  ['location_on', 'SEDE ADMINISTRATIVA', 'Av. Faria Lima, 3500 - São Paulo/SP'],
+];
 
 export default function ContactPage() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: '',
-  });
+  const [sent, setSent] = useState(false);
+  const inputCls = 'w-full bg-surface-container-low border border-outline-variant text-on-surface px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-container/20 transition-all';
 
-  const [submitted, setSubmitted] = useState(false);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = (e) => {
+  function handleSubmit(e) {
     e.preventDefault();
-    console.log('Formulário enviado:', formData);
-    setSubmitted(true);
-    setTimeout(() => {
-      setFormData({ name: '', email: '', subject: '', message: '' });
-      setSubmitted(false);
-    }, 3000);
-  };
+    setSent(true);
+    e.target.reset();
+    setTimeout(() => setSent(false), 3000);
+  }
 
   return (
-    <PageLayout>
-      <Box sx={{ width: '100%', bgcolor: theme.dark, py: 12 }}>
-        <Container maxWidth="lg">
-          <Box sx={{ mb: 8, textAlign: 'center' }}>
-            <Typography
-              sx={{
-                fontSize: { xs: '2rem', md: '3rem' },
-                fontWeight: 700,
-                color: theme.text,
-                mb: 2,
-              }}
-            >
-              Entre em Contato
-            </Typography>
-            <Typography sx={{ fontSize: '1.1rem', color: theme.textSecondary, maxWidth: '600px', mx: 'auto' }}>
-              Tem alguma dúvida? Estamos aqui para ajudar! Entre em contato conosco e responderemos o mais rápido possível.
-            </Typography>
-          </Box>
+    <div className="bg-background text-on-surface font-body-md min-h-screen overflow-x-hidden">
+      <SiteNav active="Contato" />
 
-          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 4, mb: 8 }}>
-            {/* Formulário */}
-            <Paper
-              component="form"
-              onSubmit={handleSubmit}
-              sx={{
-                p: 4,
-                bgcolor: theme.darkLight,
-                border: '1px solid rgba(124, 58, 237, 0.2)',
-                borderRadius: '16px',
-              }}
-            >
-              <Stack spacing={3}>
-                <TextField
-                  fullWidth
-                  label="Seu Nome"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                  variant="outlined"
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      color: theme.text,
-                      '& fieldset': { borderColor: 'rgba(124, 58, 237, 0.2)' },
-                      '&:hover fieldset': { borderColor: 'rgba(124, 58, 237, 0.4)' },
-                      '&.Mui-focused fieldset': { borderColor: theme.primary },
-                    },
-                    '& .MuiOutlinedInput-input::placeholder': { color: theme.textSecondary },
-                    '& .MuiInputBase-input': { color: theme.text },
-                    '& .MuiInputLabel-root': { color: theme.textSecondary },
-                    '& .MuiInputLabel-root.Mui-focused': { color: theme.primary },
-                  }}
-                />
-                <TextField
-                  fullWidth
-                  label="Seu Email"
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  variant="outlined"
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      color: theme.text,
-                      '& fieldset': { borderColor: 'rgba(124, 58, 237, 0.2)' },
-                      '&:hover fieldset': { borderColor: 'rgba(124, 58, 237, 0.4)' },
-                      '&.Mui-focused fieldset': { borderColor: theme.primary },
-                    },
-                    '& .MuiOutlinedInput-input::placeholder': { color: theme.textSecondary },
-                    '& .MuiInputBase-input': { color: theme.text },
-                    '& .MuiInputLabel-root': { color: theme.textSecondary },
-                    '& .MuiInputLabel-root.Mui-focused': { color: theme.primary },
-                  }}
-                />
-                <TextField
-                  fullWidth
-                  label="Assunto"
-                  name="subject"
-                  value={formData.subject}
-                  onChange={handleChange}
-                  required
-                  variant="outlined"
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      color: theme.text,
-                      '& fieldset': { borderColor: 'rgba(124, 58, 237, 0.2)' },
-                      '&:hover fieldset': { borderColor: 'rgba(124, 58, 237, 0.4)' },
-                      '&.Mui-focused fieldset': { borderColor: theme.primary },
-                    },
-                    '& .MuiOutlinedInput-input::placeholder': { color: theme.textSecondary },
-                    '& .MuiInputBase-input': { color: theme.text },
-                    '& .MuiInputLabel-root': { color: theme.textSecondary },
-                    '& .MuiInputLabel-root.Mui-focused': { color: theme.primary },
-                  }}
-                />
-                <TextField
-                  fullWidth
-                  label="Mensagem"
-                  name="message"
-                  value={formData.message}
-                  onChange={handleChange}
-                  required
-                  multiline
-                  rows={5}
-                  variant="outlined"
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      color: theme.text,
-                      '& fieldset': { borderColor: 'rgba(124, 58, 237, 0.2)' },
-                      '&:hover fieldset': { borderColor: 'rgba(124, 58, 237, 0.4)' },
-                      '&.Mui-focused fieldset': { borderColor: theme.primary },
-                    },
-                    '& .MuiOutlinedInput-input::placeholder': { color: theme.textSecondary },
-                    '& .MuiInputBase-input': { color: theme.text },
-                    '& .MuiInputLabel-root': { color: theme.textSecondary },
-                    '& .MuiInputLabel-root.Mui-focused': { color: theme.primary },
-                  }}
-                />
-                <Button
-                  type="submit"
-                  variant="contained"
-                  endIcon={<SendIcon />}
-                  sx={{
-                    bgcolor: theme.primary,
-                    color: 'white',
-                    fontWeight: 700,
-                    py: 1.5,
-                    '&:hover': { bgcolor: theme.secondary },
-                  }}
-                >
-                  Enviar Mensagem
-                </Button>
-                {submitted && (
-                  <Typography sx={{ color: '#10B981', textAlign: 'center', fontWeight: 600 }}>
-                    ✓ Mensagem enviada com sucesso!
-                  </Typography>
-                )}
-              </Stack>
-            </Paper>
+      <main className="pt-20">
+        {/* Hero */}
+        <section className="py-20 md:py-32 bg-surface-container-low">
+          <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop text-center">
+            <span className="font-label-caps text-label-caps text-on-primary-container mb-4 block">CONTATO</span>
+            <h1 className="font-headline-xl text-headline-xl text-on-surface max-w-3xl mx-auto mb-6">
+              Estamos aqui para ajudar você a investir com tranquilidade
+            </h1>
+            <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">
+              Nossa equipe de especialistas está pronta para oferecer suporte institucional e esclarecer qualquer dúvida sobre sua jornada financeira.
+            </p>
+          </div>
+        </section>
 
-            {/* Informações de Contato */}
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-              <Paper
-                sx={{
-                  p: 3,
-                  bgcolor: theme.darkLight,
-                  border: '1px solid rgba(124, 58, 237, 0.2)',
-                  borderRadius: '16px',
-                  display: 'flex',
-                  gap: 2,
-                }}
-              >
-                <EmailIcon sx={{ color: theme.primary, fontSize: 32, mt: 1 }} />
-                <Box>
-                  <Typography sx={{ fontWeight: 700, color: theme.text, mb: 0.5 }}>Email</Typography>
-                  <Typography sx={{ color: theme.textSecondary }}>contato@acapulco.com</Typography>
-                </Box>
-              </Paper>
+        {/* Form + canais */}
+        <section className="py-24 max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
+            {/* Form */}
+            <div className="lg:col-span-7 bg-surface-container-lowest p-8 md:p-12 rounded-xl border border-outline-variant/30 shadow-sm">
+              <h2 className="font-headline-lg text-headline-lg text-on-surface mb-8">Envie uma mensagem</h2>
+              <form className="space-y-6" onSubmit={handleSubmit}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="font-label-caps text-label-caps text-on-surface-variant">NOME COMPLETO</label>
+                    <input className={inputCls} placeholder="Como deseja ser chamado?" required type="text" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="font-label-caps text-label-caps text-on-surface-variant">E-MAIL</label>
+                    <input className={inputCls} placeholder="seu@email.com" required type="email" />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="font-label-caps text-label-caps text-on-surface-variant">ASSUNTO</label>
+                  <select className={inputCls}>
+                    <option>Suporte Técnico</option>
+                    <option>Dúvidas sobre Investimentos</option>
+                    <option>Compliance e Segurança</option>
+                    <option>Outros Assuntos</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="font-label-caps text-label-caps text-on-surface-variant">MENSAGEM</label>
+                  <textarea className={`${inputCls} resize-none`} placeholder="Descreva sua solicitação em detalhes..." required rows={5} />
+                </div>
+                <button type="submit" className={`w-full md:w-auto px-10 py-4 rounded-lg font-headline-md text-body-md text-white transition-all active:scale-95 shadow-md ${sent ? 'bg-success' : 'bg-primary-container hover:opacity-90'}`}>
+                  {sent ? 'Enviado com sucesso' : 'Enviar Mensagem'}
+                </button>
+              </form>
+            </div>
 
-              <Paper
-                sx={{
-                  p: 3,
-                  bgcolor: theme.darkLight,
-                  border: '1px solid rgba(124, 58, 237, 0.2)',
-                  borderRadius: '16px',
-                  display: 'flex',
-                  gap: 2,
-                }}
-              >
-                <PhoneIcon sx={{ color: theme.primary, fontSize: 32, mt: 1 }} />
-                <Box>
-                  <Typography sx={{ fontWeight: 700, color: theme.text, mb: 0.5 }}>Telefone</Typography>
-                  <Typography sx={{ color: theme.textSecondary }}>+55 (11) 9999-9999</Typography>
-                </Box>
-              </Paper>
+            {/* Canais */}
+            <div className="lg:col-span-5 space-y-10">
+              <div>
+                <h3 className="font-headline-lg text-headline-lg text-on-surface mb-6">Canais de Atendimento</h3>
+                <div className="space-y-4">
+                  {channels.map(([icon, label, value]) => (
+                    <div key={label} className="flex items-start gap-4 p-4 rounded-lg hover:bg-surface-container transition-colors">
+                      <div className="bg-secondary-container/40 p-3 rounded-full text-on-secondary-container">
+                        <span className="material-symbols-outlined">{icon}</span>
+                      </div>
+                      <div>
+                        <p className="font-label-caps text-label-caps text-on-surface-variant">{label}</p>
+                        <p className="font-body-lg font-medium text-on-surface">{value}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
 
-              <Paper
-                sx={{
-                  p: 3,
-                  bgcolor: theme.darkLight,
-                  border: '1px solid rgba(124, 58, 237, 0.2)',
-                  borderRadius: '16px',
-                  display: 'flex',
-                  gap: 2,
-                }}
-              >
-                <LocationOnIcon sx={{ color: theme.primary, fontSize: 32, mt: 1 }} />
-                <Box>
-                  <Typography sx={{ fontWeight: 700, color: theme.text, mb: 0.5 }}>Endereço</Typography>
-                  <Typography sx={{ color: theme.textSecondary }}>São Paulo, SP - Brasil</Typography>
-                </Box>
-              </Paper>
-            </Box>
-          </Box>
-        </Container>
-      </Box>
-    </PageLayout>
+              <hr className="border-outline-variant/30" />
+
+              <div className="bg-primary-container text-white p-8 rounded-xl">
+                <h4 className="font-headline-md text-headline-md mb-6">Detalhes Operacionais</h4>
+                <ul className="space-y-6">
+                  {operational.map(([icon, label, value]) => (
+                    <li key={label} className="flex items-center gap-4">
+                      <span className="material-symbols-outlined text-secondary-fixed-dim">{icon}</span>
+                      <div>
+                        <p className="font-label-caps text-label-caps text-white/70">{label}</p>
+                        <p className="font-body-md">{value}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Mapa */}
+        <section className="h-[400px] w-full relative grayscale hover:grayscale-0 transition-all duration-700">
+          <img alt="Localização Acapulco Financial" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6awH52vPeO03DrYeyq_az4AB4ylwOPLRLtckhOXrJbs6HgfPHCXWw1DhZbQM5CayUhKyzA1IJg-zgHEeQ8LJDC5LND_ZUYecTo5Udnvbs182Ya_a6gYbZun_5pl1AtjkwaiZ0osgH3MOh5rBvKPmYtZbRDTS1oAdxkflO7vkp_dw8xtf-DgIAJLqhjB_JxWQ1hKvsjEqVqUJ21y0TGj8oj-N45LFNff1BkLvIQUjCu4WJgb87c4UVGw4-SobiiCG6XUkm3xts0b8" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
+            <div className="bg-surface-container-lowest p-6 rounded-xl shadow-xl flex items-center gap-4 border border-outline-variant/30">
+              <div className="bg-primary-container w-10 h-10 rounded-full flex items-center justify-center text-white">
+                <span className="material-symbols-outlined">apartment</span>
+              </div>
+              <div>
+                <p className="font-headline-md text-body-md text-on-surface">Matriz Acapulco</p>
+                <p className="text-body-sm text-on-surface-variant">Vila Olímpia, SP</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <SiteFooter />
+    </div>
   );
 }
