@@ -1,44 +1,35 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import {
-  Box,
-  Container,
-  Card,
-  Typography,
-  Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  CircularProgress,
-  Alert,
-  IconButton,
-} from '@mui/material';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import PageLayout from '../components/PageLayout';
+import SiteNav from '../components/marketing/SiteNav';
+import SiteFooter from '../components/marketing/SiteFooter';
 import { getAllCryptos } from '../services/apiService';
 import { getToken } from '../utils/auth';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import CurrencyBitcoinIcon from '@mui/icons-material/CurrencyBitcoin';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
 
-const theme = {
-  primary: '#3B5BDB',
-  secondary: '#6B46C1',
-  success: '#10B981',
-  warning: '#F59E0B',
-  dark: '#0F1117',
-  darkLight: '#1A1F2E',
-  text: '#F1F5F9',
-  textSecondary: '#CBD5E1',
-};
+const ASSET_BASE = 'http://localhost:5000';
+const BRL = (v) => Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+function imageUrl(image) {
+  if (!image || !image.trim()) return null;
+  if (/^https?:\/\//.test(image)) return image;
+  return `${ASSET_BASE}${image.startsWith('/') ? image : '/' + image}`;
+}
+
+function bestPlan(plans) {
+  if (!Array.isArray(plans) || plans.length === 0) return null;
+  return plans.reduce((a, b) => (b.yieldPercentage > a.yieldPercentage ? b : a), plans[0]);
+}
+
+function CoinIcon({ crypto }) {
+  const url = imageUrl(crypto.image);
+  if (url) {
+    return <img src={url} alt={crypto.symbol} className="w-9 h-9 rounded-full object-cover bg-surface-container" />;
+  }
+  return (
+    <div className="w-9 h-9 rounded-full bg-secondary-container/40 text-on-secondary-container grid place-items-center font-bold text-[12px]">
+      {(crypto.symbol || crypto.name || '?').slice(0, 3).toUpperCase()}
+    </div>
+  );
+}
 
 export default function CryptoListPage() {
   const token = getToken();
@@ -46,341 +37,172 @@ export default function CryptoListPage() {
   const [cryptos, setCryptos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [q, setQ] = useState('');
+  const [sort, setSort] = useState('yield');
 
   const loadCryptos = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
-      // Public endpoint - no token needed
       const data = await getAllCryptos(token);
       setCryptos(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error('Erro ao carregar criptmoedas:', err);
-      setError('Erro ao carregar criptmoedas. Tente novamente.');
+      setError('Erro ao carregar criptoativos. Tente novamente.');
       setCryptos([]);
     } finally {
       setLoading(false);
     }
   }, [token]);
 
-  useEffect(() => {
-    loadCryptos();
-  }, [loadCryptos]);
+  useEffect(() => { loadCryptos(); }, [loadCryptos]);
 
-  // Debug: log image data
-  useEffect(() => {
-    if (cryptos.length > 0) {
-      console.log('Cryptos loaded:', cryptos.map(c => ({
-        name: c.name,
-        image: c.image,
-        hasImage: !!c.image
-      })));
+  const list = useMemo(() => {
+    let r = cryptos.filter((c) => c.isActive !== false);
+    if (q.trim()) {
+      const term = q.toLowerCase();
+      r = r.filter((c) => `${c.name} ${c.symbol}`.toLowerCase().includes(term));
     }
-  }, [cryptos]);
+    r = [...r].sort((a, b) => {
+      if (sort === 'price') return (a.price || 0) - (b.price || 0);
+      if (sort === 'name') return String(a.name).localeCompare(String(b.name));
+      return (bestPlan(b.plans)?.yieldPercentage || 0) - (bestPlan(a.plans)?.yieldPercentage || 0);
+    });
+    return r;
+  }, [cryptos, q, sort]);
 
-  const handleInvest = (cryptoId) => {
-    navigate(`/cryptos/${cryptoId}`);
-  };
-
-  if (loading) {
-    return (
-      <PageLayout>
-        <Container maxWidth="lg" sx={{ py: 4, display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
-          <CircularProgress />
-        </Container>
-      </PageLayout>
-    );
-  }
+  const inputCls = 'bg-surface-container-low border border-outline-variant text-on-surface px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-container/20 transition-all';
 
   return (
-    <PageLayout>
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        {/* Header */}
-        <Box sx={{ mb: 6, position: 'relative', zIndex: 0 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-            <CurrencyBitcoinIcon sx={{ fontSize: 40, color: theme.primary }} />
-            <Typography variant="h4" sx={{ fontWeight: 800, color: theme.text }}>
-              Criptmoedas Disponíveis
-            </Typography>
-          </Box>
-          <Typography variant="body1" sx={{ color: theme.textSecondary, maxWidth: '600px' }}>
-            Escolha uma criptmoeda e invista agora. Obtenha rendimentos baseado no período e taxa selecionados.
-          </Typography>
-        </Box>
+    <div className="bg-background text-on-surface font-body-md min-h-screen flex flex-col">
+      <SiteNav active="Criptoativos" />
 
-        {error && (
-          <Alert severity="error" sx={{ mb: 3 }}>
-            {error}
-          </Alert>
-        )}
+      <main className="pt-20 flex-1">
+        {/* Cabeçalho */}
+        <section className="border-b border-outline-variant/20 bg-surface-container-low">
+          <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-12">
+            <span className="font-label-caps text-label-caps text-on-primary-container mb-3 block">CATÁLOGO</span>
+            <h1 className="font-headline-xl text-headline-xl text-on-surface mb-3">Criptoativos disponíveis</h1>
+            <p className="text-body-lg text-on-surface-variant max-w-2xl">
+              Ativos selecionados com rendimento programado. Escolha um ativo para ver os planos e investir via Pix.
+            </p>
+          </div>
+        </section>
 
-        {cryptos.length === 0 ? (
-          <Card sx={{ p: 4, background: `rgba(26, 31, 46, 0.6)`, border: `1px solid rgba(59, 91, 219, 0.2)`, textAlign: 'center' }}>
-            <Typography variant="h6" sx={{ color: theme.textSecondary }}>
-              Nenhuma criptmoeda disponível no momento.
-            </Typography>
-          </Card>
-        ) : (
-          <Box sx={{ position: 'relative', zIndex: 1 }}>
-            <Swiper
-              modules={[Navigation, Pagination]}
-              navigation={{
-                nextEl: '.swiper-next',
-                prevEl: '.swiper-prev',
-              }}
-              pagination={{ clickable: true }}
-              spaceBetween={20}
-              slidesPerView={1}
-              breakpoints={{
-                640: { slidesPerView: 2 },
-                1024: { slidesPerView: 3 },
-                1400: { slidesPerView: 4 },
-              }}
-              sx={{
-                pb: 6,
-                pt: 2,
-                '& .swiper-pagination': {
-                  bottom: '0 !important',
-                  position: 'static !important',
-                  mt: 2,
-                },
-              }}
-            >
-              {cryptos.map((crypto) => (
-                <SwiperSlide key={crypto._id}>
-                  <Card
-                    sx={{
-                      p: 3,
-                      mt: 2,
-                      height: '100%',
-                      background: `rgba(26, 31, 46, 0.6)`,
-                      border: `1px solid rgba(59, 91, 219, 0.2)`,
-                      borderRadius: '12px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      transition: 'all 0.3s',
-                      position: 'relative',
-                      '&:hover': {
-                        border: `1px solid ${theme.primary}`,
-                        boxShadow: `0 0 20px rgba(59, 91, 219, 0.2)`,
-                        transform: 'translateY(-4px)',
-                        zIndex: 100,
-                      },
-                    }}
-                  >
-                    {/* Crypto Image or Icon */}
-                    <Box sx={{ mb: 3, position: 'relative', height: 120, overflow: 'hidden', borderRadius: '8px' }}>
-                      {crypto.image && crypto.image.trim() ? (
-                        <img
-                          key={crypto._id}
-                          src={`http://localhost:5000${crypto.image.startsWith('/') ? crypto.image : '/' + crypto.image}`}
-                          alt={crypto.name}
-                          crossOrigin="anonymous"
-                          onError={(e) => {
-                            console.log('Image failed to load:', crypto.image);
-                            e.target.style.display = 'none';
-                          }}
-                          onLoad={() => {
-                            console.log('Image loaded successfully:', crypto.image);
-                          }}
-                          style={{
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'cover',
-                          }}
-                        />
-                      ) : null}
-                      {!crypto.image || !crypto.image.trim() ? (
-                        <Box sx={{
-                          width: '100%',
-                          height: '100%',
-                          background: `linear-gradient(135deg, rgba(59, 91, 219, 0.2), rgba(107, 70, 193, 0.2))`,
-                          borderRadius: '8px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}>
-                          <CurrencyBitcoinIcon sx={{ fontSize: 48, color: theme.primary, opacity: 0.5 }} />
-                        </Box>
-                      ) : null}
-                    </Box>
+        {/* Filtros */}
+        <section className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-6 flex flex-col sm:flex-row gap-3 sm:items-center justify-between">
+          <div className="relative flex-1 max-w-md">
+            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar por nome ou símbolo..." className={`${inputCls} w-full pl-11`} />
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-label-caps text-on-surface-variant hidden sm:inline">ORDENAR</span>
+            <select value={sort} onChange={(e) => setSort(e.target.value)} className={inputCls}>
+              <option value="yield">Maior rendimento</option>
+              <option value="price">Menor preço</option>
+              <option value="name">Nome (A–Z)</option>
+            </select>
+          </div>
+        </section>
 
-                    {/* Crypto Info */}
-                    <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <Box>
-                        <Typography variant="h6" sx={{ fontWeight: 700, color: theme.text, mb: 0.5 }}>
-                          {crypto.name}
-                        </Typography>
-                        <Typography variant="body2" sx={{ color: theme.primary, fontWeight: 600 }}>
-                          {crypto.symbol}
-                        </Typography>
-                        <Typography variant="body2" sx={{ color: theme.warning, fontWeight: 700, mt: 0.5 }}>
-                          R$ {(Number(crypto.price) || 0).toFixed(2)}
-                        </Typography>
-                      </Box>
-                    </Box>
+        {/* Conteúdo */}
+        <section className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop pb-20">
+          {loading ? (
+            <div className="flex justify-center items-center py-32">
+              <div className="w-10 h-10 rounded-full border-4 border-outline-variant border-t-primary-container animate-spin" />
+            </div>
+          ) : error ? (
+            <div className="bg-surface-container-lowest border border-outline-variant/40 rounded-xl p-12 text-center">
+              <p className="text-on-surface-variant mb-4">{error}</p>
+              <button onClick={loadCryptos} className="bg-primary-container text-white px-5 py-2.5 rounded-lg font-label-caps uppercase hover:opacity-90">Tentar novamente</button>
+            </div>
+          ) : list.length === 0 ? (
+            <div className="bg-surface-container-lowest border border-outline-variant/40 rounded-xl p-12 text-center">
+              <p className="text-on-surface-variant">Nenhum criptoativo encontrado.</p>
+            </div>
+          ) : (
+            <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl overflow-hidden shadow-sm">
+              {/* Tabela desktop */}
+              <table className="w-full text-left hidden md:table">
+                <thead>
+                  <tr className="bg-surface-container border-b border-outline-variant/30 text-label-caps text-on-surface-variant">
+                    <th className="px-6 py-4 w-10">#</th>
+                    <th className="px-6 py-4">ATIVO</th>
+                    <th className="px-6 py-4 text-right">PREÇO</th>
+                    <th className="px-6 py-4 text-right">RENDIMENTO</th>
+                    <th className="px-6 py-4 text-right">PRAZO</th>
+                    <th className="px-6 py-4"></th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-outline-variant/20">
+                  {list.map((c, i) => {
+                    const plan = bestPlan(c.plans);
+                    return (
+                      <tr key={c._id} className="hover:bg-surface-container/50 transition-colors">
+                        <td className="px-6 py-4 text-on-surface-variant tabular-nums">{i + 1}</td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-3">
+                            <CoinIcon crypto={c} />
+                            <div>
+                              <p className="font-semibold text-on-surface">{c.name}</p>
+                              <p className="text-body-sm text-on-surface-variant uppercase">{c.symbol}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-right tabular-nums font-medium">{BRL(c.price)}</td>
+                        <td className="px-6 py-4 text-right">
+                          {plan ? <span className="text-success font-semibold tabular-nums">+{plan.yieldPercentage}%</span> : <span className="text-on-surface-variant">—</span>}
+                        </td>
+                        <td className="px-6 py-4 text-right text-on-surface-variant tabular-nums">{plan ? `${plan.period} dias` : '—'}</td>
+                        <td className="px-6 py-4 text-right">
+                          <button onClick={() => navigate(`/cryptos/${c._id}`)} className="bg-primary-container text-white px-5 py-2 rounded-lg font-label-caps uppercase hover:opacity-90 transition-opacity active:scale-95">
+                            Investir
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
 
-                    {/* Divider */}
-                    <Box sx={{ height: '1px', background: `rgba(59, 91, 219, 0.1)`, mb: 3 }} />
+              {/* Cards mobile */}
+              <div className="md:hidden divide-y divide-outline-variant/20">
+                {list.map((c) => {
+                  const plan = bestPlan(c.plans);
+                  return (
+                    <div key={c._id} className="p-5">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                          <CoinIcon crypto={c} />
+                          <div>
+                            <p className="font-semibold text-on-surface">{c.name}</p>
+                            <p className="text-body-sm text-on-surface-variant uppercase">{c.symbol}</p>
+                          </div>
+                        </div>
+                        {plan && <span className="text-success font-semibold tabular-nums">+{plan.yieldPercentage}%</span>}
+                      </div>
+                      <div className="flex items-center justify-between text-body-sm mb-4">
+                        <div>
+                          <p className="text-label-caps text-on-surface-variant">PREÇO</p>
+                          <p className="font-medium tabular-nums">{BRL(c.price)}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-label-caps text-on-surface-variant">PRAZO</p>
+                          <p className="font-medium tabular-nums">{plan ? `${plan.period} dias` : '—'}</p>
+                        </div>
+                      </div>
+                      <button onClick={() => navigate(`/cryptos/${c._id}`)} className="w-full bg-primary-container text-white py-2.5 rounded-lg font-label-caps uppercase hover:opacity-90">
+                        Investir
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </section>
+      </main>
 
-                    {/* Details */}
-                    <Box sx={{ mb: 3, flex: 1 }}>
-                      {/* Planos */}
-                      <Typography variant="body2" sx={{ color: theme.textSecondary, mb: 1.5, fontWeight: 600 }}>
-                        Planos Disponíveis
-                      </Typography>
-                      {crypto.plans && crypto.plans.map((plan, idx) => (
-                        <Box
-                          key={idx}
-                          sx={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            mb: 1.5,
-                            p: 1.5,
-                            background: `rgba(16, 185, 129, 0.05)`,
-                            borderRadius: '8px',
-                            border: `1px solid rgba(16, 185, 129, 0.2)`,
-                          }}
-                        >
-                          <Box>
-                            <Typography variant="body2" sx={{ color: theme.text, fontWeight: 600 }}>
-                              {plan.period} dias
-                            </Typography>
-                            <Typography variant="caption" sx={{ color: theme.textSecondary }}>
-                              Período
-                            </Typography>
-                          </Box>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                            <TrendingUpIcon sx={{ color: theme.success, fontSize: 18 }} />
-                            <Typography variant="h6" sx={{ color: theme.success, fontWeight: 700 }}>
-                              {plan.yieldPercentage}%
-                            </Typography>
-                          </Box>
-                        </Box>
-                      ))}
-                    </Box>
-
-                    {/* Action Button */}
-                    <Button
-                      fullWidth
-                      variant="contained"
-                      onClick={() => handleInvest(crypto._id)}
-                      sx={{
-                        background: `linear-gradient(135deg, ${theme.primary} 0%, ${theme.secondary} 100%)`,
-                        fontWeight: 600,
-                        py: 1.5,
-                        '&:hover': {
-                          opacity: 0.9,
-                        },
-                      }}
-                    >
-                      Investir Agora
-                    </Button>
-                  </Card>
-                </SwiperSlide>
-              ))}
-            </Swiper>
-
-            {/* Navigation Buttons - Below Swiper */}
-            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 3 }}>
-              <IconButton
-                className="swiper-prev"
-                sx={{
-                  background: `rgba(59, 91, 219, 0.2)`,
-                  color: theme.text,
-                  '&:hover': {
-                    background: `rgba(59, 91, 219, 0.4)`,
-                  },
-                }}
-              >
-                <ChevronLeftIcon />
-              </IconButton>
-
-              <IconButton
-                className="swiper-next"
-                sx={{
-                  background: `rgba(59, 91, 219, 0.2)`,
-                  color: theme.text,
-                  '&:hover': {
-                    background: `rgba(59, 91, 219, 0.4)`,
-                  },
-                }}
-              >
-                <ChevronRightIcon />
-              </IconButton>
-            </Box>
-          </Box>
-        )}
-
-        {error && (
-          <Alert severity="error" sx={{ mt: 3 }}>
-            {error}
-          </Alert>
-        )}
-
-        {/* Alternative Table View */}
-        {cryptos.length > 0 && (
-          <Card sx={{ mt: 4, background: `rgba(26, 31, 46, 0.6)`, border: `1px solid rgba(59, 91, 219, 0.2)` }}>
-            <Typography variant="h6" sx={{ fontWeight: 700, color: theme.text, p: 3, pb: 2 }}>
-              Visão em Tabela
-            </Typography>
-            <TableContainer sx={{ maxHeight: cryptos.length >= 10 ? '600px' : 'auto', overflow: 'auto' }}>
-              <Table>
-                <TableHead>
-                  <TableRow sx={{ borderBottom: `1px solid rgba(59, 91, 219, 0.1)` }}>
-                    <TableCell sx={{ color: theme.textSecondary, fontWeight: 600 }}>Nome</TableCell>
-                    <TableCell sx={{ color: theme.textSecondary, fontWeight: 600 }}>Símbolo</TableCell>
-                    <TableCell sx={{ color: theme.textSecondary, fontWeight: 600 }}>
-                      Planos
-                    </TableCell>
-                    <TableCell align="center" sx={{ color: theme.textSecondary, fontWeight: 600 }}>
-                      Ação
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {cryptos.map((crypto) => (
-                    <TableRow key={crypto._id} sx={{ borderBottom: `1px solid rgba(59, 91, 219, 0.1)`, '&:hover': { background: `rgba(59, 91, 219, 0.05)` } }}>
-                      <TableCell sx={{ color: theme.text }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <CurrencyBitcoinIcon sx={{ fontSize: 20, color: theme.warning }} />
-                          {crypto.name}
-                        </Box>
-                      </TableCell>
-                      <TableCell sx={{ color: theme.primary, fontWeight: 600 }}>
-                        {crypto.symbol}
-                      </TableCell>
-                      <TableCell sx={{ color: theme.text }}>
-                        {crypto.plans && crypto.plans.map((plan, idx) => (
-                          <Box key={idx} sx={{ fontSize: '0.85rem', mb: idx < crypto.plans.length - 1 ? 0.5 : 0 }}>
-                            <span style={{ color: theme.text }}>{plan.period}d</span>
-                            <span style={{ color: theme.textSecondary, margin: '0 4px' }}>→</span>
-                            <span style={{ color: theme.success, fontWeight: 600 }}>{plan.yieldPercentage}%</span>
-                          </Box>
-                        ))}
-                      </TableCell>
-                      <TableCell align="center">
-                        <Button
-                          size="small"
-                          variant="contained"
-                          onClick={() => handleInvest(crypto._id)}
-                          sx={{
-                            background: `linear-gradient(135deg, ${theme.primary} 0%, ${theme.secondary} 100%)`,
-                            fontSize: '0.75rem',
-                          }}
-                        >
-                          Investir
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Card>
-        )}
-      </Container>
-    </PageLayout>
+      <SiteFooter />
+    </div>
   );
 }
