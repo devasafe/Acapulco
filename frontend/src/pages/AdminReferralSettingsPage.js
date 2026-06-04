@@ -1,29 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  TextField,
-  Button,
-  Alert,
-  CircularProgress,
-  Container,
-  Grid,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-} from '@mui/material';
-import { useTheme } from '@mui/material/styles';
-import SettingsIcon from '@mui/icons-material/Settings';
-import SaveIcon from '@mui/icons-material/Save';
-import PageLayout from '../components/PageLayout';
+import AdminShell from '../components/admin/AdminShell';
 import { getAdminReferralSettings, updateAdminReferralSettings, getAdminReferralProfits } from '../services/referralService';
 
+const BRL = (v) => Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
 const AdminReferralSettingsPage = () => {
-  const theme = useTheme();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -49,7 +30,7 @@ const AdminReferralSettingsPage = () => {
   const fetchProfits = async () => {
     try {
       const response = await getAdminReferralProfits(token);
-      setProfits(response.data);
+      setProfits(response.data || []);
     } catch (err) {
       console.error('Erro ao carregar lucros:', err);
     } finally {
@@ -60,11 +41,11 @@ const AdminReferralSettingsPage = () => {
   const handleSave = async () => {
     try {
       setSaving(true);
+      setError('');
       if (referralPercentage < 0 || referralPercentage > 100) {
         setError('Percentual deve estar entre 0 e 100');
         return;
       }
-
       await updateAdminReferralSettings(referralPercentage, token);
       setSuccess('Configurações atualizadas com sucesso!');
       setTimeout(() => setSuccess(''), 3000);
@@ -75,168 +56,105 @@ const AdminReferralSettingsPage = () => {
     }
   };
 
+  const totalBonus = profits.reduce((sum, p) => sum + p.totalBonusEarned, 0);
+  const avgBonus = profits.length > 0 ? totalBonus / profits.length : 0;
+
   if (loading) {
     return (
-      <PageLayout>
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
-          <CircularProgress />
-        </Box>
-      </PageLayout>
+      <AdminShell title="Configurações de referência">
+        <div className="flex justify-center py-32">
+          <div className="w-10 h-10 rounded-full border-4 border-outline-variant border-t-primary-container animate-spin" />
+        </div>
+      </AdminShell>
     );
   }
 
-  const totalBonusDistributed = profits.reduce((sum, p) => sum + p.totalBonusEarned, 0);
-
   return (
-    <PageLayout>
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-        {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
+    <AdminShell title="Configurações de referência" subtitle="Defina o percentual de bônus pago por indicação.">
+      {error && <div className="bg-danger/10 border border-danger/30 text-danger rounded-lg px-4 py-3 mb-4 text-body-sm">{error}</div>}
+      {success && <div className="bg-success/10 border border-success/30 text-success rounded-lg px-4 py-3 mb-4 text-body-sm">{success}</div>}
 
-        <Typography variant="h5" sx={{ fontWeight: 700, mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
-          <SettingsIcon /> Configurações de Referência
-        </Typography>
+      {/* Percentual */}
+      <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-6 shadow-sm mb-6">
+        <h2 className="font-headline-md text-[18px] mb-4">Percentual de bônus por referência</h2>
+        <div className="flex items-end gap-3 max-w-md">
+          <div className="flex-1 space-y-1.5">
+            <label className="text-label-caps text-on-surface-variant">PERCENTUAL (%)</label>
+            <input
+              type="number" min="0" max="100" step="1"
+              value={referralPercentage}
+              onChange={(e) => setReferralPercentage(Math.max(0, Math.min(100, Number(e.target.value))))}
+              className="w-full bg-surface-container-low border border-outline-variant text-on-surface px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-container/20"
+            />
+          </div>
+          <button onClick={handleSave} disabled={saving} className="bg-primary-container text-white px-5 py-2.5 rounded-lg font-label-caps uppercase hover:opacity-90 disabled:opacity-50 inline-flex items-center gap-2">
+            <span className="material-symbols-outlined text-[18px]">save</span>
+            {saving ? 'Salvando...' : 'Salvar'}
+          </button>
+        </div>
+        <p className="text-body-sm text-on-surface-variant mt-3">
+          Quando um usuário indicado fizer seu primeiro saque, o referenciador receberá este percentual do valor em bônus.
+        </p>
 
-        {/* Configuração de Percentual */}
-        <Card sx={{ mb: 3 }}>
-          <CardContent>
-            <Typography variant="h6" sx={{ fontWeight: 700, mb: 3 }}>
-              Percentual de Bônus por Referência
-            </Typography>
+        <div className="mt-5 bg-primary-container/10 rounded-lg p-4 text-body-sm">
+          <p className="font-semibold mb-2">📌 Exemplo</p>
+          <ul className="space-y-1 text-on-surface-variant">
+            <li>• Percentual configurado: <strong className="text-on-surface">{referralPercentage}%</strong></li>
+            <li>• Usuário indicado faz saque de: <strong className="text-on-surface">{BRL(1000)}</strong></li>
+            <li className="text-success font-semibold pt-1">• Referenciador recebe: {BRL(1000 * referralPercentage / 100)}</li>
+          </ul>
+        </div>
+      </div>
 
-            <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-end', maxWidth: 400 }}>
-              <TextField
-                label="Percentual (%)"
-                type="number"
-                value={referralPercentage}
-                onChange={(e) => setReferralPercentage(Math.max(0, Math.min(100, Number(e.target.value))))}
-                variant="outlined"
-                inputProps={{ min: 0, max: 100, step: 1 }}
-                sx={{ flex: 1 }}
-              />
-              <Button
-                variant="contained"
-                startIcon={<SaveIcon />}
-                onClick={handleSave}
-                disabled={saving}
-              >
-                {saving ? 'Salvando...' : 'Salvar'}
-              </Button>
-            </Box>
+      {/* Estatísticas */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-5 shadow-sm">
+          <p className="text-label-caps text-on-surface-variant mb-1">USUÁRIOS COM BÔNUS</p>
+          <p className="font-headline-md text-headline-md text-primary-container tabular-nums">{profits.length}</p>
+        </div>
+        <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-5 shadow-sm">
+          <p className="text-label-caps text-on-surface-variant mb-1">TOTAL DISTRIBUÍDO</p>
+          <p className="font-headline-md text-headline-md text-success tabular-nums">{BRL(totalBonus)}</p>
+        </div>
+        <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-5 shadow-sm">
+          <p className="text-label-caps text-on-surface-variant mb-1">BÔNUS MÉDIO</p>
+          <p className="font-headline-md text-headline-md text-gold tabular-nums">{BRL(avgBonus)}</p>
+        </div>
+      </div>
 
-            <Typography variant="caption" sx={{ display: 'block', mt: 2, color: theme.textSecondary }}>
-              Quando um usuário indicado fazer seu primeiro saque, o referenciador receberá este percentual do valor em bônus.
-            </Typography>
-
-            {/* Exemplo */}
-            <Box sx={{ mt: 3, p: 2, background: `rgba(59, 91, 219, 0.1)`, borderRadius: '8px' }}>
-              <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
-                📌 Exemplo:
-              </Typography>
-              <Typography variant="caption" sx={{ display: 'block', color: theme.textSecondary }}>
-                • Percentual configurado: {referralPercentage}%
-              </Typography>
-              <Typography variant="caption" sx={{ display: 'block', color: theme.textSecondary }}>
-                • Usuário indicado faz saque de: R$ 1.000,00
-              </Typography>
-              <Typography variant="caption" sx={{ display: 'block', color: theme.success, fontWeight: 600, mt: 1 }}>
-                • Referenciador recebe: R$ {(1000 * referralPercentage / 100).toFixed(2)}
-              </Typography>
-            </Box>
-          </CardContent>
-        </Card>
-
-        {/* Estatísticas de Referências */}
-        <Grid container spacing={2} sx={{ mb: 3 }}>
-          <Grid item xs={12} sm={6} md={4}>
-            <Card>
-              <CardContent>
-                <Typography color="textSecondary" variant="caption">
-                  Total de Usuários com Bônus
-                </Typography>
-                <Typography variant="h4" sx={{ fontWeight: 700, color: theme.primary }}>
-                  {profits.length}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={4}>
-            <Card>
-              <CardContent>
-                <Typography color="textSecondary" variant="caption">
-                  Total em Bônus Distribuído
-                </Typography>
-                <Typography variant="h4" sx={{ fontWeight: 700, color: theme.success }}>
-                  R$ {totalBonusDistributed.toFixed(2)}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={4}>
-            <Card>
-              <CardContent>
-                <Typography color="textSecondary" variant="caption">
-                  Bônus Médio por Usuário
-                </Typography>
-                <Typography variant="h4" sx={{ fontWeight: 700, color: theme.warning }}>
-                  R$ {(profits.length > 0 ? totalBonusDistributed / profits.length : 0).toFixed(2)}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
-
-        {/* Tabela de Lucros */}
-        <Card>
-          <CardContent>
-            <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
-              Top 10 Referenciadores
-            </Typography>
-
-            {profits.length === 0 ? (
-              <Typography color="textSecondary" sx={{ py: 4, textAlign: 'center' }}>
-                Nenhum bônus de referência distribuído ainda
-              </Typography>
-            ) : (
-              <Table>
-                <TableHead>
-                  <TableRow sx={{ background: `rgba(59, 91, 219, 0.05)` }}>
-                    <TableCell sx={{ fontWeight: 700, color: theme.primary }}>Nome</TableCell>
-                    <TableCell sx={{ fontWeight: 700, color: theme.primary }}>Email</TableCell>
-                    <TableCell sx={{ fontWeight: 700, color: theme.primary }}>Código Referência</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 700, color: theme.primary }}>
-                      Bônus Total
-                    </TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 700, color: theme.primary }}>
-                      Referências Ativas
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {profits.slice(0, 10).map((profit) => (
-                    <TableRow key={profit.userId} sx={{ borderBottom: `1px solid rgba(59, 91, 219, 0.1)` }}>
-                      <TableCell sx={{ color: theme.text }}>{profit.name}</TableCell>
-                      <TableCell sx={{ color: theme.textSecondary }}>{profit.email}</TableCell>
-                      <TableCell sx={{ color: theme.textSecondary, fontFamily: 'monospace', fontSize: 12 }}>
-                        {profit.referralCode}
-                      </TableCell>
-                      <TableCell align="right" sx={{ color: theme.success, fontWeight: 700 }}>
-                        R$ {profit.totalBonusEarned.toFixed(2)}
-                      </TableCell>
-                      <TableCell align="right" sx={{ color: theme.primary, fontWeight: 700 }}>
-                        {profit.bonusCount}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-          </CardContent>
-        </Card>
-      </Container>
-    </PageLayout>
+      {/* Top 10 */}
+      <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl shadow-sm overflow-hidden">
+        <h2 className="font-headline-md text-[18px] px-6 pt-6 pb-4">Top 10 referenciadores</h2>
+        {profits.length === 0 ? (
+          <p className="text-on-surface-variant text-center py-10">Nenhum bônus de referência distribuído ainda.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left min-w-[640px]">
+              <thead>
+                <tr className="bg-surface-container border-y border-outline-variant/30 text-label-caps text-on-surface-variant">
+                  <th className="px-6 py-3">NOME</th>
+                  <th className="px-6 py-3">E-MAIL</th>
+                  <th className="px-6 py-3">CÓDIGO</th>
+                  <th className="px-6 py-3 text-right">BÔNUS TOTAL</th>
+                  <th className="px-6 py-3 text-right">REFERÊNCIAS</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-outline-variant/20">
+                {profits.slice(0, 10).map((p) => (
+                  <tr key={p.userId} className="hover:bg-surface-container/40 transition-colors">
+                    <td className="px-6 py-3 font-semibold">{p.name}</td>
+                    <td className="px-6 py-3 text-on-surface-variant">{p.email}</td>
+                    <td className="px-6 py-3 text-on-surface-variant font-data-mono text-body-sm">{p.referralCode}</td>
+                    <td className="px-6 py-3 text-right text-success font-semibold tabular-nums">{BRL(p.totalBonusEarned)}</td>
+                    <td className="px-6 py-3 text-right text-primary-container font-semibold tabular-nums">{p.bonusCount}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </AdminShell>
   );
 };
 

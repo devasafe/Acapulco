@@ -1,99 +1,57 @@
 import React from 'react';
-import { Box, Container, Grid, Card, Typography, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import PageLayout from '../components/PageLayout';
-import SettingsIcon from '@mui/icons-material/Settings';
-import CurrencyBitcoinIcon from '@mui/icons-material/CurrencyBitcoin';
-import PeopleIcon from '@mui/icons-material/People';
+import AdminShell from '../components/admin/AdminShell';
 
-const theme = {
-  primary: '#3B5BDB',
-  secondary: '#6B46C1',
-  warning: '#F59E0B',
-  dark: '#0F1117',
-  darkLight: '#1A1F2E',
-  text: '#F1F5F9',
-  textSecondary: '#CBD5E1',
-};
+const SECTIONS = [
+  {
+    title: 'Dashboard analítico',
+    description: 'Métricas consolidadas da plataforma, saldos em carteira e perfil de cada usuário.',
+    icon: 'analytics',
+    path: '/admin/dashboard-v2',
+  },
+  {
+    title: 'Gerenciar criptomoedas',
+    description: 'Criar, editar, ativar/desativar e remover criptoativos e seus planos de rendimento.',
+    icon: 'currency_bitcoin',
+    path: '/admin/cryptos',
+  },
+  {
+    title: 'Configurar referência',
+    description: 'Ajuste o percentual de bônus pago ao indicar novos investidores.',
+    icon: 'settings',
+    path: '/admin/referral-settings',
+  },
+  {
+    title: 'Lucros de referência',
+    description: 'Histórico detalhado dos bônus de indicação pagos e ranking de referenciadores.',
+    icon: 'trending_up',
+    path: '/admin/referral-profits',
+  },
+];
 
 export default function AdminPage() {
   const navigate = useNavigate();
 
-  const adminSections = [
-    {
-      title: 'Gerenciar Criptomoedas',
-      description: 'Criar, editar e deletar criptomoedas e seus rendimentos',
-      icon: <CurrencyBitcoinIcon sx={{ fontSize: 48, color: theme.primary }} />,
-      path: '/admin/cryptos',
-    },
-    {
-      title: 'Configurar Referência',
-      description: 'Ajuste o percentual de bônus de referência',
-      icon: <SettingsIcon sx={{ fontSize: 48, color: theme.warning }} />,
-      path: '/admin/referral-settings',
-    },
-    {
-      title: 'Lucros de Referência',
-      description: 'Visualize os lucros gerados por referências',
-      icon: <PeopleIcon sx={{ fontSize: 48, color: theme.secondary }} />,
-      path: '/admin/referral-profits',
-    },
-  ];
-
   return (
-    <PageLayout>
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Typography variant="h4" sx={{ fontWeight: 800, color: theme.text, mb: 4 }}>
-          Painel Administrativo
-        </Typography>
-
-        <Grid container spacing={3}>
-          {adminSections.map((section, idx) => (
-            <Grid item xs={12} md={6} lg={4} key={idx}>
-              <Card
-                sx={{
-                  p: 4,
-                  height: '100%',
-                  background: `rgba(26, 31, 46, 0.6)`,
-                  border: `1px solid rgba(59, 91, 219, 0.2)`,
-                  borderRadius: '12px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s',
-                  '&:hover': {
-                    border: `1px solid ${theme.primary}`,
-                    boxShadow: `0 0 20px rgba(59, 91, 219, 0.2)`,
-                  },
-                }}
-                onClick={() => navigate(section.path)}
-              >
-                <Box sx={{ mb: 2 }}>
-                  {section.icon}
-                </Box>
-                <Typography variant="h6" sx={{ fontWeight: 700, color: theme.text, mb: 1 }}>
-                  {section.title}
-                </Typography>
-                <Typography variant="body2" sx={{ color: theme.textSecondary, mb: 'auto' }}>
-                  {section.description}
-                </Typography>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  sx={{
-                    mt: 2,
-                    color: theme.primary,
-                    borderColor: theme.primary,
-                    '&:hover': { background: `rgba(59, 91, 219, 0.1)` },
-                  }}
-                >
-                  Acessar
-                </Button>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-      </Container>
-    </PageLayout>
+    <AdminShell title="Visão geral" subtitle="Acesse as áreas de gestão da plataforma.">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        {SECTIONS.map((s) => (
+          <button
+            key={s.path}
+            onClick={() => navigate(s.path)}
+            className="group text-left bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-6 shadow-sm hover:border-primary-container/60 hover:shadow-md transition-all"
+          >
+            <div className="w-12 h-12 rounded-lg bg-primary-container/10 text-primary-container grid place-items-center mb-4">
+              <span className="material-symbols-outlined text-[26px]">{s.icon}</span>
+            </div>
+            <h2 className="font-headline-md text-[18px] text-on-surface mb-1.5">{s.title}</h2>
+            <p className="text-body-sm text-on-surface-variant mb-4">{s.description}</p>
+            <span className="text-primary font-label-caps uppercase inline-flex items-center gap-1 group-hover:gap-2 transition-all">
+              Acessar <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+            </span>
+          </button>
+        ))}
+      </div>
+    </AdminShell>
   );
 }
