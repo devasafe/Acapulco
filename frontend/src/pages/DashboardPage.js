@@ -30,9 +30,13 @@ function buildEvolution(transactions) {
     .filter((t) => t.createdAt)
     .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
   let acc = 0;
-  return txs.map((t) => {
+  return txs.map((t, idx) => {
     acc += txSign(t.type) * Math.abs(Number(t.amount) || 0);
-    return { date: new Date(t.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }), value: Math.round(acc) };
+    return {
+      idx,
+      date: new Date(t.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit' }),
+      value: Math.round(acc),
+    };
   });
 }
 
@@ -200,9 +204,9 @@ export default function DashboardPage() {
                         <stop offset="100%" stopColor="#4B7BB0" stopOpacity={0} />
                       </linearGradient>
                     </defs>
-                    <XAxis dataKey="date" tick={{ fill: '#93A4B3', fontSize: 12 }} axisLine={false} tickLine={false} />
+                    <XAxis dataKey="idx" type="number" domain={['dataMin', 'dataMax']} allowDecimals={false} tickFormatter={(i) => evolution[i]?.date || ''} tick={{ fill: '#93A4B3', fontSize: 12 }} axisLine={false} tickLine={false} />
                     <YAxis tick={{ fill: '#93A4B3', fontSize: 12 }} axisLine={false} tickLine={false} width={56} tickFormatter={(v) => `R$ ${(v / 1000).toFixed(0)}k`} />
-                    <Tooltip formatter={(v) => BRL(v)} contentStyle={{ borderRadius: 8, border: '1px solid #94a3b855' }} />
+                    <Tooltip formatter={(v) => [BRL(v), 'Saldo']} labelFormatter={(i) => evolution[i]?.date || ''} contentStyle={{ borderRadius: 8, border: '1px solid #94a3b855', background: 'var(--surface-container-lowest)', color: 'var(--on-surface)' }} />
                     <Area type="monotone" dataKey="value" stroke="#4B7BB0" strokeWidth={2} fill="url(#evo)" dot={{ r: 3, fill: '#4B7BB0', stroke: 'var(--surface-container-lowest)', strokeWidth: 2 }} activeDot={{ r: 5 }} />
                   </AreaChart>
                 </ResponsiveContainer>
