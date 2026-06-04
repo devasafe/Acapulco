@@ -1,30 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Box,
-  Container,
-  Card,
-  Typography,
-  Stack,
-  TextField,
-  Button,
-  Grid,
-  Paper,
-  Chip,
-} from '@mui/material';
-import PageLayout from '../components/PageLayout';
+import SiteNav from '../components/marketing/SiteNav';
+import SiteFooter from '../components/marketing/SiteFooter';
 import { getProfile, updateProfile, getReferrals } from '../services/apiService';
 import { getToken } from '../utils/auth';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
-const theme = {
-  primary: '#3B5BDB',
-  secondary: '#6B46C1',
-  success: '#10B981',
-  dark: '#0F1117',
-  darkLight: '#1A1F2E',
-  text: '#F1F5F9',
-  textSecondary: '#CBD5E1',
-};
+const BRL = (v) => Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
 export default function ProfilePage() {
   const token = getToken();
@@ -32,226 +12,174 @@ export default function ProfilePage() {
   const [referrals, setReferrals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
-  const [formData, setFormData] = useState({});
+  const [form, setForm] = useState({ name: '', email: '', phone: '' });
+  const [saving, setSaving] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [msg, setMsg] = useState(null);
 
   useEffect(() => {
-    if (token) {
-      Promise.all([getProfile(token), getReferrals(token)])
-        .then(([profileRes, referralsRes]) => {
-          setProfile(profileRes);
-          setFormData(profileRes);
-          setReferrals(referralsRes || []);
-          setLoading(false);
-        })
-        .catch(() => setLoading(false));
-    }
+    if (!token) return;
+    Promise.all([getProfile(token), getReferrals(token)])
+      .then(([p, r]) => {
+        setProfile(p);
+        setForm({ name: p?.name || '', email: p?.email || '', phone: p?.phone || '' });
+        setReferrals(Array.isArray(r) ? r : r?.data || []);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, [token]);
 
-  const handleSave = async () => {
+  async function handleSave() {
+    setSaving(true);
+    setMsg(null);
     try {
-      const updated = await updateProfile(formData, token);
-      setProfile(updated);
+      const updated = await updateProfile(form, token);
+      setProfile(updated || { ...profile, ...form });
       setEditMode(false);
+      setMsg({ type: 'ok', text: 'Dados atualizados.' });
     } catch (err) {
-      alert(err.response?.data?.error || 'Erro ao atualizar');
+      setMsg({ type: 'err', text: err?.response?.data?.error || 'Erro ao atualizar.' });
+    } finally {
+      setSaving(false);
     }
-  };
+  }
 
-  const copyReferralCode = () => {
-    if (profile?.referralCode) {
-      const referralUrl = `${window.location.origin}/register?ref=${profile.referralCode}`;
-      navigator.clipboard.writeText(referralUrl);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  };
+  function copyReferral() {
+    if (!profile?.referralCode) return;
+    const url = `${window.location.origin}/register?ref=${profile.referralCode}`;
+    navigator.clipboard?.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
 
   if (loading) {
     return (
-      <PageLayout>
-        <Container maxWidth="md">
-          <Typography>Carregando...</Typography>
-        </Container>
-      </PageLayout>
+      <div className="bg-background min-h-screen">
+        <SiteNav active="Perfil" />
+        <div className="flex justify-center items-center py-40">
+          <div className="w-10 h-10 rounded-full border-4 border-outline-variant border-t-primary-container animate-spin" />
+        </div>
+      </div>
     );
   }
 
+  const referralUrl = profile?.referralCode ? `${window.location.origin}/register?ref=${profile.referralCode}` : '';
+  const totalBonus = referrals.reduce((acc, r) => acc + (Number(r.referralBonusEarned) || 0), 0);
+  const inputCls = 'w-full bg-surface-container-low border border-outline-variant text-on-surface px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-container/20 disabled:opacity-70';
+
   return (
-    <PageLayout>
-      <Container maxWidth="md" sx={{ py: 4 }}>
-        <Grid container spacing={3}>
-          {/* Perfil */}
-          <Grid item xs={12} md={8}>
-            <Card
-              sx={{
-                p: 4,
-                background: `rgba(26, 31, 46, 0.6)`,
-                border: `1px solid rgba(59, 91, 219, 0.2)`,
-                borderRadius: '12px',
-              }}
-            >
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                <Typography variant="h5" sx={{ fontWeight: 700, color: theme.text }}>
-                  Meu Perfil
-                </Typography>
-                <Button
-                  variant="outlined"
-                  onClick={() => setEditMode(!editMode)}
-                  sx={{ color: theme.primary, borderColor: theme.primary }}
-                >
-                  {editMode ? 'Cancelar' : 'Editar'}
-                </Button>
-              </Box>
+    <div className="bg-background text-on-surface font-body-md min-h-screen flex flex-col">
+      <SiteNav active="Perfil" />
 
-              <Stack spacing={3}>
-                <TextField
-                  fullWidth
-                  label="Nome"
-                  value={formData.name || ''}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  disabled={!editMode}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      color: theme.text,
-                      '& fieldset': { borderColor: `rgba(59, 91, 219, 0.3)` },
-                    },
-                  }}
-                />
+      <main className="pt-20 flex-1">
+        <div className="max-w-4xl mx-auto px-margin-mobile md:px-margin-desktop py-10 space-y-8">
+          {/* Cabeçalho */}
+          <div className="flex items-center gap-5">
+            <div className="w-20 h-20 rounded-full bg-primary-container text-white grid place-items-center text-headline-lg font-bold uppercase">
+              {(profile?.name || 'U').charAt(0)}
+            </div>
+            <div>
+              <h1 className="font-headline-lg text-headline-lg text-on-surface flex items-center gap-2">
+                {profile?.name || 'Investidor'}
+                <span className="material-symbols-outlined text-success text-[22px]" title="Conta verificada">verified</span>
+              </h1>
+              <p className="text-on-surface-variant">{profile?.email}</p>
+            </div>
+          </div>
 
-                <TextField
-                  fullWidth
-                  label="Email"
-                  type="email"
-                  value={formData.email || ''}
-                  disabled
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      color: theme.textSecondary,
-                      '& fieldset': { borderColor: `rgba(59, 91, 219, 0.3)` },
-                    },
-                  }}
-                />
-
-                {editMode && (
-                  <Button
-                    variant="contained"
-                    onClick={handleSave}
-                    sx={{
-                      background: `linear-gradient(135deg, ${theme.primary} 0%, ${theme.secondary} 100%)`,
-                    }}
-                  >
-                    Salvar Alterações
-                  </Button>
-                )}
-              </Stack>
-            </Card>
-          </Grid>
-
-          {/* Código de Referência */}
-          <Grid item xs={12} md={4}>
-            <Card
-              sx={{
-                p: 3,
-                background: `linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%)`,
-                border: `1px solid rgba(16, 185, 129, 0.2)`,
-                borderRadius: '12px',
-              }}
-            >
-              <Typography variant="subtitle2" sx={{ color: theme.textSecondary, mb: 2 }}>
-                Seu Código de Referência
-              </Typography>
-
-              <Paper
-                sx={{
-                  p: 2,
-                  background: `rgba(26, 31, 46, 0.8)`,
-                  mb: 2,
-                  textAlign: 'center',
-                }}
-              >
-                <Typography
-                  sx={{
-                    fontFamily: 'monospace',
-                    fontSize: '0.9rem',
-                    color: theme.primary,
-                    fontWeight: 700,
-                    wordBreak: 'break-all',
-                  }}
-                >
-                  {profile?.referralCode || '—'}
-                </Typography>
-              </Paper>
-
-              <Button
-                fullWidth
-                variant="contained"
-                startIcon={<ContentCopyIcon />}
-                onClick={copyReferralCode}
-                sx={{
-                  background: copied ? theme.success : theme.primary,
-                  transition: 'background 0.3s',
-                }}
-              >
-                {copied ? 'Copiado!' : 'Copiar Link'}
-              </Button>
-            </Card>
-          </Grid>
-
-          {/* Referidos */}
-          <Grid item xs={12}>
-            <Card
-              sx={{
-                p: 4,
-                background: `rgba(26, 31, 46, 0.6)`,
-                border: `1px solid rgba(59, 91, 219, 0.2)`,
-                borderRadius: '12px',
-              }}
-            >
-              <Typography variant="h6" sx={{ fontWeight: 700, color: theme.text, mb: 3 }}>
-                Meus Referidos ({referrals.length})
-              </Typography>
-
-              {referrals.length > 0 ? (
-                <Stack spacing={2}>
-                  {referrals.map((ref, idx) => (
-                    <Paper
-                      key={idx}
-                      sx={{
-                        p: 2,
-                        background: `rgba(59, 91, 219, 0.05)`,
-                        border: `1px solid rgba(59, 91, 219, 0.1)`,
-                        borderRadius: '8px',
-                      }}
-                    >
-                      <Typography sx={{ color: theme.text, fontWeight: 600 }}>
-                        {ref.name || 'Usuário'}
-                      </Typography>
-                      <Typography variant="caption" sx={{ color: theme.textSecondary }}>
-                        {ref.email}
-                      </Typography>
-                      {ref.referralBonusEarned !== undefined && (
-                        <Chip
-                          label={`Bônus: R$ ${(Number(ref.referralBonusEarned) || 0).toFixed(2)}`}
-                          sx={{
-                            mt: 1,
-                            background: `rgba(16, 185, 129, 0.2)`,
-                            color: theme.success,
-                          }}
-                        />
-                      )}
-                    </Paper>
-                  ))}
-                </Stack>
+          {/* Dados da conta */}
+          <section className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="font-headline-md text-[18px]">Dados da conta</h2>
+              {!editMode ? (
+                <button onClick={() => setEditMode(true)} className="text-primary font-label-caps uppercase hover:opacity-80 inline-flex items-center gap-1">
+                  <span className="material-symbols-outlined text-[18px]">edit</span> Editar
+                </button>
               ) : (
-                <Typography sx={{ color: theme.textSecondary }}>
-                  Você ainda não tem referidos
-                </Typography>
+                <div className="flex gap-3">
+                  <button onClick={() => { setEditMode(false); setForm({ name: profile?.name || '', email: profile?.email || '', phone: profile?.phone || '' }); }} className="text-on-surface-variant font-label-caps uppercase hover:text-on-surface">Cancelar</button>
+                  <button onClick={handleSave} disabled={saving} className="bg-primary-container text-white px-4 py-1.5 rounded-lg font-label-caps uppercase hover:opacity-90 disabled:opacity-50">{saving ? 'Salvando...' : 'Salvar'}</button>
+                </div>
               )}
-            </Card>
-          </Grid>
-        </Grid>
-      </Container>
-    </PageLayout>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="space-y-2">
+                <label className="text-label-caps text-on-surface-variant">NOME COMPLETO</label>
+                <input value={form.name} disabled={!editMode} onChange={(e) => setForm({ ...form, name: e.target.value })} className={inputCls} />
+              </div>
+              <div className="space-y-2">
+                <label className="text-label-caps text-on-surface-variant">E-MAIL</label>
+                <input type="email" value={form.email} disabled={!editMode} onChange={(e) => setForm({ ...form, email: e.target.value })} className={inputCls} />
+              </div>
+              <div className="space-y-2">
+                <label className="text-label-caps text-on-surface-variant">TELEFONE</label>
+                <input value={form.phone} disabled={!editMode} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="(00) 00000-0000" className={inputCls} />
+              </div>
+              <div className="space-y-2">
+                <label className="text-label-caps text-on-surface-variant">CÓDIGO DE INDICAÇÃO</label>
+                <input value={profile?.referralCode || '—'} disabled className={`${inputCls} font-data-mono tracking-wide`} />
+              </div>
+            </div>
+            {msg && <p className={`mt-4 text-body-sm ${msg.type === 'ok' ? 'text-success' : 'text-danger'}`}>{msg.text}</p>}
+          </section>
+
+          {/* Indicação */}
+          <section className="bg-primary-container text-white rounded-xl p-6 md:p-8 shadow-sm">
+            <h2 className="font-headline-md text-headline-md mb-2">Programa de indicação</h2>
+            <p className="text-white/70 text-body-sm mb-6">Compartilhe seu link e ganhe bônus por cada pessoa que investir.</p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+              <div className="bg-white/5 border border-white/10 rounded-lg p-4">
+                <p className="text-label-caps text-white/60">INDICADOS</p>
+                <p className="font-headline-md text-headline-md tabular-nums">{referrals.length}</p>
+              </div>
+              <div className="bg-white/5 border border-white/10 rounded-lg p-4">
+                <p className="text-label-caps text-white/60">GANHOS TOTAIS</p>
+                <p className="font-headline-md text-headline-md tabular-nums text-secondary-fixed-dim">{BRL(totalBonus)}</p>
+              </div>
+              <div className="bg-white/5 border border-white/10 rounded-lg p-4">
+                <p className="text-label-caps text-white/60">SEU CÓDIGO</p>
+                <p className="font-headline-md text-headline-md font-data-mono tracking-wide">{profile?.referralCode || '—'}</p>
+              </div>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <input readOnly value={referralUrl} className="flex-1 bg-white/5 border border-white/15 text-white/90 px-4 py-2.5 rounded-lg text-body-sm focus:outline-none" />
+              <button onClick={copyReferral} className="bg-white text-primary-container px-5 py-2.5 rounded-lg font-label-caps uppercase hover:opacity-90 inline-flex items-center justify-center gap-2">
+                <span className="material-symbols-outlined text-[18px]">{copied ? 'check' : 'content_copy'}</span>
+                {copied ? 'Copiado!' : 'Copiar link'}
+              </button>
+            </div>
+          </section>
+
+          {/* Indicados */}
+          <section className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-6 shadow-sm">
+            <h2 className="font-headline-md text-[18px] mb-4">Meus indicados</h2>
+            {referrals.length === 0 ? (
+              <p className="text-on-surface-variant text-body-sm">Você ainda não indicou ninguém. Compartilhe seu link acima.</p>
+            ) : (
+              <ul className="divide-y divide-outline-variant/20">
+                {referrals.map((r, i) => (
+                  <li key={i} className="flex items-center justify-between py-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="w-9 h-9 rounded-full bg-secondary-container/40 text-on-secondary-container grid place-items-center font-bold uppercase shrink-0">
+                        {(r.name || r.email || '?').charAt(0)}
+                      </span>
+                      <div className="min-w-0">
+                        <p className="font-medium truncate">{r.name || 'Indicado'}</p>
+                        <p className="text-body-sm text-on-surface-variant truncate">{r.email}</p>
+                      </div>
+                    </div>
+                    {r.referralBonusEarned !== undefined && (
+                      <span className="text-success font-semibold tabular-nums whitespace-nowrap">+{BRL(r.referralBonusEarned)}</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        </div>
+      </main>
+
+      <SiteFooter />
+    </div>
   );
 }
