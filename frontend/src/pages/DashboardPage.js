@@ -75,6 +75,7 @@ export default function DashboardPage() {
   const [walletBusy, setWalletBusy] = useState(false);
   const [walletMsg, setWalletMsg] = useState(null); // { type:'ok'|'err', text }
   const [, setTick] = useState(0);
+  const [visibleInvestments, setVisibleInvestments] = useState(4);
 
   const load = useCallback(async () => {
     try {
@@ -274,8 +275,9 @@ export default function DashboardPage() {
                   <p className="text-on-surface-variant text-body-sm">Você ainda não comprou nenhuma criptomoeda. <button onClick={() => navigate('/cryptos')} className="text-primary font-semibold">Comprar agora</button>.</p>
                 </div>
               ) : (
+                <>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {investments.map((inv) => {
+                  {investments.slice(0, visibleInvestments).map((inv) => {
                     const r = remainingOf(inv);
                     const isActive = (inv.status || 'active') === 'active';
                     const canRedeem = isActive && r.done;
@@ -334,6 +336,14 @@ export default function DashboardPage() {
                     );
                   })}
                 </div>
+                {investments.length > visibleInvestments && (
+                  <div className="mt-5 text-center">
+                    <button onClick={() => setVisibleInvestments((n) => n + 4)} className="px-6 py-2.5 rounded-lg border border-outline-variant text-on-surface font-label-caps uppercase hover:bg-surface-container transition-colors inline-flex items-center gap-2">
+                      Ver mais ({investments.length - visibleInvestments}) <span className="material-symbols-outlined text-[18px]">expand_more</span>
+                    </button>
+                  </div>
+                )}
+                </>
               )}
             </div>
 
