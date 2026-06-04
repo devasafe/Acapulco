@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { AreaChart, Area, PieChart, Pie, Cell, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import SiteNav from '../components/marketing/SiteNav';
 import SiteFooter from '../components/marketing/SiteFooter';
-import { getMyInvestments, getDashboardStats } from '../services/apiService';
+import { getMyInvestments, getDashboardStats, withdrawInvestment } from '../services/apiService';
 import { deposit, withdraw } from '../services/walletService';
 import { getToken, getUser } from '../utils/auth';
 
@@ -36,6 +36,23 @@ function buildEvolution(transactions) {
   });
 }
 
+// Tempo restante / progresso de um investimento
+function remainingOf(inv) {
+  if (!inv.createdAt || !inv.investmentPlan) return { left: 0, pct: 100, days: 0, hours: 0, minutes: 0, done: true };
+  const start = new Date(inv.createdAt).getTime();
+  const total = (Number(inv.investmentPlan) || 0) * 86400000;
+  const left = Math.max(0, start + total - Date.now());
+  const pct = total > 0 ? Math.min(100, Math.round(((total - left) / total) * 100)) : 100;
+  return {
+    left,
+    pct,
+    days: Math.floor(left / 86400000),
+    hours: Math.floor((left % 86400000) / 3600000),
+    minutes: Math.floor((left % 3600000) / 60000),
+    done: left === 0,
+  };
+}
+
 function buildDistribution(investments) {
   const map = {};
   (investments || []).forEach((inv) => {
@@ -57,6 +74,7 @@ export default function DashboardPage() {
   const [withdrawAmount, setWithdrawAmount] = useState('');
   const [walletBusy, setWalletBusy] = useState(false);
   const [walletMsg, setWalletMsg] = useState(null); // { type:'ok'|'err', text }
+  const [, setTick] = useState(0);
 
   const load = useCallback(async () => {
     try {
@@ -71,6 +89,19 @@ export default function DashboardPage() {
   }, [token]);
 
   useEffect(() => { if (token) load(); }, [token, load]);
+
+  // Atualiza os countdowns de tempos em tempos
+  useEffect(() => { const id = setInterval(() => setTick((t) => t + 1), 30000); return () => clearInterval(id); }, []);
+
+  async function redeem(id) {
+    if (!window.confirm('Deseja resgatar este investimento? O valor investido + lucro irá para o seu saldo.')) return;
+    try {
+      await withdrawInvestment({ investmentId: id }, token);
+      await load();
+    } catch (e) {
+      alert(e?.response?.data?.error || 'Não foi possível resgatar.');
+    }
+  }
 
   async function handleWallet(kind) {
     const amount = Number(kind === 'deposit' ? depositAmount : withdrawAmount);
@@ -235,38 +266,74 @@ export default function DashboardPage() {
 
           {/* Posições + atividade */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Posições */}
-            <div className="lg:col-span-2 bg-surface-container-lowest border border-outline-variant/30 rounded-xl shadow-sm overflow-hidden">
-              <h3 className="font-headline-md text-[18px] p-6 pb-4">Minhas posições</h3>
+            {/* Posições — minhas criptos com resgate */}
+            <div className="lg:col-span-2">
+              <h3 className="font-headline-md text-[18px] mb-4">Minhas criptomoedas</h3>
               {investments.length === 0 ? (
-                <p className="px-6 pb-6 text-on-surface-variant text-body-sm">Nenhum investimento ativo. <button onClick={() => navigate('/cryptos')} className="text-primary font-semibold">Comece agora</button>.</p>
+                <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-8 text-center shadow-sm">
+                  <p className="text-on-surface-variant text-body-sm">Você ainda não comprou nenhuma criptomoeda. <button onClick={() => navigate('/cryptos')} className="text-primary font-semibold">Comprar agora</button>.</p>
+                </div>
               ) : (
-                <table className="w-full text-left text-body-sm">
-                  <thead>
-                    <tr className="bg-surface-container text-label-caps text-on-surface-variant border-y border-outline-variant/30">
-                      <th className="px-6 py-3">ATIVO</th>
-                      <th className="px-6 py-3 text-right">INVESTIDO</th>
-                      <th className="px-6 py-3 text-right">RENDIMENTO</th>
-                      <th className="px-6 py-3 text-right">PRAZO</th>
-                      <th className="px-6 py-3 text-right">STATUS</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-outline-variant/20">
-                    {investments.map((inv) => (
-                      <tr key={inv._id} className="hover:bg-surface-container/50">
-                        <td className="px-6 py-3 font-medium">{inv.cryptoName || 'Ativo'}</td>
-                        <td className="px-6 py-3 text-right tabular-nums">{BRL(inv.amount)}</td>
-                        <td className="px-6 py-3 text-right text-success tabular-nums">+{Number(inv.yieldPercentage) || 0}%</td>
-                        <td className="px-6 py-3 text-right text-on-surface-variant tabular-nums">{inv.investmentPlan} dias</td>
-                        <td className="px-6 py-3 text-right">
-                          <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${inv.status === 'active' ? 'bg-success/15 text-success' : 'bg-surface-container text-on-surface-variant'}`}>
-                            {inv.status === 'active' ? 'Ativo' : inv.status === 'completed' ? 'Concluído' : inv.status || '—'}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {investments.map((inv) => {
+                    const r = remainingOf(inv);
+                    const isActive = (inv.status || 'active') === 'active';
+                    const canRedeem = isActive && r.done;
+                    const total = (Number(inv.amount) || 0) + (Number(inv.expectedProfit) || 0);
+                    return (
+                      <div key={inv._id} className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-5 shadow-sm flex flex-col">
+                        <div className="flex items-start justify-between mb-4">
+                          <div>
+                            <p className="font-headline-md text-[18px] text-on-surface">{inv.cryptoName || 'Ativo'}</p>
+                            <p className="text-body-sm text-on-surface-variant">Plano de {inv.investmentPlan} dias · +{Number(inv.yieldPercentage) || 0}%</p>
+                          </div>
+                          <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${isActive ? (canRedeem ? 'bg-success/15 text-success' : 'bg-secondary-container/40 text-on-secondary-container') : 'bg-surface-container text-on-surface-variant'}`}>
+                            {!isActive ? 'Resgatado' : canRedeem ? 'Disponível' : 'Em andamento'}
                           </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-2 mb-4 text-center">
+                          <div>
+                            <p className="text-[10px] text-on-surface-variant uppercase tracking-wide">Investido</p>
+                            <p className="font-semibold tabular-nums text-body-sm">{BRL(inv.amount)}</p>
+                          </div>
+                          <div>
+                            <p className="text-[10px] text-on-surface-variant uppercase tracking-wide">Lucro</p>
+                            <p className="font-semibold tabular-nums text-body-sm text-success">+{BRL(inv.expectedProfit)}</p>
+                          </div>
+                          <div>
+                            <p className="text-[10px] text-on-surface-variant uppercase tracking-wide">Total</p>
+                            <p className="font-semibold tabular-nums text-body-sm">{BRL(total)}</p>
+                          </div>
+                        </div>
+
+                        {isActive && (
+                          <div className="mb-4">
+                            <div className="flex justify-between text-[11px] text-on-surface-variant mb-1">
+                              <span>{r.done ? 'Período concluído' : `Faltam ${r.days}d ${r.hours}h ${r.minutes}m`}</span>
+                              <span className="tabular-nums">{r.pct}%</span>
+                            </div>
+                            <div className="h-2 rounded-full bg-surface-container overflow-hidden">
+                              <div className="h-full rounded-full transition-all" style={{ width: `${r.pct}%`, backgroundColor: r.done ? 'var(--success)' : 'var(--surface-tint)' }} />
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="mt-auto pt-1">
+                          {!isActive ? (
+                            <button disabled className="w-full py-2.5 rounded-lg bg-surface-container text-on-surface-variant font-label-caps uppercase cursor-default">Resgatado</button>
+                          ) : canRedeem ? (
+                            <button onClick={() => redeem(inv._id)} className="w-full py-2.5 rounded-lg bg-success text-white font-label-caps uppercase hover:opacity-90 active:scale-95 transition">Resgatar {BRL(total)}</button>
+                          ) : (
+                            <button disabled className="w-full py-2.5 rounded-lg border border-outline-variant text-on-surface-variant font-label-caps uppercase cursor-default">
+                              Resgata em {r.days}d {r.hours}h
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               )}
             </div>
 
