@@ -55,10 +55,12 @@ function remainingOf(inv) {
 
 function buildDistribution(investments) {
   const map = {};
-  (investments || []).forEach((inv) => {
-    const name = inv.cryptoName || 'Ativo';
-    map[name] = (map[name] || 0) + (Number(inv.amount) || 0);
-  });
+  (investments || [])
+    .filter((inv) => (inv.status || 'active') === 'active')
+    .forEach((inv) => {
+      const name = inv.cryptoName || 'Ativo';
+      map[name] = (map[name] || 0) + (Number(inv.amount) || 0);
+    });
   return Object.entries(map).map(([name, value]) => ({ name, value })).filter((d) => d.value > 0);
 }
 
@@ -201,7 +203,7 @@ export default function DashboardPage() {
                     <XAxis dataKey="date" tick={{ fill: '#93A4B3', fontSize: 12 }} axisLine={false} tickLine={false} />
                     <YAxis tick={{ fill: '#93A4B3', fontSize: 12 }} axisLine={false} tickLine={false} width={56} tickFormatter={(v) => `R$ ${(v / 1000).toFixed(0)}k`} />
                     <Tooltip formatter={(v) => BRL(v)} contentStyle={{ borderRadius: 8, border: '1px solid #94a3b855' }} />
-                    <Area type="monotone" dataKey="value" stroke="#4B7BB0" strokeWidth={2} fill="url(#evo)" />
+                    <Area type="monotone" dataKey="value" stroke="#4B7BB0" strokeWidth={2} fill="url(#evo)" dot={{ r: 3, fill: '#4B7BB0', stroke: 'var(--surface-container-lowest)', strokeWidth: 2 }} activeDot={{ r: 5 }} />
                   </AreaChart>
                 </ResponsiveContainer>
               ) : (
