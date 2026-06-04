@@ -74,7 +74,7 @@ export default function CryptoListPage() {
 
   return (
     <div className="bg-background text-on-surface font-body-md min-h-screen flex flex-col">
-      <SiteNav active="Criptoativos" />
+      <SiteNav active="Criptomoedas" />
 
       <main className="pt-20 flex-1">
         {/* Cabeçalho */}

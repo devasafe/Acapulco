@@ -18,8 +18,8 @@ export default function SiteNav({ active = '' }) {
     ...(loggedIn
       ? [
           { label: 'Dashboard', to: '/dashboard' },
+          { label: 'Criptomoedas', to: '/cryptos' },
           { label: 'Perfil', to: '/profile' },
-          { label: 'Referências', to: '/referrals' },
           ...(user?.isAdmin ? [{ label: 'Painel Admin', to: '/admin' }] : []),
         ]
       : []),
