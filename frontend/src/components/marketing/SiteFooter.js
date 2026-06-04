@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 const cols = [
-  { title: 'Plataforma', items: [['Criptoativos', '/cryptos'], ['Rendimentos', '/rendimentos'], ['Carteiras', '/cryptos']] },
+  { title: 'Plataforma', items: [['Criptoativos', '/cryptos'], ['Dashboard', '/dashboard'], ['Referências', '/referrals']] },
   { title: 'Institucional', items: [['Sobre', '/about'], ['Carreiras', '#'], ['Contato', '/contact']] },
   { title: 'Segurança', items: [['Proof of Reserves', '#'], ['Custódia Segregada', '#']] },
   { title: 'Legal', items: [['Aviso de Risco', '#'], ['Privacidade', '#']] },
