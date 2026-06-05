@@ -21,7 +21,7 @@ export default function ImovelList({ onInvest, onImovelClick }) {
               {imovel.images && imovel.images.length > 0 && (
                 <div style={{ display: 'flex', gap: 8, margin: '8px 0' }}>
                   {imovel.images.map((img, idx) => (
-                    <img key={idx} src={`http://localhost:5000${img}`} alt="foto" style={{ width: 100, height: 70, objectFit: 'cover', borderRadius: 4 }} />
+                    <img key={idx} src={`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${img}`} alt="foto" style={{ width: 100, height: 70, objectFit: 'cover', borderRadius: 4 }} />
                   ))}
                 </div>
               )}

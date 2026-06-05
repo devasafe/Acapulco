@@ -9,7 +9,7 @@ import {
 } from '../services/apiService';
 import { getToken } from '../utils/auth';
 
-const ASSET_BASE = 'http://localhost:5000';
+import { ASSET_BASE } from '../config';
 const BRL = (v) => Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
 function imageUrl(image) {

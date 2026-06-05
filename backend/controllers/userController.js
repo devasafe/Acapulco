@@ -82,12 +82,28 @@ exports.getDashboardStats = async (req, res) => {
       ? user.referrals.filter(ref => ref && ref.isActive === true).length 
       : 0;
 
+    // Calcular investimentos ativos (não sacados)
+    const activeInvestments = investments.filter(inv => inv.status === 'active');
+    const totalActiveInvested = activeInvestments.reduce((sum, inv) => sum + inv.amount, 0);
+
+    // Calcular lucro realizado (apenas rendimento, sem capital)
+    const profitTransactions = transactions.filter(tx => tx.type === 'profit');
+    const totalRealizedProfit = profitTransactions.reduce((sum, tx) => sum + tx.amount, 0);
+
+    // Total sacado
+    const withdrawTransactions = transactions.filter(tx => tx.type === 'withdrawal');
+    const totalWithdrawn = withdrawTransactions.reduce((sum, tx) => sum + tx.amount, 0);
+
+    // Total bônus de referência
+    const bonusTransactions = transactions.filter(tx => tx.type === 'referral_bonus');
+    const totalReferralBonus = bonusTransactions.reduce((sum, tx) => sum + tx.amount, 0);
+
     res.json({
       wallet: user.wallet,
-      totalInvested: user.totalInvested || 0,
-      totalRealizedProfit: user.totalRealizedProfit || 0,
-      totalWithdrawn: user.totalWithdrawn || 0,
-      totalReferralBonus: user.totalReferralBonus || 0,
+      totalInvested: totalActiveInvested, // Apenas investimentos ativos
+      totalRealizedProfit: totalRealizedProfit, // Apenas lucro líquido
+      totalWithdrawn: totalWithdrawn,
+      totalReferralBonus: totalReferralBonus,
       activeReferrals,
       recentTransactions: transactions.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
     });

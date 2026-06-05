@@ -10,6 +10,7 @@ import HomePage from './pages/HomePage';
 import DashboardPage from './pages/DashboardPage';
 import ProfilePage from './pages/ProfilePage';
 import AdminPage from './pages/AdminPage';
+import AdminDashboardV2 from './pages/AdminDashboardV2';
 import CryptoAdminPage from './pages/CryptoAdminPage';
 import CryptoListPage from './pages/CryptoListPage';
 import CryptoDetailPage from './pages/CryptoDetailPage';
@@ -97,6 +98,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <AdminPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/dashboard-v2"
+            element={
+              <ProtectedRoute>
+                <AdminDashboardV2 />
               </ProtectedRoute>
             }
           />

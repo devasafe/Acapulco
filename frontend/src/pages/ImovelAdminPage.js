@@ -80,7 +80,7 @@ export default function ImovelAdminPage() {
         {editId && currentImages.length > 0 && (
           <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
             {currentImages.map((img, idx) => (
-              <img key={idx} src={`http://localhost:5000${img}`} alt="foto" style={{ width: 80, height: 60, objectFit: 'cover', borderRadius: 4 }} />
+              <img key={idx} src={`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${img}`} alt="foto" style={{ width: 80, height: 60, objectFit: 'cover', borderRadius: 4 }} />
             ))}
           </div>
         )}

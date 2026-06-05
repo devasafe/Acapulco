@@ -7,8 +7,13 @@ const path = require('path');
 const app = express();
 
 // ✓ CORS FIRST
+// Em produção, defina CORS_ORIGIN com a URL do frontend (ex.: https://acapulco.vercel.app).
+// Sem essa variável, reflete a origem da requisição (libera geral — útil em demo).
+const allowedOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',').map((o) => o.trim())
+  : true;
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:5000'],
+  origin: allowedOrigins,
   credentials: true
 }));
 

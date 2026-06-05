@@ -3,17 +3,23 @@ import { Box, AppBar, Toolbar, Typography, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import Footer from './Footer';
 
 const theme = {
-  primary: '#3B5BDB',
+  primary: '#7C3AED',
   secondary: '#6B46C1',
-  dark: '#0F1117',
-  darkLight: '#1A1F2E',
+  success: '#10B981',
+  error: '#EF4444',
+  warning: '#F59E0B',
+  dark: '#0a0e27',
+  darkLight: 'rgba(26, 26, 77, 0.6)',
+  darker: 'rgba(45, 27, 78, 0.6)',
   text: '#F1F5F9',
   textSecondary: '#CBD5E1',
+  textTertiary: '#94A3B8',
 };
 
-export default function PageLayout({ children }) {
+export default function PageLayout({ children, noPadding = false }) {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
 
@@ -35,14 +41,14 @@ export default function PageLayout({ children }) {
   };
 
   return (
-    <Box sx={{ background: `linear-gradient(135deg, ${theme.dark} 0%, ${theme.darkLight} 100%)`, minHeight: '100vh' }}>
+    <Box sx={{ background: `linear-gradient(135deg, ${theme.dark} 0%, #1a1a4d 15%, #2d1b4e 30%, #3d2e5f 45%, #2a1f4d 60%, #1a1a3e 75%, #0f172a 100%)`, minHeight: '100vh' }}>
       <AppBar
         position="static"
         sx={{
-          background: `rgba(26, 31, 46, 0.95)`,
+          background: `linear-gradient(135deg, rgba(10, 14, 39, 0.98) 0%, rgba(26, 26, 77, 0.95) 100%)`,
           backdropFilter: 'blur(10px)',
-          borderBottom: `1px solid rgba(59, 91, 219, 0.1)`,
-          boxShadow: 'none',
+          borderBottom: `1px solid rgba(124, 58, 237, 0.2)`,
+          boxShadow: '0 4px 12px rgba(124, 58, 237, 0.15)',
         }}
       >
         <Toolbar>
@@ -127,9 +133,10 @@ export default function PageLayout({ children }) {
           </Box>
         </Toolbar>
       </AppBar>
-      <Box sx={{ py: 4 }}>
+      <Box sx={{ py: noPadding ? 0 : 4 }}>
         {children}
       </Box>
+      <Footer />
     </Box>
   );
 }

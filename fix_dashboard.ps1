@@ -1,23 +1,96 @@
-$file = "d:\PROJETOS\Acapulco\frontend\src\pages\DashboardPage.js"
-$content = Get-Content -Path $file -Raw
+# Debug script para o problema "Total Lucro R$ 0k"
+# Script para Windows PowerShell
 
-# New charts section
-$newCharts = @"
-        {/* Seção Gráficos */}
-        <Box sx={{ mb: 5 }}>
-          <Typography variant="h6" fontWeight={800} sx={{ mb: 3, background: 'linear-gradient(90deg, #00ffff 0%, #ff00ff 50%, #ffff00 100%)', backgroundClip: 'text', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', letterSpacing: '1px' }}>
-            📊 Visualizações de Investimentos
-          </Typography>
+Write-Host "==================================" -ForegroundColor Cyan
+Write-Host "Debug: Total Lucro R$ 0k" -ForegroundColor Cyan
+Write-Host "==================================" -ForegroundColor Cyan
+Write-Host ""
 
-          <Grid container spacing={2} sx={{ width: '100%' }}>
-            {chartData.dates.length > 0 && (
-              <>
-                {/* Gráfico de Transações */}
-                <Grid item xs={12} sm={6} lg={4} sx={{ display: 'flex', flexDirection: 'column' }}>
-                  <Paper sx={{
-                    p: 2,
-                    borderRadius: 3,
-                    boxShadow: '0 0 30px rgba(0, 255, 255, 0.2), inset 0 1px 0 rgba(255,255,255,0.05)',
+Write-Host "📋 MUDANÇAS APLICADAS" -ForegroundColor Green
+Write-Host ""
+Write-Host "✅ Backend:" -ForegroundColor Yellow
+Write-Host "   1. investmentController.js - Corrigido para usar crypto.plans[]"
+Write-Host "   2. adminController.js - Melhorado error handling e conversão de tipos"
+Write-Host "   3. NOVO: scripts/debugDatabase.js - Analisa estado do banco"
+Write-Host "   4. NOVO: scripts/seedInvestmentsWithProfit.js - Cria dados de teste"
+Write-Host ""
+Write-Host "✅ Frontend:" -ForegroundColor Yellow
+Write-Host "   1. AdminDashboardV2.js - Adicionado console.log para debug"
+Write-Host ""
+
+Write-Host "🔍 CHECKLIST DE TESTE" -ForegroundColor Cyan
+Write-Host ""
+
+Write-Host "PASSO 1: Verificar estado do banco" -ForegroundColor Green
+Write-Host "Command: cd backend && node scripts/debugDatabase.js" -ForegroundColor White
+Write-Host ""
+Write-Host "Procure por:" -ForegroundColor Yellow
+Write-Host "  ✓ Total de usuários > 0"
+Write-Host "  ✓ Transações de Profit > 0"
+Write-Host "  ✓ Investimentos Retirados > 0"
+Write-Host ""
+
+Write-Host "PASSO 2: Se não houver dados, crie dados de teste" -ForegroundColor Green
+Write-Host "Commands:" -ForegroundColor White
+Write-Host "  cd backend"
+Write-Host "  node scripts/seedCryptos.js"
+Write-Host "  node scripts/seedInvestmentsWithProfit.js"
+Write-Host ""
+
+Write-Host "PASSO 3: Reiniciar o servidor backend" -ForegroundColor Green
+Write-Host "Command: npm start" -ForegroundColor White
+Write-Host ""
+
+Write-Host "PASSO 4: Abrir admin dashboard e verificar console" -ForegroundColor Green
+Write-Host "Steps:" -ForegroundColor White
+Write-Host "  1. Abra http://localhost:3000/admin/dashboard"
+Write-Host "  2. Pressione F12 para abrir DevTools"
+Write-Host "  3. Vá para a aba 'Console'"
+Write-Host "  4. Procure por mensagens com 🔍 e 📡"
+Write-Host ""
+
+Write-Host "📊 MENSAGENS ESPERADAS NO CONSOLE:" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "📡 [AdminDashboard] Resposta da API /admin/users: [...]" -ForegroundColor White
+Write-Host "🔍 [AdminDashboard] Dados carregados: {" -ForegroundColor White
+Write-Host "     totalProfit: XXX,  // <- Deve ser > 0" -ForegroundColor Green
+Write-Host "     allUsersProfit: [...]" -ForegroundColor White
+Write-Host "   }" -ForegroundColor White
+Write-Host ""
+
+Write-Host "❓ TROUBLESHOOTING" -ForegroundColor Yellow
+Write-Host ""
+Write-Host "Se totalProfit ainda for 0:" -ForegroundColor Red
+Write-Host "  1. Verifique Network tab -> /admin/users"
+Write-Host "  2. Response deve conter 'profit' field com valores > 0"
+Write-Host "  3. Se profit estiver 0 na API, problema é no backend"
+Write-Host ""
+
+Write-Host "Se houver erro 401 Unauthorized:" -ForegroundColor Red
+Write-Host "  1. Logout e login novamente"
+Write-Host "  2. Limpe cache: localStorage.clear() no console"
+Write-Host "  3. Recarregue a página"
+Write-Host ""
+
+Write-Host "📁 ARQUIVOS MODIFICADOS" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "Backend:" -ForegroundColor Yellow
+Write-Host "  • backend/controllers/investmentController.js (FIX: crypto.plans[])"
+Write-Host "  • backend/controllers/adminController.js (FIX: error handling)"
+Write-Host "  • backend/scripts/debugDatabase.js (NOVO)"
+Write-Host "  • backend/scripts/seedInvestmentsWithProfit.js (NOVO)"
+Write-Host ""
+Write-Host "Frontend:" -ForegroundColor Yellow
+Write-Host "  • frontend/src/pages/AdminDashboardV2.js (DEBUG: console.log)"
+Write-Host ""
+Write-Host "Documentação:" -ForegroundColor Yellow
+Write-Host "  • PROFIT_DEBUG.md - Guia completo de troubleshooting"
+Write-Host "  • RUN_DEBUG.sh - Script bash de debug (se usar WSL/Git Bash)"
+Write-Host "  • fix_dashboard.ps1 - Este arquivo (você está lendo)"
+Write-Host ""
+
+Write-Host "✅ STATUS: Pronto para teste!" -ForegroundColor Green
+Write-Host ""
                     background: 'linear-gradient(135deg, rgba(0, 255, 255, 0.08) 0%, rgba(255, 0, 255, 0.05) 100%), linear-gradient(135deg, #0a0f25 0%, #1a0f35 100%)',
                     backdropFilter: 'blur(10px)',
                     border: '1px solid rgba(0, 255, 255, 0.2)',

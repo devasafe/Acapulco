@@ -6,9 +6,63 @@ const Investment = require('../models/Investment');
 // Get all users
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await User.find().select('name email wallet referralCode createdAt').lean();
-    res.json(users);
+    const users = await User.find()
+      .select('name email wallet totalInvested totalRealizedProfit totalReferralBonus referralCode createdAt')
+      .lean();
+    
+    // Enriquecer com dados de transações se necessário
+    const enrichedUsers = await Promise.all(users.map(async (user) => {
+      try {
+        // Buscar profit realizado
+        const profitTransactions = await Transaction.find({
+          userId: user._id,
+          type: 'profit'
+        }).lean();
+        
+        const realizedProfit = profitTransactions.reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
+
+        // Buscar saques realizados
+        const withdrawTransactions = await Transaction.find({
+          userId: user._id,
+          type: 'withdrawal'
+        }).lean();
+        
+        const totalWithdrawn = withdrawTransactions.reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
+
+        // Buscar depósitos realizados
+        const depositTransactions = await Transaction.find({
+          userId: user._id,
+          type: 'deposit'
+        }).lean();
+        
+        const totalDeposited = depositTransactions.reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
+        
+        return {
+          ...user,
+          walletBalance: Number(user.wallet) || 0,
+          totalInvested: Number(user.totalInvested) || 0,
+          profit: realizedProfit,  // SEMPRE use o total de transactions, não fallback
+          totalReferralBonus: Number(user.totalReferralBonus) || 0,
+          totalWithdrawn: totalWithdrawn,
+          totalDeposited: totalDeposited
+        };
+      } catch (userErr) {
+        console.error(`Erro ao processar usuário ${user._id}:`, userErr);
+        return {
+          ...user,
+          walletBalance: Number(user.wallet) || 0,
+          totalInvested: Number(user.totalInvested) || 0,
+          profit: 0,  // Se houver erro, retorna 0 (não temos transactions válidas)
+          totalReferralBonus: Number(user.totalReferralBonus) || 0,
+          totalWithdrawn: 0,
+          totalDeposited: 0
+        };
+      }
+    }));
+
+    res.json(enrichedUsers);
   } catch (err) {
+    console.error('Erro em getAllUsers:', err);
     res.status(500).json({ error: err.message });
   }
 };

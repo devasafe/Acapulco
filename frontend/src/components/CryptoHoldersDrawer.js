@@ -76,7 +76,7 @@ const CryptoHoldersDrawer = ({ open, onClose, crypto }) => {
           {crypto?.image && (
             <Box
               component="img"
-              src={`http://localhost:5000${crypto.image}`}
+              src={`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${crypto.image}`}
               alt={crypto.name}
               sx={{
                 width: '100%',

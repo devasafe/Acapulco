@@ -43,6 +43,22 @@ export default function Navbar({ user, onLogout }) {
   const handleMenuOpen = (e) => setAnchorEl(e.currentTarget);
   const handleMenuClose = () => setAnchorEl(null);
 
+  // Menu items sempre visíveis
+  const alwaysVisibleItems = [
+    { label: 'Início', icon: <HomeIcon />, path: '/' },
+    { label: 'Sobre', icon: <InfoOutlinedIcon />, path: '/about' },
+    { label: 'Contato', icon: <EmailIcon />, path: '/contact' },
+  ];
+
+  // Menu items apenas para usuários logados
+  const userOnlyItems = [
+    { label: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
+    { label: 'Perfil', icon: <PersonIcon />, path: '/profile' },
+    { label: 'Referências', icon: <ShareIcon />, path: '/referrals' },
+    ...(user?.isAdmin ? [
+      { label: 'Painel Admin', icon: <AdminPanelSettingsIcon />, path: '/admin' },
+    ] : []),
+  ];
 
   // Items para renderizar baseado em login
   const displayMenuItems = user ? [...alwaysVisibleItems, ...userOnlyItems] : alwaysVisibleItems;

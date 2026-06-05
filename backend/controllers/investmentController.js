@@ -16,13 +16,13 @@ exports.getMyInvestments = async (req, res) => {
   }
 };
 
-// Create investment (buy crypto)
+// Create investment (buy crypto) - Deprecated, use investInCrypto instead
 exports.createInvestment = async (req, res) => {
   try {
-    const { cryptoId, amount } = req.body;
+    const { cryptoId, amount, period } = req.body;
     
-    if (!cryptoId || !amount) {
-      return res.status(400).json({ error: 'Missing cryptoId or amount' });
+    if (!cryptoId || !amount || !period) {
+      return res.status(400).json({ error: 'Missing cryptoId, amount, or period' });
     }
 
     const user = await User.findById(req.user.userId);
@@ -35,7 +35,12 @@ exports.createInvestment = async (req, res) => {
     const crypto = await Crypto.findById(cryptoId);
     if (!crypto) return res.status(404).json({ error: 'Crypto not found' });
 
-    const expectedProfit = (amount * crypto.yieldPercentage / 100).toFixed(2);
+    // Find the selected plan
+    const selectedPlan = crypto.plans.find(p => p.period === Number(period));
+    if (!selectedPlan) return res.status(400).json({ error: 'Plan not found' });
+
+    // ✅ IMPORTANTE: Converter para número, não string!
+    const expectedProfit = Number((amount * selectedPlan.yieldPercentage / 100).toFixed(2));
     
     const investment = new Investment({
       userId: req.user.userId,
@@ -43,8 +48,8 @@ exports.createInvestment = async (req, res) => {
       cryptoId,
       cryptoName: crypto.name,
       amount,
-      investmentPlan: crypto.period,
-      yieldPercentage: crypto.yieldPercentage,
+      investmentPlan: period,
+      yieldPercentage: selectedPlan.yieldPercentage,
       expectedProfit,
       status: 'active'
     });
@@ -60,7 +65,7 @@ exports.createInvestment = async (req, res) => {
       userId: req.user.userId,
       type: 'investment',
       amount,
-      description: `Investimento em ${crypto.name}`,
+      description: `Investimento em ${crypto.name} - ${period} dias`,
       relatedInvestment: investment._id
     });
     await transaction.save();
@@ -99,12 +104,25 @@ exports.withdrawInvestment = async (req, res) => {
     investment.status = 'withdrawn';
     await investment.save();
 
-    // Record redemption transaction (resgate - different from withdrawal/saque)
+    // Record profit transaction (apenas o lucro)
+    const profitAmount = parseFloat(investment.expectedProfit);
+    if (profitAmount > 0) {
+      const profitTransaction = new Transaction({
+        userId: req.user.userId,
+        type: 'profit',
+        amount: profitAmount,
+        description: `Lucro do resgate de investimento em ${investment.cryptoName}`,
+        relatedInvestment: investment._id
+      });
+      await profitTransaction.save();
+    }
+
+    // Record redemption transaction (resgate - capital devolvido)
     const redemptionTransaction = new Transaction({
       userId: req.user.userId,
       type: 'redemption',
-      amount: totalReturn,
-      description: `Resgate do investimento em ${investment.cryptoName}`,
+      amount: investment.amount,
+      description: `Devolução de capital - Investimento em ${investment.cryptoName}`,
       relatedInvestment: investment._id
     });
     await redemptionTransaction.save();
@@ -141,7 +159,8 @@ exports.investInCrypto = async (req, res) => {
     const selectedPlan = crypto.plans.find(p => p.period === Number(period));
     if (!selectedPlan) return res.status(400).json({ error: 'Plan not found' });
 
-    const expectedProfit = (amount * selectedPlan.yieldPercentage / 100).toFixed(2);
+    // ✅ IMPORTANTE: Converter para número, não string!
+    const expectedProfit = Number((amount * selectedPlan.yieldPercentage / 100).toFixed(2));
     
     const investment = new Investment({
       userId: req.user.userId,

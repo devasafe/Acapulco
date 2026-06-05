@@ -260,7 +260,7 @@ export default function CryptoList({ onCryptoClick }) {
                     <Box
                       sx={{
                         height: 200,
-                        backgroundImage: `url(http://localhost:5000${crypto.image})`,
+                        backgroundImage: `url(${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${crypto.image})`,
                         backgroundSize: 'cover',
                         backgroundPosition: 'center',
                         position: 'relative',
