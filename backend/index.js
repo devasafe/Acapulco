@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+const http = require('http');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const path = require('path');
@@ -20,7 +21,7 @@ app.use(cors({
 // ✓ JSON parser
 app.use(express.json());
 
-// ✓ Servir uploads ANTES de tudo com headers CORS corretos
+// ✓ Servir uploads com headers CORS corretos
 app.use('/uploads', (req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
@@ -32,45 +33,51 @@ app.use('/uploads', (req, res, next) => {
   next();
 }, express.static(path.join(__dirname, 'uploads')));
 
-
+// Rotas
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
-const cryptoRoutes = require('./routes/cryptoRoutes');
-const investmentRoutes = require('./routes/investmentRoutes');
+const assetRoutes = require('./routes/assetRoutes');
+const marketRoutes = require('./routes/marketRoutes');
+const tradeRoutes = require('./routes/tradeRoutes');
 const walletRoutes = require('./routes/walletRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const transactionRoutes = require('./routes/transactionRoutes');
 const referralRoutes = require('./routes/referralRoutes');
-const imovelRoutes = require('./routes/imovelRoutes');
+const ideaRoutes = require('./routes/ideaRoutes');
+const leaderboardRoutes = require('./routes/leaderboardRoutes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/cryptos', cryptoRoutes);
-app.use('/api/investments', investmentRoutes);
+app.use('/api/assets', assetRoutes);
+app.use('/api/market', marketRoutes);
+app.use('/api/trades', tradeRoutes);
+app.use('/api/ideas', ideaRoutes);
+app.use('/api/leaderboard', leaderboardRoutes);
 app.use('/api/wallet', walletRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/referrals', referralRoutes);
-app.use('/api/imovels', imovelRoutes);
+
+app.get('/api/health', (req, res) => res.json({ ok: true }));
+
+// HTTP server + Socket.io (preços ao vivo)
+const server = http.createServer(app);
+const { init: initSocket } = require('./utils/socket');
+initSocket(server);
 
 // MongoDB connection
 mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/acapulco', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
-.then(() => console.log('MongoDB connected'))
-.catch((err) => console.error('MongoDB connection error:', err));
+  .then(() => {
+    console.log('MongoDB connected');
+    // Inicia o broadcaster de preços ao vivo após DB + socket prontos
+    require('./utils/priceBroadcaster').start();
+  })
+  .catch((err) => console.error('MongoDB connection error:', err));
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
-// Job agendado para atualizar lucros dos investimentos a cada 24h
-const updateProfitsForAllUsers = require('./utils/updateInvestmentProfits');
-const ONE_DAY_MS = 24 * 60 * 60 * 1000;
-setInterval(() => {
-  updateProfitsForAllUsers()
-    .then(() => console.log('Lucros dos investimentos atualizados para todos os usuários.'))
-    .catch(err => console.error('Erro ao atualizar lucros dos investimentos:', err));
-}, ONE_DAY_MS);

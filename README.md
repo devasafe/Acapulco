@@ -1,9 +1,9 @@
-<h1 align="center">Acapulco — Plataforma de investimento em criptomoedas</h1>
+<h1 align="center">Acapulco — Simulador de Trading (Paper Trading)</h1>
 
 <p align="center">
-  Fintech para investir em criptoativos com rendimento programado, sistema de indicação e painel administrativo.
+  Simulador educacional para praticar compra e venda de ativos com <b>gráficos e preços reais de mercado</b> e <b>dinheiro 100% fictício</b>.
   <br/>
-  <i>A fintech to invest in crypto assets with programmed yield, a referral system and an admin panel.</i>
+  <i>An educational paper-trading simulator: practice trading with real market data and 100% virtual money.</i>
 </p>
 
 <p align="center">
@@ -11,64 +11,71 @@
   <img src="https://img.shields.io/badge/Node.js-339933?logo=node.js&logoColor=white" />
   <img src="https://img.shields.io/badge/Express-000?logo=express&logoColor=white" />
   <img src="https://img.shields.io/badge/MongoDB-47A248?logo=mongodb&logoColor=white" />
-  <img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?logo=tailwindcss&logoColor=white" />
+  <img src="https://img.shields.io/badge/Socket.io-010101?logo=socket.io&logoColor=white" />
+  <img src="https://img.shields.io/badge/ApexCharts-FF4560" />
 </p>
 
 <p align="center">🇧🇷 Português &nbsp;|&nbsp; <a href="#-english">🇺🇸 English</a></p>
-
-<!-- 📸 Dica: adicione um print aqui → ![Acapulco](docs/screenshot.png) -->
 
 ---
 
 ## 🇧🇷 Português
 
 ### Sobre
-Plataforma onde o usuário investe em criptoativos com **rendimento programado** e acompanha tudo num **dashboard** com gráficos de evolução de patrimônio e distribuição da carteira. Tem **sistema de indicação** com bônus e um **painel administrativo** completo. Interface repaginada com identidade **fintech institucional** e **modo claro/escuro**.
+**Acapulco é um simulador de trading educacional.** Você pratica compra e venda de criptoativos
+com **dados reais de mercado em tempo real** (gráficos candlestick estilo bolsa), mas usando uma
+**carteira fictícia** — sem depósito, sem risco, sem dinheiro real.
+
+> ⚠️ **Não é uma plataforma de investimento.** Todo saldo é fictício, não há lucro garantido,
+> nem "sinais privilegiados", e ninguém controla o resultado: o P&L vem **exclusivamente do mercado real**.
 
 ### Funcionalidades
-- 📊 **Dashboard** com KPIs e gráficos (evolução do patrimônio e distribuição da carteira)
-- 🪙 Catálogo de criptoativos com **planos de rendimento** por prazo
-- 👥 **Sistema de indicação** com bônus e histórico
-- 🛠️ **Painel admin**: usuários, criptoativos, configurações e relatórios de referência
-- 🌗 **Modo claro/escuro** com paleta em variáveis CSS
+- 📈 **Gráficos candlestick** com dados reais de mercado (Binance) e **preços ao vivo** via WebSocket
+- 💱 **Paper trading**: compra/venda a preço real, posições com preço médio e **P&L real** (realizado e não-realizado)
+- 📊 **Dashboard** com patrimônio, caixa, posições valorizadas ao vivo e histórico de operações
+- 🏆 **Ranking** de traders por desempenho da carteira fictícia
+- 💡 **Ideias & Análises**: conteúdo educacional **transparente** publicado pelo admin (opinião, não recomendação)
+- 🛠️ **Painel admin**: watchlist de ativos **por símbolo** (validados no provedor de mercado)
 
 ### Stack
-**React** · **Node.js / Express** · **MongoDB** · **Recharts** · **Tailwind CSS** · monorepo `frontend/` + `backend/`
+**React** · **MUI** · **ApexCharts** · **Socket.io-client** · **Node.js / Express** · **MongoDB / Mongoose** · **Socket.io** · API pública da **Binance** (sem chave)
 
 ### Como rodar
 ```bash
-# Backend (API em http://localhost:5000)
-cd backend && npm install && npm run dev      # configure o .env com MONGODB_URI
+# Backend (API + WebSocket em http://localhost:5000) — requer Node ≥ 18
+cd backend && npm install && npm run dev      # configure MONGO_URI no .env
 
 # Frontend (em http://localhost:3000)
 cd frontend && npm install && npm start
 ```
+
+### Arquitetura (resumo)
+- **Dados de mercado:** `backend/services/marketData/` (cripto via Binance; ações planejadas via provedor com chave)
+- **Modelos:** `Asset` (watchlist), `Position` (holding), `Trade` (execuções), `Idea`, `User`
+- **Tempo real:** `utils/socket.js` + `utils/priceBroadcaster.js` emitem o evento `price`
+- **Sem rendimento fabricado:** o P&L é sempre calculado a partir do preço real de mercado
 
 ---
 
 ## 🇺🇸 English
 
 ### About
-A platform where users invest in crypto assets with **programmed yield** and track everything on a **dashboard** with portfolio-evolution and allocation charts. It includes a **referral system** with bonuses and a full **admin panel**. The UI was redesigned with an **institutional fintech** identity and a **light/dark theme**.
+**Acapulco is an educational trading simulator.** Practice buying and selling crypto assets with
+**real, live market data** (candlestick charts) using a **virtual wallet** — no deposits, no risk, no real money.
+
+> ⚠️ **Not an investment platform.** All balances are fictitious, there is no guaranteed profit,
+> no "insider signals", and nobody controls the outcome: P&L comes **solely from the real market**.
 
 ### Features
-- 📊 **Dashboard** with KPIs and charts (portfolio evolution and allocation)
-- 🪙 Crypto-asset catalog with **yield plans** by term
-- 👥 **Referral system** with bonuses and history
-- 🛠️ **Admin panel**: users, crypto assets, settings and referral reports
-- 🌗 **Light/dark theme** via CSS variables
+- 📈 Candlestick charts with real market data (Binance) and **live prices** over WebSocket
+- 💱 Paper trading: buy/sell at real prices, average-price positions and **real P&L** (realized & unrealized)
+- 📊 Dashboard with equity, cash, live-valued positions and trade history
+- 🏆 Traders leaderboard by virtual-portfolio performance
+- 💡 Ideas & Analysis: **transparent** educational content (opinion, not advice)
+- 🛠️ Admin panel: asset watchlist **by symbol** (validated against the market provider)
 
 ### Tech stack
-**React** · **Node.js / Express** · **MongoDB** · **Recharts** · **Tailwind CSS**
-
-### Getting started
-```bash
-# Backend (API at http://localhost:5000)
-cd backend && npm install && npm run dev      # set MONGODB_URI in .env
-
-# Frontend (at http://localhost:3000)
-cd frontend && npm install && npm start
-```
+**React** · **MUI** · **ApexCharts** · **Node.js / Express** · **MongoDB** · **Socket.io** · public **Binance** API (no key)
 
 ---
 

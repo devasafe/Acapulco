@@ -2,10 +2,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 const cols = [
-  { title: 'Plataforma', items: [['Criptoativos', '/cryptos'], ['Dashboard', '/dashboard'], ['Referências', '/referrals']] },
-  { title: 'Institucional', items: [['Sobre', '/about'], ['Carreiras', '#'], ['Contato', '/contact']] },
-  { title: 'Segurança', items: [['Proof of Reserves', '#'], ['Custódia Segregada', '#']] },
-  { title: 'Legal', items: [['Aviso de Risco', '#'], ['Privacidade', '#']] },
+  { title: 'Simulador', items: [['Mercados', '/markets'], ['Dashboard', '/dashboard'], ['Ranking', '/leaderboard']] },
+  { title: 'Aprenda', items: [['Ideias & Análises', '/ideas'], ['Sobre', '/about'], ['Contato', '/contact']] },
+  { title: 'Sobre o projeto', items: [['Como funciona', '/about'], ['Perfil', '/profile']] },
 ];
 
 export default function SiteFooter() {
@@ -13,9 +12,9 @@ export default function SiteFooter() {
     <footer className="bg-primary-container w-full py-16 px-margin-mobile md:px-margin-desktop border-t border-white/10">
       <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-gutter max-w-container-max mx-auto">
         <div className="lg:col-span-2">
-          <div className="text-headline-md font-headline-md text-white mb-6">Acapulco Financial</div>
+          <div className="text-headline-md font-headline-md text-white mb-6">Acapulco</div>
           <p className="text-white/70 text-body-sm max-w-xs mb-8">
-            Liderando a convergência entre o mercado financeiro tradicional e a nova economia digital.
+            Simulador educacional de trading com dados reais de mercado e dinheiro 100% fictício.
           </p>
         </div>
         {cols.map((c) => (
@@ -32,8 +31,8 @@ export default function SiteFooter() {
         ))}
       </div>
       <div className="max-w-container-max mx-auto mt-16 pt-8 border-t border-white/15 flex flex-col md:flex-row justify-between items-center gap-4">
-        <p className="text-white/50 text-body-sm">© 2024 Acapulco Financial. Todos os direitos reservados. CNPJ: 00.000.000/0001-00</p>
-        <p className="text-white/50 text-body-sm">Investir em criptoativos envolve riscos.</p>
+        <p className="text-white/50 text-body-sm">© 2026 Acapulco — Simulador educacional. Projeto de portfólio.</p>
+        <p className="text-white/50 text-body-sm">Dinheiro fictício. Não é investimento nem recomendação financeira.</p>
       </div>
     </footer>
   );

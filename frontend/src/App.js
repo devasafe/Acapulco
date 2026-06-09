@@ -10,13 +10,13 @@ import HomePage from './pages/HomePage';
 import DashboardPage from './pages/DashboardPage';
 import ProfilePage from './pages/ProfilePage';
 import AdminPage from './pages/AdminPage';
-import AdminDashboardV2 from './pages/AdminDashboardV2';
-import CryptoAdminPage from './pages/CryptoAdminPage';
-import CryptoListPage from './pages/CryptoListPage';
-import CryptoDetailPage from './pages/CryptoDetailPage';
+import MarketsPage from './pages/MarketsPage';
+import AssetPage from './pages/AssetPage';
+import AssetAdminPage from './pages/AssetAdminPage';
+import LeaderboardPage from './pages/LeaderboardPage';
+import IdeasPage from './pages/IdeasPage';
+import AdminIdeasPage from './pages/AdminIdeasPage';
 import ReferralNetworkPage from './pages/ReferralNetworkPage';
-import AdminReferralSettingsPage from './pages/AdminReferralSettingsPage';
-import AdminReferralProfitsPage from './pages/AdminReferralProfitsPage';
 import ContactPage from './pages/ContactPage';
 import AboutPage from './pages/AboutPage';
 
@@ -24,17 +24,14 @@ import AboutPage from './pages/AboutPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import { getToken } from './utils/auth';
 
-// Theme
 const theme = createTheme({
   palette: {
     mode: 'dark',
-    primary: { main: '#3B5BDB' },
+    primary: { main: '#7C3AED' },
     secondary: { main: '#6B46C1' },
     background: { default: '#0F1117', paper: '#1A1F2E' },
   },
-  typography: {
-    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-  },
+  typography: { fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif' },
 });
 
 function App() {
@@ -43,100 +40,29 @@ function App() {
       <CssBaseline />
       <Router>
         <Routes>
-          {/* Public Routes */}
+          {/* Público */}
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/about" element={<AboutPage />} />
 
-          {/* Protected Routes */}
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <DashboardPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/cryptos"
-            element={
-              <ProtectedRoute>
-                <CryptoListPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/cryptos/:id"
-            element={
-              <ProtectedRoute>
-                <CryptoDetailPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <ProfilePage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/referrals"
-            element={
-              <ProtectedRoute>
-                <ReferralNetworkPage />
-              </ProtectedRoute>
-            }
-          />
+          {/* Protegidas */}
+          <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+          <Route path="/markets" element={<ProtectedRoute><MarketsPage /></ProtectedRoute>} />
+          <Route path="/asset/:symbol" element={<ProtectedRoute><AssetPage /></ProtectedRoute>} />
+          <Route path="/leaderboard" element={<ProtectedRoute><LeaderboardPage /></ProtectedRoute>} />
+          <Route path="/ideas" element={<ProtectedRoute><IdeasPage /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+          <Route path="/referrals" element={<ProtectedRoute><ReferralNetworkPage /></ProtectedRoute>} />
 
-          {/* Admin Routes */}
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute>
-                <AdminPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/dashboard-v2"
-            element={
-              <ProtectedRoute>
-                <AdminDashboardV2 />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/cryptos"
-            element={
-              <ProtectedRoute>
-                <CryptoAdminPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/referral-settings"
-            element={
-              <ProtectedRoute>
-                <AdminReferralSettingsPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/referral-profits"
-            element={
-              <ProtectedRoute>
-                <AdminReferralProfitsPage />
-              </ProtectedRoute>
-            }
-          />
+          {/* Admin */}
+          <Route path="/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
+          <Route path="/admin/assets" element={<ProtectedRoute><AssetAdminPage /></ProtectedRoute>} />
+          <Route path="/admin/ideas" element={<ProtectedRoute><AdminIdeasPage /></ProtectedRoute>} />
 
-          {/* Redirect */}
-          <Route path="/" element={<Navigate to={getToken() ? '/dashboard' : '/login'} replace />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          {/* Fallback */}
+          <Route path="*" element={<Navigate to={getToken() ? '/dashboard' : '/'} replace />} />
         </Routes>
       </Router>
     </ThemeProvider>

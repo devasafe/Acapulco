@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { getStartingBalance } = require('../utils/settings');
 
 // Register
 exports.register = async (req, res) => {
@@ -16,11 +17,15 @@ exports.register = async (req, res) => {
     // Hash da senha
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Saldo virtual inicial (dinheiro fictício do simulador)
+    const startingBalance = await getStartingBalance();
+
     // Criar usuário
     const user = new User({
       email,
       password: hashedPassword,
       name,
+      wallet: startingBalance,
     });
 
     await user.save();
@@ -108,11 +113,15 @@ exports.registerWithReferral = async (req, res) => {
     // Hash da senha
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Saldo virtual inicial (dinheiro fictício do simulador)
+    const startingBalance = await getStartingBalance();
+
     // Criar usuário
     const user = new User({
       email,
       password: hashedPassword,
       name,
+      wallet: startingBalance,
       referredBy: referrer ? referrer._id : null,
     });
 

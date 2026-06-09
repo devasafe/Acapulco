@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom';
 import ThemeToggle from '../marketing/ThemeToggle';
 
 const TRUST = [
-  { icon: 'verified_user', title: 'Custódia segregada', text: 'Ativos sob custódia institucional e auditada.' },
-  { icon: 'lock', title: 'Criptografia ponta a ponta', text: 'Seus dados e operações protegidos por padrão.' },
-  { icon: 'trending_up', title: 'Rendimento programado', text: 'Planos transparentes com prazo e retorno definidos.' },
+  { icon: 'savings', title: 'Dinheiro fictício', text: 'Você pratica sem nenhum risco — o saldo é virtual.' },
+  { icon: 'show_chart', title: 'Dados reais de mercado', text: 'Gráficos e cotações reais, atualizando ao vivo.' },
+  { icon: 'school', title: 'Foco em aprender', text: 'Teste estratégias e evolua antes de arriscar de verdade.' },
 ];
 
 export default function AuthLayout({ title, subtitle, badge, children }) {
@@ -22,10 +22,10 @@ export default function AuthLayout({ title, subtitle, badge, children }) {
 
         <div className="relative z-10 max-w-md">
           <h2 className="font-headline-xl text-headline-xl leading-tight mb-3">
-            Invista em criptoativos com a solidez de uma instituição.
+            Aprenda a operar com dados reais e dinheiro fictício.
           </h2>
           <p className="text-white/70 mb-10">
-            Plataforma regulada para construir patrimônio em ativos digitais com rendimento programado.
+            Simulador educacional de trading. Pratique compra e venda sem arriscar dinheiro real.
           </p>
           <ul className="space-y-5">
             {TRUST.map((t) => (

@@ -18,7 +18,8 @@ function init(server) {
       if (!token) return next(new Error('Token não fornecido'));
       const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
       const user = await User.findById(decoded.userId);
-      if (!user || !user.isAdmin) return next(new Error('Acesso negado - admin apenas'));
+      // Qualquer usuário autenticado pode conectar (todos recebem preços ao vivo).
+      if (!user) return next(new Error('Usuário não encontrado'));
       // attach user info to socket
       socket.userId = user._id.toString();
       socket.isAdmin = !!user.isAdmin;

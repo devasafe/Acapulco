@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import Footer from './Footer';
+import DisclaimerBanner from './DisclaimerBanner';
 
 const theme = {
   primary: '#7C3AED',
@@ -42,6 +43,7 @@ export default function PageLayout({ children, noPadding = false }) {
 
   return (
     <Box sx={{ background: `linear-gradient(135deg, ${theme.dark} 0%, #1a1a4d 15%, #2d1b4e 30%, #3d2e5f 45%, #2a1f4d 60%, #1a1a3e 75%, #0f172a 100%)`, minHeight: '100vh' }}>
+      <DisclaimerBanner />
       <AppBar
         position="static"
         sx={{
@@ -81,10 +83,24 @@ export default function PageLayout({ children, noPadding = false }) {
             </Button>
             <Button
               color="inherit"
-              onClick={() => navigate('/cryptos')}
+              onClick={() => navigate('/markets')}
               sx={{ color: theme.textSecondary, '&:hover': { color: theme.primary } }}
             >
-              Criptmoedas
+              Mercados
+            </Button>
+            <Button
+              color="inherit"
+              onClick={() => navigate('/leaderboard')}
+              sx={{ color: theme.textSecondary, '&:hover': { color: theme.primary } }}
+            >
+              Ranking
+            </Button>
+            <Button
+              color="inherit"
+              onClick={() => navigate('/ideas')}
+              sx={{ color: theme.textSecondary, '&:hover': { color: theme.primary } }}
+            >
+              Ideias
             </Button>
             <Button
               color="inherit"

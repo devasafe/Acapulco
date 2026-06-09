@@ -4,28 +4,16 @@ import AdminShell from '../components/admin/AdminShell';
 
 const SECTIONS = [
   {
-    title: 'Dashboard analítico',
-    description: 'Métricas consolidadas da plataforma, saldos em carteira e perfil de cada usuário.',
-    icon: 'analytics',
-    path: '/admin/dashboard-v2',
+    title: 'Gerenciar ativos (watchlist)',
+    description: 'Adicione ativos por símbolo (validados no provedor de mercado), ative/desative e remova.',
+    icon: 'candlestick_chart',
+    path: '/admin/assets',
   },
   {
-    title: 'Gerenciar criptomoedas',
-    description: 'Criar, editar, ativar/desativar e remover criptoativos e seus planos de rendimento.',
-    icon: 'currency_bitcoin',
-    path: '/admin/cryptos',
-  },
-  {
-    title: 'Configurar referência',
-    description: 'Ajuste o percentual de bônus pago ao indicar novos investidores.',
-    icon: 'settings',
-    path: '/admin/referral-settings',
-  },
-  {
-    title: 'Lucros de referência',
-    description: 'Histórico detalhado dos bônus de indicação pagos e ranking de referenciadores.',
-    icon: 'trending_up',
-    path: '/admin/referral-profits',
+    title: 'Ideias & Análises',
+    description: 'Publique conteúdo educacional transparente (opinião/estudo) para os usuários do simulador.',
+    icon: 'lightbulb',
+    path: '/admin/ideas',
   },
 ];
 

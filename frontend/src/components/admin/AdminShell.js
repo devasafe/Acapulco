@@ -5,10 +5,8 @@ import SiteFooter from '../marketing/SiteFooter';
 
 const TABS = [
   { key: 'hub', label: 'Visão geral', icon: 'grid_view', path: '/admin' },
-  { key: 'users', label: 'Usuários', icon: 'groups', path: '/admin/dashboard-v2' },
-  { key: 'cryptos', label: 'Criptomoedas', icon: 'currency_bitcoin', path: '/admin/cryptos' },
-  { key: 'ref-settings', label: 'Config. referência', icon: 'settings', path: '/admin/referral-settings' },
-  { key: 'ref-profits', label: 'Lucros de referência', icon: 'trending_up', path: '/admin/referral-profits' },
+  { key: 'assets', label: 'Ativos (watchlist)', icon: 'candlestick_chart', path: '/admin/assets' },
+  { key: 'ideas', label: 'Ideias & Análises', icon: 'lightbulb', path: '/admin/ideas' },
 ];
 
 export default function AdminShell({ title, subtitle, actions, children }) {

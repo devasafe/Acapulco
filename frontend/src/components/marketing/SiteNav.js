@@ -18,7 +18,9 @@ export default function SiteNav({ active = '' }) {
     ...(loggedIn
       ? [
           { label: 'Dashboard', to: '/dashboard' },
-          { label: 'Criptomoedas', to: '/cryptos' },
+          { label: 'Mercados', to: '/markets' },
+          { label: 'Ranking', to: '/leaderboard' },
+          { label: 'Ideias', to: '/ideas' },
           { label: 'Perfil', to: '/profile' },
           ...(user?.isAdmin ? [{ label: 'Painel Admin', to: '/admin' }] : []),
         ]
@@ -39,7 +41,7 @@ export default function SiteNav({ active = '' }) {
     <nav className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 shadow-sm">
       <div className="flex justify-between items-center h-20 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
         <Link to="/" className="text-headline-md font-headline-lg font-bold tracking-tight text-on-surface">
-          Acapulco Financial
+          Acapulco <span className="text-on-surface-variant font-normal text-body-sm">· Simulador</span>
         </Link>
 
         {/* Desktop */}
