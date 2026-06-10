@@ -84,11 +84,13 @@ export default function MarketControlPage() {
     return p;
   };
 
-  // Ativa o modo controlado num ativo espelho (exige preço inicial > 0).
-  const activate = () => act(
-    () => configure(selected, { priceMode: 'controlled', initialPrice: Number(form.initialPrice), ...engineParams() }),
-    'Modo controlado ativado.',
-  );
+  // Ativa o modo controlado num ativo espelho. Sem preço inicial = continua do preço
+  // atual do mercado real (sem alterar o gráfico do cliente). Com preço = sobrescreve.
+  const activate = () => act(() => configure(selected, {
+    priceMode: 'controlled',
+    ...(form.initialPrice !== '' ? { initialPrice: Number(form.initialPrice) } : {}),
+    ...engineParams(),
+  }), 'Modo controlado ativado.');
 
   // Salva os parâmetros do motor (sem trocar o modo) num ativo já controlado.
   const saveConfig = () => act(() => configure(selected, engineParams()), 'Configuração salva.');
@@ -240,7 +242,7 @@ export default function MarketControlPage() {
             <p className="text-body-sm text-on-surface-variant mb-4">
               {isControlled
                 ? 'Ajuste referência, força de acompanhamento e ruído. As mudanças entram no próximo tique.'
-                : 'Passe este ativo para o motor próprio. Defina um preço inicial (>0); opcionalmente, a referência que ele acompanha.'}
+                : 'Passe este ativo para o motor próprio. Por padrão ele continua exatamente do preço e histórico atuais do mercado real — o cliente não vê nada mudar. Preencha o preço inicial só se quiser forçar outro valor (isso faria o gráfico pular).'}
             </p>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 mb-4">
               <label className="flex flex-col gap-1 text-body-sm text-on-surface-variant">
@@ -257,8 +259,8 @@ export default function MarketControlPage() {
               </label>
               {!isControlled && (
                 <label className="flex flex-col gap-1 text-body-sm text-on-surface-variant">
-                  Preço inicial (&gt; 0)
-                  <input className={inputCls} placeholder="100" value={form.initialPrice} onChange={setField('initialPrice')} />
+                  Preço inicial (opcional)
+                  <input className={inputCls} placeholder="preço atual do mercado" value={form.initialPrice} onChange={setField('initialPrice')} />
                 </label>
               )}
             </div>
@@ -268,7 +270,7 @@ export default function MarketControlPage() {
                 <button onClick={revertToMirror} className={ghostBtn}>Voltar para espelho</button>
               </div>
             ) : (
-              <button onClick={activate} className={primaryBtn} disabled={!(Number(form.initialPrice) > 0)}>
+              <button onClick={activate} className={primaryBtn}>
                 Ativar modo controlado
               </button>
             )}

@@ -1,13 +1,38 @@
 // backend/controllers/marketControlController.js
 // Endpoints de admin para pilotar ativos controlados.
 const Asset = require('../models/Asset');
+const PriceCandle = require('../models/PriceCandle');
+const market = require('../services/marketData');
 const { applyJump } = require('../services/priceEngine/engineMath');
+const { bucketStart } = require('../services/priceEngine/candleMath');
 
 async function getControlled(id) {
   const asset = await Asset.findById(id);
   if (!asset) return { error: 404, msg: 'Ativo não encontrado' };
   if (asset.priceMode !== 'controlled') return { error: 400, msg: 'Ativo não está em modo controlado' };
   return { asset };
+}
+
+// Continuidade na ativação: copia o histórico recente do mercado real (Binance) para
+// o ativo controlado e devolve o preço atual. Assim, ao ativar o controle, NADA muda
+// no gráfico do cliente — preço e histórico continuam de onde estavam.
+async function seedFromRealMarket(asset) {
+  const [quote, candles] = await Promise.all([
+    market.getQuote(asset.symbol, asset.assetType, 'mirror').catch(() => null),
+    market.getCandles(asset.symbol, '5m', 500, asset.assetType, 'mirror').catch(() => []),
+  ]);
+  if (candles && candles.length) {
+    await PriceCandle.deleteMany({ assetId: asset._id }); // evita duplicar histórico
+    const docs = candles.map((c) => ({
+      assetId: asset._id,
+      openTime: new Date(bucketStart(c.time)),
+      open: c.open, high: c.high, low: c.low, close: c.close, volume: c.volume || 0,
+    }));
+    await PriceCandle.insertMany(docs, { ordered: false }).catch(() => {});
+  }
+  if (quote && quote.price > 0) return quote.price;
+  if (candles && candles.length) return candles[candles.length - 1].close;
+  return null;
 }
 
 // PUT /api/admin/market/:id  -> configura modo e parâmetros do motor
@@ -23,11 +48,17 @@ exports.configure = async (req, res) => {
     if (followStrength !== undefined) asset.control.followStrength = followStrength;
     if (noiseVolatility !== undefined) asset.control.noiseVolatility = noiseVolatility;
 
-    // Ao virar controlado sem preço, exige/usa um preço inicial.
+    // Ao virar controlado: por padrão herda o preço/histórico real (continuidade total).
+    // Um initialPrice explícito (> 0) sobrescreve, mas aí o gráfico do cliente pula.
     if (asset.priceMode === 'controlled' && !asset.control.currentPrice) {
-      const p = Number(initialPrice);
-      if (!p || p <= 0) return res.status(400).json({ error: 'initialPrice obrigatório (> 0) ao ativar modo controlado' });
-      asset.control.currentPrice = p;
+      let seed = Number(initialPrice);
+      if (!(seed > 0)) seed = await seedFromRealMarket(asset);
+      if (!(seed > 0)) {
+        return res.status(400).json({ error: 'Não foi possível obter o preço atual do mercado. Informe um preço inicial (> 0).' });
+      }
+      asset.control.currentPrice = seed;
+      // Por padrão segue o próprio símbolo real, então continua acompanhando a moeda de verdade.
+      if (!asset.control.referenceSymbol) asset.control.referenceSymbol = asset.symbol;
     }
     asset.markModified('control');
     await asset.save();
