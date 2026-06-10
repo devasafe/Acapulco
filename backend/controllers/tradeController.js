@@ -20,7 +20,7 @@ exports.buy = async (req, res) => {
     const asset = await getTradableAsset(req.body.symbol);
     if (!asset) return res.status(400).json({ error: 'Ativo não disponível para negociação' });
 
-    const quote = await market.getQuote(asset.symbol, asset.assetType, asset.priceMode);
+    const quote = await market.getQuote(asset.symbol, asset.assetType);
     const price = Number(quote.price);
     const cost = price * quantity;
 
@@ -84,7 +84,7 @@ exports.sell = async (req, res) => {
       return res.status(400).json({ error: 'Você não tem quantidade suficiente desse ativo' });
     }
 
-    const quote = await market.getQuote(asset.symbol, asset.assetType, asset.priceMode);
+    const quote = await market.getQuote(asset.symbol, asset.assetType);
     const price = Number(quote.price);
     const proceeds = price * quantity;
     const realizedPnl = (price - position.avgEntryPrice) * quantity;

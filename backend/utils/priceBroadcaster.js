@@ -18,7 +18,7 @@ async function tick() {
     await Promise.all(
       assets.map(async (a) => {
         try {
-          const q = await market.getQuote(a.symbol, a.assetType, a.priceMode);
+          const q = await market.getQuote(a.symbol, a.assetType);
           io.emit('price', {
             symbol: a.symbol,
             price: q.price,
