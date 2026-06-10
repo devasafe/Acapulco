@@ -65,4 +65,11 @@ describe('applyJump', () => {
   test('por preço absoluto', () => { expect(applyJump(100, { toPrice: 137 })).toBe(137); });
   test('por percentual', () => { expect(applyJump(100, { percent: 10 })).toBeCloseTo(110, 5); });
   test('nunca <= 0', () => { expect(applyJump(100, { toPrice: -5 })).toBeGreaterThan(0); });
+  // Reproduz como o controller chama: Number(req.body.x) vira NaN no campo ausente.
+  test('percentual funciona mesmo com toPrice=NaN (caminho do controller)', () => {
+    expect(applyJump(100, { toPrice: NaN, percent: 5 })).toBeCloseTo(105, 5);
+  });
+  test('preço absoluto funciona mesmo com percent=NaN (caminho do controller)', () => {
+    expect(applyJump(100, { toPrice: 150, percent: NaN })).toBe(150);
+  });
 });

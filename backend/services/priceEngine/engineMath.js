@@ -64,10 +64,13 @@ function computeNextPrice(state, now, rng) {
 }
 
 // Pulo instantâneo (não tem estado próprio — só muda o preço).
+// Usa Number.isFinite (não typeof): o controller passa Number(req.body.x), que vira
+// NaN quando o campo está ausente. NaN é typeof 'number', então typeof deixaria o
+// pulo por percentual quebrado. isFinite(NaN)===false faz o fallback correto.
 function applyJump(currentPrice, { toPrice, percent }) {
   let p;
-  if (typeof toPrice === 'number') p = toPrice;
-  else if (typeof percent === 'number') p = currentPrice * (1 + percent / 100);
+  if (Number.isFinite(toPrice)) p = toPrice;
+  else if (Number.isFinite(percent)) p = currentPrice * (1 + percent / 100);
   else p = currentPrice;
   return Math.max(p, MIN_PRICE);
 }
