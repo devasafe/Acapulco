@@ -7,6 +7,7 @@ const TABS = [
   { key: 'hub', label: 'Visão geral', icon: 'grid_view', path: '/admin' },
   { key: 'assets', label: 'Ativos (watchlist)', icon: 'candlestick_chart', path: '/admin/assets' },
   { key: 'ideas', label: 'Ideias & Análises', icon: 'lightbulb', path: '/admin/ideas' },
+  { key: 'market', label: 'Controle de Mercado', icon: 'tune', path: '/admin/market' },
 ];
 
 export default function AdminShell({ title, subtitle, actions, children }) {

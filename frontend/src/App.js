@@ -16,6 +16,7 @@ import AssetAdminPage from './pages/AssetAdminPage';
 import LeaderboardPage from './pages/LeaderboardPage';
 import IdeasPage from './pages/IdeasPage';
 import AdminIdeasPage from './pages/AdminIdeasPage';
+import MarketControlPage from './pages/MarketControlPage';
 import ReferralNetworkPage from './pages/ReferralNetworkPage';
 import ContactPage from './pages/ContactPage';
 import AboutPage from './pages/AboutPage';
@@ -60,6 +61,7 @@ function App() {
           <Route path="/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
           <Route path="/admin/assets" element={<ProtectedRoute><AssetAdminPage /></ProtectedRoute>} />
           <Route path="/admin/ideas" element={<ProtectedRoute><AdminIdeasPage /></ProtectedRoute>} />
+          <Route path="/admin/market" element={<ProtectedRoute><MarketControlPage /></ProtectedRoute>} />
 
           {/* Fallback */}
           <Route path="*" element={<Navigate to={getToken() ? '/dashboard' : '/'} replace />} />

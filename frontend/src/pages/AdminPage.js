@@ -15,6 +15,12 @@ const SECTIONS = [
     icon: 'lightbulb',
     path: '/admin/ideas',
   },
+  {
+    title: 'Controle de Mercado',
+    description: 'Pilote os ativos controlados: alvo gradual, pulo, tendência e presets, com estado ao vivo do motor de preço.',
+    icon: 'tune',
+    path: '/admin/market',
+  },
 ];
 
 export default function AdminPage() {
