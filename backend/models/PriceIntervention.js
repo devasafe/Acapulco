@@ -1,26 +1,20 @@
 const mongoose = require('mongoose');
 
-// Candle de override de 1min persistido junto da intervenção aplicada.
-const candleSchema = new mongoose.Schema({
-  open: Number, high: Number, low: Number, close: Number, volume: Number,
-}, { _id: false });
-
-// Intervenção pontual agendada pelo admin. O ativo continua espelhando o real;
-// quando 'scheduledAt' vence, o scheduler calcula o alvo, grava o candle de override
-// e marca como 'applied'. O overlay (marketData) sobrepõe esse candle no gráfico real.
+// Janela de intervenção: real -> alvo (rampa), sustenta o nível, volta suave ao real.
 const schema = new mongoose.Schema({
   assetId: { type: mongoose.Schema.Types.ObjectId, ref: 'Asset', required: true },
-  scheduledAt: { type: Date, required: true },
+  startAt: { type: Date, required: true },
+  endAt: { type: Date, required: true },
   mode: { type: String, enum: ['absolute', 'percent'], required: true },
-  value: { type: Number, required: true }, // absolute: preço-alvo; percent: ex. +10 = +10%
-  status: { type: String, enum: ['pending', 'applied', 'cancelled'], default: 'pending' },
-  resultPrice: Number,        // alvo calculado ao aplicar
-  bucketOpenTime: Date,       // bucket de 1min em que caiu
-  candle: candleSchema,       // candle de override (open real, close = alvo)
-  appliedAt: Date,
+  value: { type: Number, required: true },          // alvo (preço) ou % (+10 = +10%)
+  rampCandles: { type: Number, required: true },     // nº de velas da rampa
+  rampTimeframeMs: { type: Number, required: true }, // duração de cada vela da rampa (ms)
+  status: { type: String, enum: ['pending', 'active', 'done', 'cancelled'], default: 'pending' },
+  factor: { type: Number },        // F travado na ativação
+  realAtStart: { type: Number },   // preço real no início (para F absoluto)
   createdAt: { type: Date, default: Date.now },
 });
-schema.index({ assetId: 1, status: 1 });
-schema.index({ status: 1, scheduledAt: 1 });
+schema.index({ status: 1, startAt: 1 });
+schema.index({ assetId: 1 });
 
 module.exports = mongoose.model('PriceIntervention', schema);
