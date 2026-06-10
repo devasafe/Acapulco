@@ -77,14 +77,18 @@ export default function AssetPage() {
     return () => { mounted = false; };
   }, [symbol, refreshPortfolio]);
 
-  // Candles por intervalo
-  useEffect(() => {
-    let mounted = true;
+  // Candles por intervalo (re-busca ao vivo a cada 5s para o gráfico atualizar sozinho)
+  const loadCandles = useCallback(() => {
     getCandles(symbol, { interval, limit: 200 })
-      .then((res) => { if (mounted) setCandles(res.data); })
+      .then((res) => setCandles(res.data))
       .catch(() => {});
-    return () => { mounted = false; };
   }, [symbol, interval]);
+
+  useEffect(() => {
+    loadCandles();                              // imediato ao abrir / trocar timeframe
+    const t = setInterval(loadCandles, 5000);   // atualização ao vivo a cada 5s
+    return () => clearInterval(t);
+  }, [loadCandles]);
 
   // Preço ao vivo
   useEffect(() => {
@@ -109,7 +113,7 @@ export default function AssetPage() {
   }];
 
   const chartOptions = {
-    chart: { type: 'candlestick', height: 440, background: 'transparent', toolbar: { show: false }, fontFamily: 'Inter, sans-serif' },
+    chart: { type: 'candlestick', height: 440, background: 'transparent', toolbar: { show: false }, fontFamily: 'Inter, sans-serif', animations: { enabled: false } },
     xaxis: { type: 'datetime', labels: { style: { colors: axis } }, axisBorder: { color: gridC }, axisTicks: { color: gridC } },
     yaxis: { tooltip: { enabled: true }, labels: { style: { colors: axis }, formatter: (v) => `$${fmt(v, 2)}` }, opposite: true },
     grid: { borderColor: gridC, strokeDashArray: 3 },
