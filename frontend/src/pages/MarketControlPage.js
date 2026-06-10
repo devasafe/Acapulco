@@ -14,7 +14,7 @@ export default function MarketControlPage() {
   const [form, setForm] = useState({
     targetPrice: '', durationMinutes: '', easing: 'easeInOut',
     jumpPrice: '', drift: '',
-    priceMode: '', referenceSymbol: '', followStrength: '', noiseVolatility: '', initialPrice: '',
+    referenceSymbol: '', followStrength: '', noiseVolatility: '', initialPrice: '',
   });
   const [msg, setMsg] = useState(null); // { type: 'error' | 'success', text }
 
@@ -75,19 +75,30 @@ export default function MarketControlPage() {
   const trendOff = () => act(() => setTrend(selected, { off: true }), 'Tendência desligada.');
   const applyPreset = (type) => act(() => preset(selected, { type }), `Preset "${type}" aplicado.`);
 
-  const saveConfig = () => act(() => {
-    const payload = {};
-    const pm = form.priceMode || state?.priceMode; // preserva o modo atual se não mexido
-    if (pm) payload.priceMode = pm;
-    if (form.referenceSymbol !== '') payload.referenceSymbol = form.referenceSymbol.toUpperCase();
-    if (form.followStrength !== '') payload.followStrength = Number(form.followStrength);
-    if (form.noiseVolatility !== '') payload.noiseVolatility = Number(form.noiseVolatility);
-    if (form.initialPrice !== '') payload.initialPrice = Number(form.initialPrice);
-    return configure(selected, payload);
-  }, 'Configuração salva.');
+  // Monta o payload de parâmetros do motor (referência/força/ruído) a partir do form.
+  const engineParams = () => {
+    const p = {};
+    if (form.referenceSymbol !== '') p.referenceSymbol = form.referenceSymbol.toUpperCase();
+    if (form.followStrength !== '') p.followStrength = Number(form.followStrength);
+    if (form.noiseVolatility !== '') p.noiseVolatility = Number(form.noiseVolatility);
+    return p;
+  };
+
+  // Ativa o modo controlado num ativo espelho (exige preço inicial > 0).
+  const activate = () => act(
+    () => configure(selected, { priceMode: 'controlled', initialPrice: Number(form.initialPrice), ...engineParams() }),
+    'Modo controlado ativado.',
+  );
+
+  // Salva os parâmetros do motor (sem trocar o modo) num ativo já controlado.
+  const saveConfig = () => act(() => configure(selected, engineParams()), 'Configuração salva.');
+
+  // Devolve o ativo ao modo espelho (volta a seguir a Binance ao vivo).
+  const revertToMirror = () => act(() => configure(selected, { priceMode: 'mirror' }), 'Voltou para modo espelho.');
 
   const c = state?.control || {};
   const target = c.target || {};
+  const isControlled = state?.priceMode === 'controlled';
   const inputCls = 'bg-background border border-outline-variant/40 rounded-lg px-3 py-2 text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-primary-container';
   const primaryBtn = 'bg-primary-container text-on-primary-container px-4 py-2 rounded-lg font-label-caps uppercase hover:opacity-90 transition-opacity disabled:opacity-40';
   const ghostBtn = 'bg-surface-container border border-outline-variant/40 text-on-surface px-4 py-2 rounded-lg hover:border-primary-container/60 transition-colors';
@@ -114,7 +125,7 @@ export default function MarketControlPage() {
         {assets.map((a) => (
           <button
             key={a._id}
-            onClick={() => { setSelected(a._id); setState(null); setForm((f) => ({ ...f, priceMode: '', initialPrice: '' })); }}
+            onClick={() => { setSelected(a._id); setState(null); setForm((f) => ({ ...f, initialPrice: '' })); }}
             className={`px-4 py-2 rounded-lg border transition-colors flex items-center gap-2 ${
               selected === a._id
                 ? 'bg-primary-container text-on-primary-container border-primary-container'
@@ -144,10 +155,10 @@ export default function MarketControlPage() {
       </div>
 
       {/* Aviso quando o ativo selecionado ainda é espelho */}
-      {state && state.priceMode !== 'controlled' && (
+      {state && !isControlled && (
         <div className="mb-6 rounded-lg px-4 py-3 text-body-sm bg-outline-variant/10 border border-outline-variant/40 text-on-surface-variant">
           <span className="text-on-surface font-label-caps">{state.symbol}</span> está em <b>modo espelho</b> (segue a Binance ao vivo).
-          Para pilotá-lo, defina um <b>preço inicial</b> e salve a <b>Configuração do motor</b> abaixo — isso ativa o modo controlado.
+          Os controles de pilotagem só aparecem após você <b>ativar o modo controlado</b> abaixo (defina um preço inicial &gt; 0).
         </div>
       )}
 
@@ -173,64 +184,65 @@ export default function MarketControlPage() {
             </div>
           </section>
 
-          {/* Alvo gradual (principal) */}
-          <section className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-5">
-            <h2 className="font-headline-md text-[18px] text-on-surface mb-3">Alvo gradual</h2>
-            <div className="flex gap-2 mb-3 flex-wrap">
-              <input className={`${inputCls} w-32`} placeholder="preço-alvo" value={form.targetPrice} onChange={setField('targetPrice')} />
-              <input className={`${inputCls} w-28`} placeholder="duração (min)" value={form.durationMinutes} onChange={setField('durationMinutes')} />
-              <select className={inputCls} value={form.easing} onChange={setField('easing')}>
-                <option value="easeInOut">suave</option>
-                <option value="linear">linear</option>
-              </select>
-            </div>
-            <button onClick={launchTarget} className={`${primaryBtn} w-full`} disabled={!selected}>Lançar</button>
-          </section>
+          {/* Controles de pilotagem — só para ativos controlados */}
+          {isControlled && (
+            <>
+              {/* Alvo gradual (principal) */}
+              <section className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-5">
+                <h2 className="font-headline-md text-[18px] text-on-surface mb-3">Alvo gradual</h2>
+                <div className="flex gap-2 mb-3 flex-wrap">
+                  <input className={`${inputCls} w-32`} placeholder="preço-alvo" value={form.targetPrice} onChange={setField('targetPrice')} />
+                  <input className={`${inputCls} w-28`} placeholder="duração (min)" value={form.durationMinutes} onChange={setField('durationMinutes')} />
+                  <select className={inputCls} value={form.easing} onChange={setField('easing')}>
+                    <option value="easeInOut">suave</option>
+                    <option value="linear">linear</option>
+                  </select>
+                </div>
+                <button onClick={launchTarget} className={`${primaryBtn} w-full`}>Lançar</button>
+              </section>
 
-          {/* Pulo rápido */}
-          <section className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-5">
-            <h2 className="font-headline-md text-[18px] text-on-surface mb-3">Pulo rápido</h2>
-            <div className="flex gap-2 mb-3 flex-wrap">
-              <button onClick={() => jumpPct(1)} className={ghostBtn}>+1%</button>
-              <button onClick={() => jumpPct(5)} className={ghostBtn}>+5%</button>
-              <button onClick={() => jumpPct(-5)} className={ghostBtn}>-5%</button>
-            </div>
-            <div className="flex gap-2 flex-wrap">
-              <input className={`${inputCls} w-32`} placeholder="ir pra $X" value={form.jumpPrice} onChange={setField('jumpPrice')} />
-              <button onClick={jumpTo} className={primaryBtn} disabled={!selected}>Ir</button>
-            </div>
-          </section>
+              {/* Pulo rápido */}
+              <section className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-5">
+                <h2 className="font-headline-md text-[18px] text-on-surface mb-3">Pulo rápido</h2>
+                <div className="flex gap-2 mb-3 flex-wrap">
+                  <button onClick={() => jumpPct(1)} className={ghostBtn}>+1%</button>
+                  <button onClick={() => jumpPct(5)} className={ghostBtn}>+5%</button>
+                  <button onClick={() => jumpPct(-5)} className={ghostBtn}>-5%</button>
+                </div>
+                <div className="flex gap-2 flex-wrap">
+                  <input className={`${inputCls} w-32`} placeholder="ir pra $X" value={form.jumpPrice} onChange={setField('jumpPrice')} />
+                  <button onClick={jumpTo} className={primaryBtn}>Ir</button>
+                </div>
+              </section>
 
-          {/* Tendência + presets */}
-          <section className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-5">
-            <h2 className="font-headline-md text-[18px] text-on-surface mb-3">Tendência & presets</h2>
-            <div className="flex gap-2 mb-4 flex-wrap">
-              <input className={`${inputCls} w-32`} placeholder="% drift/dia" value={form.drift} onChange={setField('drift')} />
-              <button onClick={applyTrend} className={primaryBtn} disabled={!selected}>Aplicar</button>
-              <button onClick={trendOff} className={ghostBtn}>Desligar</button>
-            </div>
-            <div className="flex gap-2 flex-wrap">
-              <button onClick={() => applyPreset('pump')} className="bg-success/20 text-success border border-success/40 px-4 py-2 rounded-lg flex-1 hover:bg-success/30 transition-colors">Pump</button>
-              <button onClick={() => applyPreset('dump')} className="bg-danger/20 text-danger border border-danger/40 px-4 py-2 rounded-lg flex-1 hover:bg-danger/30 transition-colors">Dump</button>
-              <button onClick={() => applyPreset('flat')} className={`${ghostBtn} flex-1`}>Lateral</button>
-            </div>
-          </section>
+              {/* Tendência + presets */}
+              <section className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-5">
+                <h2 className="font-headline-md text-[18px] text-on-surface mb-3">Tendência & presets</h2>
+                <div className="flex gap-2 mb-4 flex-wrap">
+                  <input className={`${inputCls} w-32`} placeholder="% drift/dia" value={form.drift} onChange={setField('drift')} />
+                  <button onClick={applyTrend} className={primaryBtn}>Aplicar</button>
+                  <button onClick={trendOff} className={ghostBtn}>Desligar</button>
+                </div>
+                <div className="flex gap-2 flex-wrap">
+                  <button onClick={() => applyPreset('pump')} className="bg-success/20 text-success border border-success/40 px-4 py-2 rounded-lg flex-1 hover:bg-success/30 transition-colors">Pump</button>
+                  <button onClick={() => applyPreset('dump')} className="bg-danger/20 text-danger border border-danger/40 px-4 py-2 rounded-lg flex-1 hover:bg-danger/30 transition-colors">Dump</button>
+                  <button onClick={() => applyPreset('flat')} className={`${ghostBtn} flex-1`}>Lateral</button>
+                </div>
+              </section>
+            </>
+          )}
 
-          {/* Configuração do motor */}
+          {/* Configuração / ativação do motor */}
           <section className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-5 md:col-span-2">
-            <h2 className="font-headline-md text-[18px] text-on-surface mb-1">Configuração do motor</h2>
+            <h2 className="font-headline-md text-[18px] text-on-surface mb-1">
+              {isControlled ? 'Configuração do motor' : 'Ativar modo controlado'}
+            </h2>
             <p className="text-body-sm text-on-surface-variant mb-4">
-              Define referência, força de acompanhamento e ruído. Ao ativar o modo controlado pela primeira vez,
-              informe um preço inicial (&gt; 0).
+              {isControlled
+                ? 'Ajuste referência, força de acompanhamento e ruído. As mudanças entram no próximo tique.'
+                : 'Passe este ativo para o motor próprio. Defina um preço inicial (>0); opcionalmente, a referência que ele acompanha.'}
             </p>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 mb-4">
-              <label className="flex flex-col gap-1 text-body-sm text-on-surface-variant">
-                Modo
-                <select className={inputCls} value={form.priceMode || state.priceMode} onChange={setField('priceMode')}>
-                  <option value="controlled">controlado (motor)</option>
-                  <option value="mirror">espelho (Binance)</option>
-                </select>
-              </label>
               <label className="flex flex-col gap-1 text-body-sm text-on-surface-variant">
                 Referência (ex.: BTCUSDT)
                 <input className={inputCls} placeholder="BTCUSDT" value={form.referenceSymbol} onChange={setField('referenceSymbol')} />
@@ -243,12 +255,23 @@ export default function MarketControlPage() {
                 Ruído (ex.: 0.002)
                 <input className={inputCls} placeholder="0.002" value={form.noiseVolatility} onChange={setField('noiseVolatility')} />
               </label>
-              <label className="flex flex-col gap-1 text-body-sm text-on-surface-variant">
-                Preço inicial (ativação)
-                <input className={inputCls} placeholder="100" value={form.initialPrice} onChange={setField('initialPrice')} />
-              </label>
+              {!isControlled && (
+                <label className="flex flex-col gap-1 text-body-sm text-on-surface-variant">
+                  Preço inicial (&gt; 0)
+                  <input className={inputCls} placeholder="100" value={form.initialPrice} onChange={setField('initialPrice')} />
+                </label>
+              )}
             </div>
-            <button onClick={saveConfig} className={primaryBtn} disabled={!selected}>Salvar configuração</button>
+            {isControlled ? (
+              <div className="flex gap-2 flex-wrap">
+                <button onClick={saveConfig} className={primaryBtn}>Salvar configuração</button>
+                <button onClick={revertToMirror} className={ghostBtn}>Voltar para espelho</button>
+              </div>
+            ) : (
+              <button onClick={activate} className={primaryBtn} disabled={!(Number(form.initialPrice) > 0)}>
+                Ativar modo controlado
+              </button>
+            )}
           </section>
         </div>
       )}
