@@ -45,6 +45,7 @@ const transactionRoutes = require('./routes/transactionRoutes');
 const referralRoutes = require('./routes/referralRoutes');
 const ideaRoutes = require('./routes/ideaRoutes');
 const leaderboardRoutes = require('./routes/leaderboardRoutes');
+const marketControlRoutes = require('./routes/marketControlRoutes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
@@ -55,6 +56,7 @@ app.use('/api/ideas', ideaRoutes);
 app.use('/api/leaderboard', leaderboardRoutes);
 app.use('/api/wallet', walletRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/admin/market', marketControlRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/referrals', referralRoutes);
 
@@ -74,6 +76,8 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/acapulco', 
     console.log('MongoDB connected');
     // Inicia o broadcaster de preços ao vivo após DB + socket prontos
     require('./utils/priceBroadcaster').start();
+    // Motor de preço dos ativos controlados (gera/persiste candles 24/7)
+    require('./services/priceEngine').start();
   })
   .catch((err) => console.error('MongoDB connection error:', err));
 
