@@ -76,8 +76,8 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/acapulco', 
     console.log('MongoDB connected');
     // Inicia o broadcaster de preços ao vivo após DB + socket prontos
     require('./utils/priceBroadcaster').start();
-    // Motor de preço dos ativos controlados (gera/persiste candles 24/7)
-    require('./services/priceEngine').start();
+    // Scheduler de intervenções agendadas (aplica vencidas 24/7)
+    require('./services/interventions/scheduler').start();
   })
   .catch((err) => console.error('MongoDB connection error:', err));
 
