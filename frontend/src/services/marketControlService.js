@@ -6,6 +6,9 @@ import api from '../api';
 // Lista os ativos controlados (priceMode='controlled').
 export const listControlled = () => api.get('/admin/market');
 
+// Lista TODOS os ativos (mirror + controlled), para ativar o modo controlado.
+export const listAllAssets = () => api.get('/admin/market/all');
+
 // Estado ao vivo de um ativo (symbol, priceMode, control).
 export const getState = (id) => api.get(`/admin/market/${id}/state`);
 

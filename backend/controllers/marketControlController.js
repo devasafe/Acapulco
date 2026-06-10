@@ -146,3 +146,16 @@ exports.list = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+// GET /api/admin/market/all  -> TODOS os ativos (mirror + controlled) para o painel
+// poder ativar o modo controlado em um ativo que ainda é 'mirror'.
+exports.listAll = async (req, res) => {
+  try {
+    const assets = await Asset.find().sort({ symbol: 1 }).lean();
+    res.json(assets.map((a) => ({
+      _id: a._id, symbol: a.symbol, name: a.name, priceMode: a.priceMode, control: a.control,
+    })));
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
