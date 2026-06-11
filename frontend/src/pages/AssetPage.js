@@ -5,7 +5,7 @@ import ProChart from '../components/ProChart';
 import SiteFooter from '../components/marketing/SiteFooter';
 import { getAsset } from '../services/assetService';
 import { getCandles } from '../services/marketService';
-import { buy as buyTrade, sell as sellTrade, getPositions, getStats } from '../services/tradeService';
+import { buy as buyTrade, sell as sellTrade, closePosition, getPositions, getStats } from '../services/tradeService';
 import { connectSocket } from '../services/socketService';
 import { getToken } from '../utils/auth';
 
@@ -48,7 +48,7 @@ export default function AssetPage() {
   const [change, setChange] = useState(null);
   const [position, setPosition] = useState(null);
   const [cash, setCash] = useState(null);
-  const [qty, setQty] = useState('');
+  const [usd, setUsd] = useState('100');
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState(null);
@@ -110,33 +110,32 @@ export default function AssetPage() {
 
   const handleTrade = async (side) => {
     setMsg(null);
-    const quantity = Number(qty);
-    if (!quantity || quantity <= 0) {
-      setMsg({ type: 'error', text: 'Informe uma quantidade válida.' });
-      return;
-    }
+    const amount = Number(usd);
+    if (!amount || amount < 1) { setMsg({ type: 'error', text: 'Valor mínimo $1.' }); return; }
     setBusy(true);
     try {
       const fn = side === 'buy' ? buyTrade : sellTrade;
-      const res = await fn({ symbol, quantity });
-      const pnl = res.data.realizedPnl;
-      setMsg({
-        type: 'success',
-        text:
-          side === 'buy'
-            ? `Compra executada: ${quantity} ${symbol} @ ${fmtUsd(res.data.trade.price)}`
-            : `Venda executada: ${quantity} ${symbol} @ ${fmtUsd(res.data.trade.price)} (P&L ${fmtUsd(pnl)})`,
-      });
-      setQty('');
+      const res = await fn({ symbol, usd: amount });
+      setMsg({ type: 'success', text: `${side === 'buy' ? 'Compra' : 'Venda'} de ${fmtUsd(amount)} @ ${fmtUsd(res.data.trade.price)}` });
       await refreshPortfolio();
     } catch (err) {
       setMsg({ type: 'error', text: err.response?.data?.error || 'Erro ao executar a ordem.' });
-    } finally {
-      setBusy(false);
-    }
+    } finally { setBusy(false); }
   };
 
-  const estCost = qty && price ? Number(qty) * price : 0;
+  const handleClose = async () => {
+    setMsg(null);
+    setBusy(true);
+    try {
+      const res = await closePosition({ symbol });
+      setMsg({ type: 'success', text: `Posição fechada (P&L ${fmtUsd(res.data.realizedPnl)})` });
+      await refreshPortfolio();
+    } catch (err) {
+      setMsg({ type: 'error', text: err.response?.data?.error || 'Erro ao fechar.' });
+    } finally { setBusy(false); }
+  };
+
+  const estUnits = usd && price ? Number(usd) / price : 0; // 1 unidade = 1 unidade do ativo
   const changeUp = (change ?? 0) >= 0;
 
   const cardCls = 'bg-surface-container-lowest border border-outline-variant/30 rounded-xl shadow-sm';
@@ -213,15 +212,25 @@ export default function AssetPage() {
                 )}
 
                 <label className="flex flex-col gap-1 text-body-sm text-on-surface-variant mt-4">
-                  Quantidade
-                  <input
-                    type="number" min="0" step="any" value={qty} onChange={(e) => setQty(e.target.value)}
-                    placeholder="0.00"
-                    className="bg-background border border-outline-variant/40 rounded-lg px-3 py-2 text-on-surface tabular-nums focus:outline-none focus:border-primary-container"
-                  />
+                  Valor (USD)
+                  <div className="flex items-center gap-2">
+                    <span className="text-on-surface-variant">$</span>
+                    <input
+                      type="number" min="1" step="1" value={usd} onChange={(e) => setUsd(e.target.value)}
+                      className="flex-1 w-full bg-background border border-outline-variant/40 rounded-lg px-3 py-2 text-on-surface tabular-nums focus:outline-none focus:border-primary-container"
+                    />
+                  </div>
                 </label>
+                <div className="flex gap-1.5 mt-2">
+                  {[10, 50, 100, 500].map((v) => (
+                    <button key={v} type="button" onClick={() => setUsd(String(v))}
+                      className="px-2.5 py-1 rounded-md text-body-sm bg-surface-container text-on-surface-variant hover:text-on-surface">
+                      ${v}
+                    </button>
+                  ))}
+                </div>
                 <p className="text-body-sm text-on-surface-variant mt-2">
-                  Estimativa: <b className="text-on-surface tabular-nums">{fmtUsd(estCost)}</b>
+                  ≈ <b className="text-on-surface tabular-nums">{estUnits ? estUnits.toFixed(6) : '0'}</b> unidades
                 </p>
 
                 <div className="flex gap-2 mt-4">
@@ -242,24 +251,38 @@ export default function AssetPage() {
 
               <section className={`${cardCls} p-5`}>
                 <h2 className="font-headline-md text-[18px] text-on-surface mb-3">Sua posição</h2>
-                {position && position.quantity > 0 ? (
+                {position && Math.abs(position.netUnits ?? 0) > 0 ? (
                   <div className="space-y-2 text-body-sm">
-                    <div className="flex justify-between">
-                      <span className="text-on-surface-variant">Quantidade</span>
-                      <b className="text-on-surface tabular-nums">{fmt(position.quantity, 8)}</b>
+                    <div className="flex justify-between items-center">
+                      <span className="text-on-surface-variant">Direção</span>
+                      <span className={`px-2 py-0.5 rounded font-label-caps uppercase ${position.netUnits > 0 ? 'bg-success/15 text-success' : 'bg-danger/15 text-danger'}`}>
+                        {position.netUnits > 0 ? 'Comprado' : 'Vendido'}
+                      </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-on-surface-variant">Preço médio</span>
+                      <span className="text-on-surface-variant">Valor investido</span>
+                      <b className="text-on-surface tabular-nums">{fmtUsd(position.invested ?? position.reserved)}</b>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-on-surface-variant">Unidades</span>
+                      <b className="text-on-surface tabular-nums">{Math.abs(position.netUnits).toFixed(6)}</b>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-on-surface-variant">Preço de entrada</span>
                       <b className="text-on-surface tabular-nums">{fmtUsd(position.avgEntryPrice)}</b>
                     </div>
                     <div className="flex justify-between items-center pt-1">
-                      <span className="text-on-surface-variant">P&L não realizado</span>
-                      <span className={`px-2 py-0.5 rounded font-semibold tabular-nums ${
-                        (position.unrealizedPnl ?? 0) >= 0 ? 'bg-success/15 text-success' : 'bg-danger/15 text-danger'
-                      }`}>
-                        {fmtUsd(position.unrealizedPnl)}
+                      <span className="text-on-surface-variant">P&L flutuante</span>
+                      <span className={`px-2 py-0.5 rounded font-semibold tabular-nums ${(position.floatingPnl ?? 0) >= 0 ? 'bg-success/15 text-success' : 'bg-danger/15 text-danger'}`}>
+                        {fmtUsd(position.floatingPnl)}{position.floatingPnlPercent != null ? ` (${position.floatingPnlPercent.toFixed(2)}%)` : ''}
                       </span>
                     </div>
+                    <button
+                      disabled={busy} onClick={handleClose}
+                      className="w-full mt-3 bg-surface-container border border-outline-variant/40 text-on-surface py-2.5 rounded-lg font-label-caps uppercase hover:border-primary-container/60 disabled:opacity-40 transition-colors"
+                    >
+                      Fechar posição
+                    </button>
                   </div>
                 ) : (
                   <p className="text-body-sm text-on-surface-variant">Você ainda não tem posição neste ativo.</p>
