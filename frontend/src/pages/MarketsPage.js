@@ -1,19 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Container, Typography, Box, Card, CardContent, Grid, Chip, Button,
-  CircularProgress, TextField, InputAdornment,
-} from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import { useNavigate } from 'react-router-dom';
-import PageLayout from '../components/PageLayout';
+import SiteShell from '../components/SiteShell';
 import { getAssets } from '../services/assetService';
 import { connectSocket } from '../services/socketService';
 import { getToken } from '../utils/auth';
 
 const fmtPrice = (n) =>
   n == null ? '—' : `$${Number(n).toLocaleString('en-US', { maximumFractionDigits: 8 })}`;
+
+function Spinner() {
+  return (
+    <div className="flex justify-center items-center py-24">
+      <div className="w-10 h-10 rounded-full border-4 border-outline-variant border-t-primary-container animate-spin" />
+    </div>
+  );
+}
 
 export default function MarketsPage() {
   const navigate = useNavigate();
@@ -50,100 +51,75 @@ export default function MarketsPage() {
   );
 
   return (
-    <PageLayout>
-      <Container maxWidth="lg">
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="h4" sx={{ fontWeight: 800, color: '#F1F5F9' }}>
-            Mercados
-          </Typography>
-          <Typography variant="body2" sx={{ color: '#94A3B8' }}>
+    <SiteShell active="Mercados">
+      <div className="max-w-6xl mx-auto px-margin-mobile md:px-margin-desktop py-8">
+        <div className="mb-6">
+          <h1 className="font-headline-xl text-headline-md text-on-surface leading-tight">Mercados</h1>
+          <p className="text-on-surface-variant text-body-sm mt-1">
             Preços reais de mercado, atualizando ao vivo. Pratique com dinheiro fictício.
-          </Typography>
-        </Box>
+          </p>
+        </div>
 
-        <TextField
-          fullWidth
-          size="small"
-          placeholder="Filtrar por símbolo ou nome..."
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-          sx={{ mb: 3, '& .MuiOutlinedInput-root': { color: '#F1F5F9' } }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon sx={{ color: '#94A3B8' }} />
-              </InputAdornment>
-            ),
-          }}
-        />
+        <label className="relative block mb-6">
+          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px] pointer-events-none">
+            search
+          </span>
+          <input
+            type="text"
+            placeholder="Filtrar por símbolo ou nome..."
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            className="w-full bg-background border border-outline-variant/40 rounded-lg pl-10 pr-3 py-2.5 text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-primary-container"
+          />
+        </label>
 
         {loading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-            <CircularProgress />
-          </Box>
+          <Spinner />
         ) : visible.length === 0 ? (
-          <Typography sx={{ color: '#94A3B8', textAlign: 'center', py: 6 }}>
-            Nenhum ativo na watchlist. {`(O admin pode adicionar ativos por símbolo no painel.)`}
-          </Typography>
+          <p className="text-on-surface-variant text-center py-16 font-body-sm">
+            Nenhum ativo na watchlist. (O admin pode adicionar ativos por símbolo no painel.)
+          </p>
         ) : (
-          <Grid container spacing={2}>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {visible.map((a) => {
               const up = (a.changePercent ?? 0) >= 0;
               return (
-                <Grid item xs={12} sm={6} md={4} key={a.symbol}>
-                  <Card
-                    sx={{
-                      background: 'rgba(26, 31, 46, 0.8)',
-                      border: '1px solid rgba(124, 58, 237, 0.2)',
-                      borderRadius: 3,
-                      transition: 'transform .2s, border-color .2s',
-                      '&:hover': { transform: 'translateY(-4px)', borderColor: '#7C3AED' },
-                    }}
-                  >
-                    <CardContent>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Box>
-                          <Typography variant="h6" sx={{ fontWeight: 700, color: '#F1F5F9' }}>
-                            {a.symbol}
-                          </Typography>
-                          <Typography variant="caption" sx={{ color: '#94A3B8' }}>
-                            {a.name}
-                          </Typography>
-                        </Box>
-                        <Chip
-                          size="small"
-                          icon={up ? <TrendingUpIcon /> : <TrendingDownIcon />}
-                          label={a.changePercent == null ? '—' : `${a.changePercent.toFixed(2)}%`}
-                          sx={{
-                            bgcolor: up ? 'rgba(16,185,129,.15)' : 'rgba(239,68,68,.15)',
-                            color: up ? '#10B981' : '#EF4444',
-                            fontWeight: 700,
-                          }}
-                        />
-                      </Box>
-                      <Typography variant="h5" sx={{ mt: 2, fontWeight: 800, color: '#F1F5F9' }}>
-                        {fmtPrice(a.price)}
-                      </Typography>
-                      <Button
-                        fullWidth
-                        variant="contained"
-                        sx={{
-                          mt: 2,
-                          background: 'linear-gradient(135deg, #7C3AED, #6B46C1)',
-                          fontWeight: 700,
-                        }}
-                        onClick={() => navigate(`/asset/${a.symbol}`)}
-                      >
-                        Negociar
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </Grid>
+                <button
+                  key={a.symbol}
+                  type="button"
+                  onClick={() => navigate(`/asset/${a.symbol}`)}
+                  className="text-left bg-surface-container-lowest border border-outline-variant/30 rounded-xl shadow-sm p-5 transition-all hover:-translate-y-1 hover:border-primary-container/60 focus:outline-none focus:border-primary-container"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <h2 className="font-headline-md text-[18px] text-on-surface truncate">{a.symbol}</h2>
+                      <p className="text-on-surface-variant font-body-sm truncate">{a.name}</p>
+                    </div>
+                    <span
+                      className={`shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded font-semibold tabular-nums text-body-sm ${
+                        up ? 'bg-success/15 text-success' : 'bg-danger/15 text-danger'
+                      }`}
+                    >
+                      <span className="material-symbols-outlined text-[16px]">
+                        {up ? 'trending_up' : 'trending_down'}
+                      </span>
+                      {a.changePercent == null ? '—' : `${a.changePercent.toFixed(2)}%`}
+                    </span>
+                  </div>
+
+                  <p className="font-headline-md text-headline-md text-on-surface tabular-nums mt-4">
+                    {fmtPrice(a.price)}
+                  </p>
+
+                  <span className="mt-4 w-full inline-flex justify-center items-center bg-primary-container text-on-primary-container py-2.5 rounded-lg font-label-caps uppercase">
+                    Negociar
+                  </span>
+                </button>
               );
             })}
-          </Grid>
+          </div>
         )}
-      </Container>
-    </PageLayout>
+      </div>
+    </SiteShell>
   );
 }
