@@ -184,7 +184,7 @@ export default function AssetPage() {
               </div>
 
               {candles.length > 0 ? (
-                <ProChart candles={candles} interval={interval} />
+                <ProChart candles={candles} />
               ) : (
                 <Spinner />
               )}

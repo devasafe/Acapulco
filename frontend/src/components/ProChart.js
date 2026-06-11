@@ -48,10 +48,10 @@ const DRAWINGS = [
   ['fibonacciLine', 'Fibonacci'],
 ];
 
-export default function ProChart({ candles, interval }) {
+export default function ProChart({ candles }) {
   const elRef = useRef(null);
   const chartRef = useRef(null);
-  const lastIntervalRef = useRef(null);
+  const lastSpacingRef = useRef(null);
   const paneIds = useRef({});
   const [on, setOn] = useState({ VOL: true, MA: true, EMA: false, MACD: false, RSI: false });
 
@@ -67,19 +67,22 @@ export default function ProChart({ candles, interval }) {
     return () => { dispose(el); chartRef.current = null; paneIds.current = {}; };
   }, []);
 
-  // Carrega/atualiza os dados. Troca de timeframe -> recarrega tudo; poll ao vivo -> só o último candle (mantém o zoom).
+  // Carrega/atualiza os dados. Detecta troca de timeframe pelo ESPAÇAMENTO real entre os
+  // candles (não pelo prop interval, que muda antes dos novos dados chegarem — o que fazia
+  // aplicar dados do timeframe antigo e corromper o gráfico). Mesmo espaçamento = poll ao
+  // vivo -> atualiza só o último candle (mantém o zoom). Espaçamento diferente = recarrega.
   useEffect(() => {
     const chart = chartRef.current;
-    if (!chart || !candles) return;
+    if (!chart || !candles || !candles.length) return;
     const data = candles.map((c) => ({ timestamp: c.time, open: c.open, high: c.high, low: c.low, close: c.close, volume: c.volume || 0 }));
-    if (!data.length) return;
-    if (lastIntervalRef.current !== interval) {
+    const spacing = data.length > 1 ? data[data.length - 1].timestamp - data[data.length - 2].timestamp : 0;
+    if (lastSpacingRef.current !== spacing) {
       chart.applyNewData(data);
-      lastIntervalRef.current = interval;
+      lastSpacingRef.current = spacing;
     } else {
       chart.updateData(data[data.length - 1]);
     }
-  }, [candles, interval]);
+  }, [candles]);
 
   const toggle = (name, onMain) => {
     const chart = chartRef.current;
