@@ -9,7 +9,7 @@ import { listIdeas, createIdea, removeIdea } from '../services/ideaService';
 
 export default function AdminIdeasPage() {
   const [ideas, setIdeas] = useState([]);
-  const [form, setForm] = useState({ symbol: '', title: '', body: '', stance: 'neutral' });
+  const [form, setForm] = useState({ symbol: '', title: '', body: '', stance: 'neutral', startDate: '', endDate: '' });
   const [msg, setMsg] = useState(null);
 
   const load = () => listIdeas().then((r) => setIdeas(r.data)).catch(() => {});
@@ -19,10 +19,11 @@ export default function AdminIdeasPage() {
 
   const handleSubmit = async () => {
     setMsg(null);
+    if (!form.symbol) { setMsg({ type: 'error', text: 'Informe o símbolo (moeda) da dica.' }); return; }
     try {
       await createIdea(form);
       setMsg({ type: 'success', text: 'Ideia publicada.' });
-      setForm({ symbol: '', title: '', body: '', stance: 'neutral' });
+      setForm({ symbol: '', title: '', body: '', stance: 'neutral', startDate: '', endDate: '' });
       load();
     } catch (err) {
       setMsg({ type: 'error', text: err.response?.data?.error || 'Erro ao publicar.' });
@@ -48,12 +49,16 @@ export default function AdminIdeasPage() {
           <CardContent>
             <Stack spacing={2}>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                <TextField label="Símbolo (opcional)" value={form.symbol} onChange={handleChange('symbol')} size="small" sx={{ flex: 1 }} />
+                <TextField label="Símbolo (moeda) *" value={form.symbol} onChange={handleChange('symbol')} size="small" placeholder="BTCUSDT" sx={{ flex: 1 }} />
                 <TextField label="Viés" value={form.stance} onChange={handleChange('stance')} select size="small" sx={{ flex: 1 }}>
                   <MenuItem value="bullish">Alta (bullish)</MenuItem>
                   <MenuItem value="bearish">Baixa (bearish)</MenuItem>
                   <MenuItem value="neutral">Neutro</MenuItem>
                 </TextField>
+              </Stack>
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                <TextField label="Início" type="date" value={form.startDate} onChange={handleChange('startDate')} size="small" InputLabelProps={{ shrink: true }} sx={{ flex: 1 }} />
+                <TextField label="Fim" type="date" value={form.endDate} onChange={handleChange('endDate')} size="small" InputLabelProps={{ shrink: true }} sx={{ flex: 1 }} />
               </Stack>
               <TextField label="Título" value={form.title} onChange={handleChange('title')} size="small" fullWidth />
               <TextField label="Análise / conteúdo" value={form.body} onChange={handleChange('body')} multiline rows={4} fullWidth />
@@ -74,6 +79,11 @@ export default function AdminIdeasPage() {
                 </Box>
                 <Typography sx={{ color: '#F1F5F9', fontWeight: 700 }}>{idea.title}</Typography>
                 <Typography variant="body2" sx={{ color: '#94A3B8' }}>{idea.body}</Typography>
+                {(idea.startDate || idea.endDate) && (
+                  <Typography variant="caption" sx={{ color: '#64748B' }}>
+                    Válida {idea.startDate ? new Date(idea.startDate).toLocaleDateString('pt-BR') : '—'} → {idea.endDate ? new Date(idea.endDate).toLocaleDateString('pt-BR') : '—'}
+                  </Typography>
+                )}
               </Box>
               <IconButton onClick={() => handleRemove(idea._id)} sx={{ color: '#EF4444' }}><DeleteIcon /></IconButton>
             </CardContent>

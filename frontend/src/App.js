@@ -14,7 +14,6 @@ import MarketsPage from './pages/MarketsPage';
 import AssetPage from './pages/AssetPage';
 import AssetAdminPage from './pages/AssetAdminPage';
 import LeaderboardPage from './pages/LeaderboardPage';
-import IdeasPage from './pages/IdeasPage';
 import AdminIdeasPage from './pages/AdminIdeasPage';
 import MarketControlPage from './pages/MarketControlPage';
 import ReferralNetworkPage from './pages/ReferralNetworkPage';
@@ -53,7 +52,6 @@ function App() {
           <Route path="/markets" element={<ProtectedRoute><MarketsPage /></ProtectedRoute>} />
           <Route path="/asset/:symbol" element={<ProtectedRoute><AssetPage /></ProtectedRoute>} />
           <Route path="/leaderboard" element={<ProtectedRoute><LeaderboardPage /></ProtectedRoute>} />
-          <Route path="/ideas" element={<ProtectedRoute><IdeasPage /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
           <Route path="/referrals" element={<ProtectedRoute><ReferralNetworkPage /></ProtectedRoute>} />
 

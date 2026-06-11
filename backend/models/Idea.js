@@ -6,10 +6,12 @@ const mongoose = require('mongoose');
 const ideaSchema = new mongoose.Schema({
   authorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   authorName: { type: String },
-  symbol: { type: String, uppercase: true, trim: true },
+  symbol: { type: String, required: true, uppercase: true, trim: true }, // moeda da dica
   title: { type: String, required: true },
   body: { type: String, required: true },
   stance: { type: String, enum: ['bullish', 'bearish', 'neutral'], default: 'neutral' },
+  startDate: { type: Date }, // janela de exibição na página da moeda
+  endDate: { type: Date },
   createdAt: { type: Date, default: Date.now },
 });
 

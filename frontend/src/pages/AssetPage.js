@@ -7,6 +7,7 @@ import { getAsset } from '../services/assetService';
 import { getCandles } from '../services/marketService';
 import { buy as buyTrade, sell as sellTrade, closePosition, getPositions, getStats } from '../services/tradeService';
 import { connectSocket } from '../services/socketService';
+import { listIdeas } from '../services/ideaService';
 import { getToken } from '../utils/auth';
 
 const fmt = (n, d = 2) =>
@@ -19,6 +20,13 @@ const INTERVALS = [
   { label: '1h', v: '1h' }, { label: '4h', v: '4h' }, { label: '1D', v: '1d' },
   { label: '1S', v: '1w' }, { label: '1M', v: '1M' },
 ];
+
+const fmtDate = (d) => (d ? new Date(d).toLocaleDateString('pt-BR') : '');
+const STANCE = {
+  bullish: { label: 'Alta', cls: 'bg-success/15 text-success' },
+  bearish: { label: 'Baixa', cls: 'bg-danger/15 text-danger' },
+  neutral: { label: 'Neutro', cls: 'bg-outline-variant/20 text-on-surface-variant' },
+};
 
 function Shell({ children }) {
   return (
@@ -52,6 +60,7 @@ export default function AssetPage() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState(null);
+  const [ideas, setIdeas] = useState([]);
 
   const refreshPortfolio = useCallback(async () => {
     try {
@@ -94,6 +103,11 @@ export default function AssetPage() {
     const t = setInterval(loadCandles, 5000);   // atualização ao vivo a cada 5s
     return () => clearInterval(t);
   }, [loadCandles]);
+
+  // Ideias/dicas ativas desta moeda (janela de exibição)
+  useEffect(() => {
+    listIdeas({ symbol, active: 1 }).then((r) => setIdeas(r.data)).catch(() => {});
+  }, [symbol]);
 
   // Preço ao vivo
   useEffect(() => {
@@ -154,6 +168,7 @@ export default function AssetPage() {
         {loading ? (
           <Spinner />
         ) : (
+          <>
           <div className="grid gap-6 lg:grid-cols-3">
             {/* Gráfico */}
             <section className={`${cardCls} p-5 lg:col-span-2`}>
@@ -290,6 +305,31 @@ export default function AssetPage() {
               </section>
             </div>
           </div>
+
+          {ideas.length > 0 && (
+            <section className={`${cardCls} p-5 mt-6`}>
+              <h2 className="font-headline-md text-[18px] text-on-surface mb-4">Ideias &amp; Análises</h2>
+              <div className="space-y-4">
+                {ideas.map((idea) => (
+                  <article key={idea._id} className="border border-outline-variant/30 rounded-xl p-4">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <span className={`text-[11px] uppercase px-2 py-0.5 rounded font-label-caps ${STANCE[idea.stance]?.cls || STANCE.neutral.cls}`}>
+                        {STANCE[idea.stance]?.label || idea.stance}
+                      </span>
+                      <h3 className="font-headline-md text-[15px] text-on-surface">{idea.title}</h3>
+                    </div>
+                    <p className="text-body-sm text-on-surface-variant whitespace-pre-line">{idea.body}</p>
+                    {(idea.startDate || idea.endDate) && (
+                      <p className="text-[11px] text-on-surface-variant/70 mt-2">
+                        Válida{idea.startDate ? ` de ${fmtDate(idea.startDate)}` : ''}{idea.endDate ? ` até ${fmtDate(idea.endDate)}` : ''}
+                      </p>
+                    )}
+                  </article>
+                ))}
+              </div>
+            </section>
+          )}
+          </>
         )}
       </div>
     </Shell>

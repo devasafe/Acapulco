@@ -20,7 +20,6 @@ export default function SiteNav({ active = '' }) {
           { label: 'Dashboard', to: '/dashboard' },
           { label: 'Mercados', to: '/markets' },
           { label: 'Ranking', to: '/leaderboard' },
-          { label: 'Ideias', to: '/ideas' },
           { label: 'Perfil', to: '/profile' },
           ...(user?.isAdmin ? [{ label: 'Painel Admin', to: '/admin' }] : []),
         ]
