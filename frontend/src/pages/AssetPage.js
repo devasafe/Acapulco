@@ -152,6 +152,11 @@ export default function AssetPage() {
   const estUnits = usd && price ? Number(usd) / price : 0; // 1 unidade = 1 unidade do ativo
   const changeUp = (change ?? 0) >= 0;
 
+  // P&L flutuante recalculado AO VIVO a partir do preço atual (atualiza a cada 5s, sem F5).
+  const invested = position ? (position.invested ?? position.reserved ?? Math.abs(position.netUnits || 0) * (position.avgEntryPrice || 0)) : 0;
+  const livePnl = position && price != null ? (price - position.avgEntryPrice) * position.netUnits : null;
+  const livePnlPct = livePnl != null && invested > 0 ? (livePnl / invested) * 100 : null;
+
   const cardCls = 'bg-surface-container-lowest border border-outline-variant/30 rounded-xl shadow-sm';
   const pillBase = 'px-3 py-1.5 rounded-lg text-body-sm font-label-caps transition-colors';
 
@@ -276,7 +281,7 @@ export default function AssetPage() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-on-surface-variant">Valor investido</span>
-                      <b className="text-on-surface tabular-nums">{fmtUsd(position.invested ?? position.reserved)}</b>
+                      <b className="text-on-surface tabular-nums">{fmtUsd(invested)}</b>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-on-surface-variant">Unidades</span>
@@ -288,8 +293,8 @@ export default function AssetPage() {
                     </div>
                     <div className="flex justify-between items-center pt-1">
                       <span className="text-on-surface-variant">P&L flutuante</span>
-                      <span className={`px-2 py-0.5 rounded font-semibold tabular-nums ${(position.floatingPnl ?? 0) >= 0 ? 'bg-success/15 text-success' : 'bg-danger/15 text-danger'}`}>
-                        {fmtUsd(position.floatingPnl)}{position.floatingPnlPercent != null ? ` (${position.floatingPnlPercent.toFixed(2)}%)` : ''}
+                      <span className={`px-2 py-0.5 rounded font-semibold tabular-nums ${(livePnl ?? 0) >= 0 ? 'bg-success/15 text-success' : 'bg-danger/15 text-danger'}`}>
+                        {fmtUsd(livePnl)}{livePnlPct != null ? ` (${livePnlPct.toFixed(2)}%)` : ''}
                       </span>
                     </div>
                     <button
