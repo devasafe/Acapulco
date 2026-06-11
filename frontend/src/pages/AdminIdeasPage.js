@@ -6,14 +6,19 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import PageLayout from '../components/PageLayout';
 import { listIdeas, createIdea, removeIdea } from '../services/ideaService';
+import { getAllAssetsAdmin } from '../services/assetService';
 
 export default function AdminIdeasPage() {
   const [ideas, setIdeas] = useState([]);
+  const [assets, setAssets] = useState([]);
   const [form, setForm] = useState({ symbol: '', title: '', body: '', stance: 'neutral', startDate: '', endDate: '' });
   const [msg, setMsg] = useState(null);
 
   const load = () => listIdeas().then((r) => setIdeas(r.data)).catch(() => {});
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+    getAllAssetsAdmin().then((r) => setAssets(r.data)).catch(() => {});
+  }, []);
 
   const handleChange = (k) => (e) => setForm({ ...form, [k]: e.target.value });
 
@@ -49,7 +54,12 @@ export default function AdminIdeasPage() {
           <CardContent>
             <Stack spacing={2}>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                <TextField label="Símbolo (moeda) *" value={form.symbol} onChange={handleChange('symbol')} size="small" placeholder="BTCUSDT" sx={{ flex: 1 }} />
+                <TextField label="Moeda *" value={form.symbol} onChange={handleChange('symbol')} select size="small" sx={{ flex: 1 }}>
+                  <MenuItem value="">Selecione…</MenuItem>
+                  {assets.map((a) => (
+                    <MenuItem key={a._id} value={a.symbol}>{a.symbol}{a.name ? ` — ${a.name}` : ''}</MenuItem>
+                  ))}
+                </TextField>
                 <TextField label="Viés" value={form.stance} onChange={handleChange('stance')} select size="small" sx={{ flex: 1 }}>
                   <MenuItem value="bullish">Alta (bullish)</MenuItem>
                   <MenuItem value="bearish">Baixa (bearish)</MenuItem>
