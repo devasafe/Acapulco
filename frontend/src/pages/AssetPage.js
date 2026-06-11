@@ -77,10 +77,15 @@ export default function AssetPage() {
     return () => { mounted = false; };
   }, [symbol, refreshPortfolio]);
 
-  // Candles por intervalo (re-busca ao vivo a cada 5s para o gráfico atualizar sozinho)
+  // Candles por intervalo (re-busca ao vivo a cada 5s para o gráfico atualizar sozinho).
+  // O preço do topo vem do MESMO dado (close do último candle) — fonte única de verdade,
+  // então o número de cima é sempre idêntico ao do gráfico.
   const loadCandles = useCallback(() => {
     getCandles(symbol, { interval, limit: 200 })
-      .then((res) => setCandles(res.data))
+      .then((res) => {
+        setCandles(res.data);
+        if (res.data.length) setPrice(res.data[res.data.length - 1].close);
+      })
       .catch(() => {});
   }, [symbol, interval]);
 
@@ -95,7 +100,8 @@ export default function AssetPage() {
     const socket = connectSocket(getToken());
     const onPrice = (p) => {
       if (p.symbol !== symbol) return;
-      setPrice(p.price);
+      // O preço do topo NÃO vem daqui (vem do close do último candle, p/ bater com o
+      // gráfico). Do socket usamos só a variação 24h.
       if (p.changePercent != null) setChange(p.changePercent);
     };
     if (socket) socket.on('price', onPrice);
