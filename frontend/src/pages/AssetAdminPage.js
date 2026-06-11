@@ -1,11 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Container, Card, CardContent, Typography, Box, TextField, Button, Table,
-  TableBody, TableCell, TableHead, TableRow, Chip, Alert, InputAdornment, Stack,
-} from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import DeleteIcon from '@mui/icons-material/Delete';
-import PageLayout from '../components/PageLayout';
+import AdminShell from '../components/admin/AdminShell';
 import { getAllAssetsAdmin, addAsset, toggleAsset, removeAsset } from '../services/assetService';
 import { searchSymbols } from '../services/marketService';
 
@@ -13,7 +7,7 @@ export default function AssetAdminPage() {
   const [assets, setAssets] = useState([]);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
-  const [msg, setMsg] = useState(null);
+  const [msg, setMsg] = useState(null); // { type: 'error' | 'success', text }
 
   const load = () => getAllAssetsAdmin().then((r) => setAssets(r.data)).catch(() => {});
 
@@ -45,83 +39,159 @@ export default function AssetAdminPage() {
   const handleToggle = async (id) => { await toggleAsset(id); load(); };
   const handleRemove = async (id) => { await removeAsset(id); load(); };
 
+  const inputCls = 'bg-background border border-outline-variant/40 rounded-lg px-3 py-2 text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-primary-container';
+  const primaryBtn = 'bg-primary-container text-on-primary-container px-4 py-2 rounded-lg font-label-caps uppercase hover:opacity-90 transition-opacity disabled:opacity-40';
+  const ghostBtn = 'bg-surface-container-lowest text-on-surface border border-outline-variant/40 px-4 py-2 rounded-lg font-label-caps uppercase hover:border-primary-container/60 transition-colors disabled:opacity-40';
+
   return (
-    <PageLayout>
-      <Container maxWidth="md">
-        <Typography variant="h4" sx={{ fontWeight: 800, color: '#F1F5F9', mb: 1 }}>
-          Admin — Ativos (watchlist)
-        </Typography>
-        <Typography variant="body2" sx={{ color: '#94A3B8', mb: 3 }}>
-          Adicione ativos por símbolo. O sistema valida no provedor de mercado antes de salvar.
-        </Typography>
+    <AdminShell
+      title="Ativos (watchlist)"
+      subtitle="Adicione ativos por símbolo. O sistema valida no provedor de mercado antes de salvar."
+    >
+      {msg && (
+        <div
+          className={`mb-5 rounded-lg px-4 py-3 text-body-sm border ${
+            msg.type === 'error'
+              ? 'bg-error/10 border-error/40 text-error'
+              : 'bg-success/10 border-success/40 text-success'
+          }`}
+        >
+          {msg.text}
+        </div>
+      )}
 
-        {msg && <Alert severity={msg.type} sx={{ mb: 2 }}>{msg.text}</Alert>}
+      {/* Busca / adição */}
+      <section className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-5 mb-6">
+        <h2 className="font-headline-md text-[18px] text-on-surface mb-3">Adicionar ativo</h2>
+        <div className="flex flex-col sm:flex-row gap-2">
+          <div className="relative flex-1">
+            <span className="material-symbols-outlined text-[20px] text-on-surface-variant absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">search</span>
+            <input
+              className={`${inputCls} w-full pl-10`}
+              placeholder="Buscar símbolo (ex.: btc, eth, sol)"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+            />
+          </div>
+          <button onClick={handleSearch} className={primaryBtn}>Buscar</button>
+          <button
+            onClick={() => handleAdd(query.toUpperCase(), query.toUpperCase())}
+            className={ghostBtn}
+            disabled={!query.trim()}
+          >
+            Adicionar direto
+          </button>
+        </div>
 
-        {/* Busca/adição */}
-        <Card sx={{ background: 'rgba(26,31,46,0.85)', border: '1px solid rgba(124,58,237,0.2)', borderRadius: 3, mb: 3 }}>
-          <CardContent>
-            <Stack direction="row" spacing={1}>
-              <TextField
-                fullWidth size="small" placeholder="Buscar símbolo (ex.: btc, eth, sol)"
-                value={query} onChange={(e) => setQuery(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                sx={{ '& .MuiOutlinedInput-root': { color: '#F1F5F9' } }}
-                InputProps={{ startAdornment: <InputAdornment position="start"><SearchIcon sx={{ color: '#94A3B8' }} /></InputAdornment> }}
-              />
-              <Button variant="contained" onClick={handleSearch} sx={{ background: '#7C3AED', fontWeight: 700 }}>Buscar</Button>
-              <Button variant="outlined" onClick={() => handleAdd(query.toUpperCase(), query.toUpperCase())} sx={{ color: '#CBD5E1', borderColor: 'rgba(148,163,184,0.3)' }}>
-                Adicionar direto
-              </Button>
-            </Stack>
+        {results.length > 0 && (
+          <div className="mt-4 flex flex-wrap gap-2">
+            {results.map((r) => (
+              <button
+                key={r.symbol}
+                onClick={() => handleAdd(r.symbol, r.name, r.assetType)}
+                className="inline-flex items-center gap-1 bg-primary-container/15 text-on-primary-container hover:bg-primary-container/30 transition-colors rounded-full px-3 py-1.5 text-body-sm"
+              >
+                <span className="material-symbols-outlined text-[16px]">add</span>
+                <span className="font-label-caps">{r.symbol}</span>
+                <span className="text-on-surface-variant">({r.name})</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </section>
 
-            {results.length > 0 && (
-              <Box sx={{ mt: 2, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                {results.map((r) => (
-                  <Chip key={r.symbol} label={`${r.symbol} (${r.name})`} onClick={() => handleAdd(r.symbol, r.name, r.assetType)}
-                    sx={{ bgcolor: 'rgba(124,58,237,.15)', color: '#C4B5FD', cursor: 'pointer', '&:hover': { bgcolor: 'rgba(124,58,237,.3)' } }} />
-                ))}
-              </Box>
-            )}
-          </CardContent>
-        </Card>
+      {/* Lista */}
+      <section className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-5">
+        <h2 className="font-headline-md text-[18px] text-on-surface mb-3">Watchlist atual</h2>
 
-        {/* Lista */}
-        <Card sx={{ background: 'rgba(26,31,46,0.85)', border: '1px solid rgba(124,58,237,0.2)', borderRadius: 3 }}>
-          <CardContent>
-            <Typography variant="h6" sx={{ fontWeight: 700, color: '#F1F5F9', mb: 1 }}>Watchlist atual</Typography>
-            <Table size="small">
-              <TableHead>
-                <TableRow>
-                  {['Símbolo', 'Nome', 'Tipo', 'Status', 'Ações'].map((h) => (
-                    <TableCell key={h} sx={{ color: '#94A3B8' }}>{h}</TableCell>
+        {assets.length === 0 ? (
+          <p className="text-on-surface-variant text-body-sm">Nenhum ativo cadastrado.</p>
+        ) : (
+          <>
+            {/* Tabela (desktop) */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-body-sm">
+                <thead>
+                  <tr className="text-left border-b border-outline-variant/20">
+                    {['Símbolo', 'Nome', 'Tipo', 'Status', 'Ações'].map((h) => (
+                      <th key={h} className="font-label-caps text-[12px] uppercase text-on-surface-variant py-2 px-2">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {assets.map((a) => (
+                    <tr key={a._id} className="border-b border-outline-variant/10 last:border-0">
+                      <td className="py-2.5 px-2 font-label-caps text-on-surface">{a.symbol}</td>
+                      <td className="py-2.5 px-2 text-on-surface-variant">{a.name}</td>
+                      <td className="py-2.5 px-2 text-on-surface-variant">{a.assetType}</td>
+                      <td className="py-2.5 px-2">
+                        <button
+                          onClick={() => handleToggle(a._id)}
+                          title="Ativar / desativar"
+                          className={`inline-flex items-center gap-1 text-[11px] uppercase px-2 py-0.5 rounded transition-opacity hover:opacity-80 ${
+                            a.isActive
+                              ? 'bg-success/15 text-success'
+                              : 'bg-outline-variant/20 text-on-surface-variant'
+                          }`}
+                        >
+                          <span className="material-symbols-outlined text-[16px]">{a.isActive ? 'toggle_on' : 'toggle_off'}</span>
+                          {a.isActive ? 'Ativo' : 'Inativo'}
+                        </button>
+                      </td>
+                      <td className="py-2.5 px-2">
+                        <button
+                          onClick={() => handleRemove(a._id)}
+                          title="Remover"
+                          className="inline-flex items-center gap-1 text-error hover:underline"
+                        >
+                          <span className="material-symbols-outlined text-[18px]">delete</span>
+                          Remover
+                        </button>
+                      </td>
+                    </tr>
                   ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {assets.map((a) => (
-                  <TableRow key={a._id}>
-                    <TableCell sx={{ color: '#F1F5F9', fontWeight: 700 }}>{a.symbol}</TableCell>
-                    <TableCell sx={{ color: '#CBD5E1' }}>{a.name}</TableCell>
-                    <TableCell sx={{ color: '#CBD5E1' }}>{a.assetType}</TableCell>
-                    <TableCell>
-                      <Chip size="small" label={a.isActive ? 'Ativo' : 'Inativo'} onClick={() => handleToggle(a._id)}
-                        sx={{ cursor: 'pointer', bgcolor: a.isActive ? 'rgba(16,185,129,.15)' : 'rgba(148,163,184,.15)', color: a.isActive ? '#10B981' : '#94A3B8' }} />
-                    </TableCell>
-                    <TableCell>
-                      <Button size="small" startIcon={<DeleteIcon />} onClick={() => handleRemove(a._id)} sx={{ color: '#EF4444' }}>
-                        Remover
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {assets.length === 0 && (
-                  <TableRow><TableCell colSpan={5} sx={{ color: '#94A3B8', textAlign: 'center' }}>Nenhum ativo cadastrado.</TableCell></TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-      </Container>
-    </PageLayout>
+                </tbody>
+              </table>
+            </div>
+
+            {/* Cards (mobile) */}
+            <div className="md:hidden space-y-2">
+              {assets.map((a) => (
+                <div key={a._id} className="bg-background rounded-lg px-3 py-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <div>
+                      <span className="font-label-caps text-on-surface">{a.symbol}</span>
+                      <span className="text-on-surface-variant text-body-sm"> · {a.name}</span>
+                      <span className="block text-on-surface-variant text-[12px]">{a.assetType}</span>
+                    </div>
+                    <button
+                      onClick={() => handleToggle(a._id)}
+                      title="Ativar / desativar"
+                      className={`inline-flex items-center gap-1 text-[11px] uppercase px-2 py-0.5 rounded shrink-0 ${
+                        a.isActive
+                          ? 'bg-success/15 text-success'
+                          : 'bg-outline-variant/20 text-on-surface-variant'
+                      }`}
+                    >
+                      <span className="material-symbols-outlined text-[16px]">{a.isActive ? 'toggle_on' : 'toggle_off'}</span>
+                      {a.isActive ? 'Ativo' : 'Inativo'}
+                    </button>
+                  </div>
+                  <button
+                    onClick={() => handleRemove(a._id)}
+                    title="Remover"
+                    className="mt-2 inline-flex items-center gap-1 text-error text-body-sm hover:underline"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">delete</span>
+                    Remover
+                  </button>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </section>
+    </AdminShell>
   );
 }
