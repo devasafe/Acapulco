@@ -2,8 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 const cols = [
-  { title: 'Simulador', items: [['Mercados', '/markets'], ['Dashboard', '/dashboard'], ['Ranking', '/leaderboard']] },
-  { title: 'Aprenda', items: [['Ideias & Análises', '/ideas'], ['Sobre', '/about'], ['Contato', '/contact']] },
+  { title: 'Simulador', items: [['Mercados', '/markets'], ['Dashboard', '/dashboard']] },
+  { title: 'Aprenda', items: [['Sobre', '/about'], ['Contato', '/contact']] },
   { title: 'Sobre o projeto', items: [['Como funciona', '/about'], ['Perfil', '/profile']] },
 ];
 

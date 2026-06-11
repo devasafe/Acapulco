@@ -90,13 +90,6 @@ export default function PageLayout({ children, noPadding = false }) {
             </Button>
             <Button
               color="inherit"
-              onClick={() => navigate('/leaderboard')}
-              sx={{ color: theme.textSecondary, '&:hover': { color: theme.primary } }}
-            >
-              Ranking
-            </Button>
-            <Button
-              color="inherit"
               onClick={() => navigate('/profile')}
               sx={{ color: theme.textSecondary, '&:hover': { color: theme.primary } }}
             >

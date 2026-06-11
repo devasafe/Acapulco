@@ -90,8 +90,6 @@ export default function Footer() {
                 </Typography>
                 <Stack spacing={2} sx={{ textAlign: 'center' }}>
                   <FooterLink label="Mercados" onClick={() => navigate('/markets')} />
-                  <FooterLink label="Ranking" onClick={() => navigate('/leaderboard')} />
-                  <FooterLink label="Ideias" onClick={() => navigate('/ideas')} />
                 </Stack>
               </Box>
             </Grid>
