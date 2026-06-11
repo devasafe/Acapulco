@@ -62,6 +62,10 @@ export default function ProChart({ candles }) {
     const chart = init(el);
     chart.setStyles(stylesFor(dark));
     chartRef.current = chart;
+    // Gráfico novo está vazio: força o próximo efeito de dados a fazer applyNewData
+    // (e não updateData). Sem isso, no remount do StrictMode o ref persistia e
+    // caía no updateData num gráfico vazio -> um candle gigante só.
+    lastSpacingRef.current = null;
     paneIds.current.VOL = chart.createIndicator('VOL', false, { id: 'pane_vol' });
     paneIds.current.MA = chart.createIndicator('MA', true, { id: 'candle_pane' });
     return () => { dispose(el); chartRef.current = null; paneIds.current = {}; };
