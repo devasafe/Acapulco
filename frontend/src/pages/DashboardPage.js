@@ -1,26 +1,33 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Container, Grid, Card, CardContent, Typography, Box, Table, TableBody,
-  TableCell, TableHead, TableRow, Chip, CircularProgress, Button,
-} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import PageLayout from '../components/PageLayout';
+import SiteShell from '../components/SiteShell';
 import { getStats, getPositions, getTrades } from '../services/tradeService';
 import { connectSocket } from '../services/socketService';
 import { getToken } from '../utils/auth';
 
 const fmtUsd = (n) =>
   n == null ? '—' : `$${Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-const fmtQty = (n) => Number(n).toLocaleString('en-US', { maximumFractionDigits: 8 });
+const fmtUnits = (n) => (n == null ? '—' : Number(n).toLocaleString('en-US', { maximumFractionDigits: 8 }));
+const fmtPct = (n) => (n == null ? '—' : `${Number(n).toFixed(2)}%`);
+const fmtDate = (d) => (d ? new Date(d).toLocaleString('pt-BR') : '—');
 
-function Kpi({ label, value, color = '#F1F5F9' }) {
+const cardCls = 'bg-surface-container-lowest border border-outline-variant/30 rounded-xl shadow-sm';
+const pnlCls = (v) => ((v ?? 0) >= 0 ? 'text-success' : 'text-danger');
+
+function Spinner() {
   return (
-    <Card sx={{ background: 'rgba(26,31,46,0.85)', border: '1px solid rgba(124,58,237,0.2)', borderRadius: 3, height: '100%' }}>
-      <CardContent>
-        <Typography variant="caption" sx={{ color: '#94A3B8' }}>{label}</Typography>
-        <Typography variant="h5" sx={{ fontWeight: 800, color }}>{value}</Typography>
-      </CardContent>
-    </Card>
+    <div className="flex justify-center items-center py-24">
+      <div className="w-10 h-10 rounded-full border-4 border-outline-variant border-t-primary-container animate-spin" />
+    </div>
+  );
+}
+
+function Kpi({ label, value, valueCls = 'text-on-surface' }) {
+  return (
+    <div className={`${cardCls} p-5`}>
+      <p className="font-label-caps uppercase text-body-sm text-on-surface-variant">{label}</p>
+      <p className={`font-headline-md text-headline-md mt-1 tabular-nums ${valueCls}`}>{value}</p>
+    </div>
   );
 }
 
@@ -50,113 +57,144 @@ export default function DashboardPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const pnlColor = (v) => ((v ?? 0) >= 0 ? '#10B981' : '#EF4444');
-
   return (
-    <PageLayout>
-      <Container maxWidth="lg">
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
-          <Box>
-            <Typography variant="h4" sx={{ fontWeight: 800, color: '#F1F5F9' }}>Dashboard</Typography>
-            <Typography variant="body2" sx={{ color: '#94A3B8' }}>
+    <SiteShell active="Dashboard">
+      <div className="max-w-6xl mx-auto px-margin-mobile md:px-margin-desktop py-8">
+        <div className="flex items-start justify-between flex-wrap gap-4 mb-6">
+          <div>
+            <h1 className="font-headline-xl text-headline-md text-on-surface leading-tight">Dashboard</h1>
+            <p className="text-on-surface-variant text-body-sm mt-1">
               Sua carteira fictícia, valorizada com preços reais de mercado.
-            </Typography>
-          </Box>
-          <Button variant="contained" sx={{ background: 'linear-gradient(135deg,#7C3AED,#6B46C1)', fontWeight: 700 }} onClick={() => navigate('/markets')}>
+            </p>
+          </div>
+          <button
+            onClick={() => navigate('/markets')}
+            className="bg-primary-container text-on-primary-container px-5 py-2.5 rounded-lg font-label-caps uppercase hover:opacity-90 transition-opacity active:scale-95"
+          >
             Ir aos mercados
-          </Button>
-        </Box>
+          </button>
+        </div>
 
         {loading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}><CircularProgress /></Box>
+          <Spinner />
         ) : (
           <>
-            <Grid container spacing={2} sx={{ mb: 3 }}>
-              <Grid item xs={12} sm={6} md={3}><Kpi label="Patrimônio total" value={fmtUsd(stats?.totalEquity)} /></Grid>
-              <Grid item xs={12} sm={6} md={3}><Kpi label="Caixa disponível" value={fmtUsd(stats?.cash)} /></Grid>
-              <Grid item xs={12} sm={6} md={3}><Kpi label="P&L não realizado" value={fmtUsd(stats?.unrealizedPnl)} color={pnlColor(stats?.unrealizedPnl)} /></Grid>
-              <Grid item xs={12} sm={6} md={3}><Kpi label="P&L realizado" value={fmtUsd(stats?.realizedPnl)} color={pnlColor(stats?.realizedPnl)} /></Grid>
-            </Grid>
+            {/* KPIs */}
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5 mb-6">
+              <Kpi label="Patrimônio" value={fmtUsd(stats?.equity ?? stats?.totalEquity)} />
+              <Kpi label="Caixa livre" value={fmtUsd(stats?.freeMargin ?? stats?.balance ?? stats?.cash)} />
+              <Kpi label="Margem usada" value={fmtUsd(stats?.marginUsed)} />
+              <Kpi
+                label="P&L flutuante"
+                value={fmtUsd(stats?.floatingPnl ?? stats?.unrealizedPnl)}
+                valueCls={pnlCls(stats?.floatingPnl ?? stats?.unrealizedPnl)}
+              />
+              <Kpi
+                label="P&L realizado"
+                value={fmtUsd(stats?.realizedPnl)}
+                valueCls={pnlCls(stats?.realizedPnl)}
+              />
+            </div>
 
-            {/* Posições */}
-            <Card sx={{ background: 'rgba(26,31,46,0.85)', border: '1px solid rgba(124,58,237,0.2)', borderRadius: 3, mb: 3 }}>
-              <CardContent>
-                <Typography variant="h6" sx={{ fontWeight: 700, color: '#F1F5F9', mb: 1 }}>Posições abertas</Typography>
-                {positions.length === 0 ? (
-                  <Typography variant="body2" sx={{ color: '#94A3B8' }}>Nenhuma posição aberta. Vá aos mercados e comece a praticar!</Typography>
-                ) : (
-                  <Box sx={{ overflowX: 'auto' }}>
-                    <Table size="small">
-                      <TableHead>
-                        <TableRow>
-                          {['Ativo', 'Qtd', 'Preço médio', 'Preço atual', 'Valor', 'P&L'].map((h) => (
-                            <TableCell key={h} sx={{ color: '#94A3B8' }}>{h}</TableCell>
-                          ))}
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {positions.map((p) => (
-                          <TableRow key={p.symbol} hover sx={{ cursor: 'pointer' }} onClick={() => navigate(`/asset/${p.symbol}`)}>
-                            <TableCell sx={{ color: '#F1F5F9', fontWeight: 700 }}>{p.symbol}</TableCell>
-                            <TableCell sx={{ color: '#CBD5E1' }}>{fmtQty(p.quantity)}</TableCell>
-                            <TableCell sx={{ color: '#CBD5E1' }}>{fmtUsd(p.avgEntryPrice)}</TableCell>
-                            <TableCell sx={{ color: '#CBD5E1' }}>{fmtUsd(p.currentPrice)}</TableCell>
-                            <TableCell sx={{ color: '#CBD5E1' }}>{fmtUsd(p.marketValue)}</TableCell>
-                            <TableCell>
-                              <Chip size="small" label={`${fmtUsd(p.unrealizedPnl)} (${p.unrealizedPnlPercent == null ? '—' : p.unrealizedPnlPercent.toFixed(2) + '%'})`}
-                                sx={{ bgcolor: (p.unrealizedPnl ?? 0) >= 0 ? 'rgba(16,185,129,.15)' : 'rgba(239,68,68,.15)', color: pnlColor(p.unrealizedPnl), fontWeight: 700 }} />
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </Box>
-                )}
-              </CardContent>
-            </Card>
+            {/* Posições abertas */}
+            <section className={`${cardCls} p-5 mb-6`}>
+              <h2 className="font-headline-md text-[18px] text-on-surface mb-3">Posições abertas</h2>
+              {positions.length === 0 ? (
+                <p className="text-body-sm text-on-surface-variant">
+                  Nenhuma posição aberta. Vá aos mercados e comece a praticar!
+                </p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-body-sm">
+                    <thead>
+                      <tr className="text-left font-label-caps uppercase text-on-surface-variant border-b border-outline-variant/30">
+                        <th className="py-2 pr-4 font-medium">Ativo</th>
+                        <th className="py-2 pr-4 font-medium">Direção</th>
+                        <th className="py-2 pr-4 font-medium text-right">Unidades</th>
+                        <th className="py-2 pr-4 font-medium text-right">Preço médio</th>
+                        <th className="py-2 pr-4 font-medium text-right">Preço atual</th>
+                        <th className="py-2 pr-4 font-medium text-right">Investido</th>
+                        <th className="py-2 font-medium text-right">P&L</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {positions.map((p) => (
+                        <tr
+                          key={p.symbol}
+                          onClick={() => navigate(`/asset/${p.symbol}`)}
+                          className="border-b border-outline-variant/20 last:border-0 cursor-pointer hover:bg-surface-container/50 transition-colors"
+                        >
+                          <td className="py-2.5 pr-4 font-semibold text-on-surface">{p.symbol}</td>
+                          <td className="py-2.5 pr-4">
+                            <span className={`px-2 py-0.5 rounded font-label-caps uppercase text-[11px] ${p.direction === 'long' ? 'bg-success/15 text-success' : 'bg-danger/15 text-danger'}`}>
+                              {p.direction === 'long' ? 'Comprado' : 'Vendido'}
+                            </span>
+                          </td>
+                          <td className="py-2.5 pr-4 text-right tabular-nums text-on-surface-variant">{fmtUnits(p.units)}</td>
+                          <td className="py-2.5 pr-4 text-right tabular-nums text-on-surface-variant">{fmtUsd(p.avgEntryPrice)}</td>
+                          <td className="py-2.5 pr-4 text-right tabular-nums text-on-surface-variant">{fmtUsd(p.currentPrice)}</td>
+                          <td className="py-2.5 pr-4 text-right tabular-nums text-on-surface-variant">{fmtUsd(p.invested)}</td>
+                          <td className={`py-2.5 text-right tabular-nums font-semibold ${pnlCls(p.floatingPnl)}`}>
+                            {fmtUsd(p.floatingPnl)}
+                            <span className="text-on-surface-variant font-normal"> ({fmtPct(p.floatingPnlPercent)})</span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </section>
 
-            {/* Histórico */}
-            <Card sx={{ background: 'rgba(26,31,46,0.85)', border: '1px solid rgba(124,58,237,0.2)', borderRadius: 3 }}>
-              <CardContent>
-                <Typography variant="h6" sx={{ fontWeight: 700, color: '#F1F5F9', mb: 1 }}>Histórico de operações</Typography>
-                {trades.length === 0 ? (
-                  <Typography variant="body2" sx={{ color: '#94A3B8' }}>Nenhuma operação ainda.</Typography>
-                ) : (
-                  <Box sx={{ overflowX: 'auto' }}>
-                    <Table size="small">
-                      <TableHead>
-                        <TableRow>
-                          {['Data', 'Tipo', 'Ativo', 'Qtd', 'Preço', 'Total', 'P&L'].map((h) => (
-                            <TableCell key={h} sx={{ color: '#94A3B8' }}>{h}</TableCell>
-                          ))}
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {trades.map((t) => (
-                          <TableRow key={t._id}>
-                            <TableCell sx={{ color: '#CBD5E1' }}>{new Date(t.createdAt).toLocaleString('pt-BR')}</TableCell>
-                            <TableCell>
-                              <Chip size="small" label={t.side === 'buy' ? 'Compra' : 'Venda'}
-                                sx={{ bgcolor: t.side === 'buy' ? 'rgba(16,185,129,.15)' : 'rgba(239,68,68,.15)', color: t.side === 'buy' ? '#10B981' : '#EF4444', fontWeight: 700 }} />
-                            </TableCell>
-                            <TableCell sx={{ color: '#F1F5F9', fontWeight: 600 }}>{t.symbol}</TableCell>
-                            <TableCell sx={{ color: '#CBD5E1' }}>{fmtQty(t.quantity)}</TableCell>
-                            <TableCell sx={{ color: '#CBD5E1' }}>{fmtUsd(t.price)}</TableCell>
-                            <TableCell sx={{ color: '#CBD5E1' }}>{fmtUsd(t.total)}</TableCell>
-                            <TableCell sx={{ color: t.side === 'sell' ? pnlColor(t.realizedPnl) : '#64748B' }}>
-                              {t.side === 'sell' ? fmtUsd(t.realizedPnl) : '—'}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </Box>
-                )}
-              </CardContent>
-            </Card>
+            {/* Histórico de operações */}
+            <section className={`${cardCls} p-5`}>
+              <h2 className="font-headline-md text-[18px] text-on-surface mb-3">Histórico de operações</h2>
+              {trades.length === 0 ? (
+                <p className="text-body-sm text-on-surface-variant">Nenhuma operação ainda.</p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-body-sm">
+                    <thead>
+                      <tr className="text-left font-label-caps uppercase text-on-surface-variant border-b border-outline-variant/30">
+                        <th className="py-2 pr-4 font-medium">Data</th>
+                        <th className="py-2 pr-4 font-medium">Tipo</th>
+                        <th className="py-2 pr-4 font-medium">Ativo</th>
+                        <th className="py-2 pr-4 font-medium text-right">Unidades</th>
+                        <th className="py-2 pr-4 font-medium text-right">Preço</th>
+                        <th className="py-2 pr-4 font-medium text-right">Total</th>
+                        <th className="py-2 font-medium text-right">P&L</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {trades.map((t) => (
+                        <tr
+                          key={t._id}
+                          onClick={() => navigate(`/asset/${t.symbol}`)}
+                          className="border-b border-outline-variant/20 last:border-0 cursor-pointer hover:bg-surface-container/50 transition-colors"
+                        >
+                          <td className="py-2.5 pr-4 text-on-surface-variant whitespace-nowrap">{fmtDate(t.createdAt)}</td>
+                          <td className="py-2.5 pr-4">
+                            <span className={`px-2 py-0.5 rounded font-label-caps uppercase text-[11px] ${t.side === 'buy' ? 'bg-success/15 text-success' : 'bg-danger/15 text-danger'}`}>
+                              {t.side === 'buy' ? 'Compra' : 'Venda'}
+                            </span>
+                          </td>
+                          <td className="py-2.5 pr-4 font-semibold text-on-surface">{t.symbol}</td>
+                          <td className="py-2.5 pr-4 text-right tabular-nums text-on-surface-variant">{fmtUnits(t.units)}</td>
+                          <td className="py-2.5 pr-4 text-right tabular-nums text-on-surface-variant">{fmtUsd(t.price)}</td>
+                          <td className="py-2.5 pr-4 text-right tabular-nums text-on-surface-variant">{fmtUsd(t.total ?? t.usdAmount)}</td>
+                          <td className={`py-2.5 text-right tabular-nums ${t.realizedPnl != null ? pnlCls(t.realizedPnl) : 'text-on-surface-variant'}`}>
+                            {t.realizedPnl != null ? fmtUsd(t.realizedPnl) : '—'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </section>
           </>
         )}
-      </Container>
-    </PageLayout>
+      </div>
+    </SiteShell>
   );
 }
