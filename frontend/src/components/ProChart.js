@@ -91,16 +91,16 @@ export default function ProChart({ candles }) {
   const toggle = (name, onMain) => {
     const chart = chartRef.current;
     if (!chart) return;
-    setOn((prev) => {
-      const next = !prev[name];
-      if (next) {
-        paneIds.current[name] = chart.createIndicator(name, onMain, onMain ? { id: 'candle_pane' } : undefined);
-      } else if (paneIds.current[name]) {
-        chart.removeIndicator(paneIds.current[name], name);
-        paneIds.current[name] = null;
-      }
-      return { ...prev, [name]: next };
-    });
+    // O efeito colateral fica FORA do setOn (que o StrictMode chama 2x -> duplicava o
+    // indicador). paneIds (ref) é a fonte de verdade do que está ativo; cria/remove 1x.
+    const isOn = !!paneIds.current[name];
+    if (isOn) {
+      chart.removeIndicator(paneIds.current[name], name);
+      paneIds.current[name] = null;
+    } else {
+      paneIds.current[name] = chart.createIndicator(name, onMain, onMain ? { id: 'candle_pane' } : undefined);
+    }
+    setOn((prev) => ({ ...prev, [name]: !isOn }));
   };
 
   const pill = (active) =>
