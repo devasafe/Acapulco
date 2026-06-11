@@ -1,4 +1,4 @@
-const { shape, factorFor, multiplier, scaleCandle, aggregateRange, mergeOverrides, widenWithOverrides } = require('./windowMath');
+const { shape, factorFor, multiplier, manipulatedCandle, aggregateRange, mergeOverrides, widenWithOverrides } = require('./windowMath');
 
 describe('shape (trapézio)', () => {
   const s = 1000, e = 5000, ramp = 1000; // janela 1000..5000, rampa 1000ms
@@ -19,10 +19,21 @@ describe('multiplier', () => {
   test('shape 0.5 = meio do caminho', () => { expect(multiplier(1.2, 0.5)).toBeCloseTo(1.1, 5); });
 });
 
-describe('scaleCandle', () => {
-  test('escala OHLC, mantém volume', () => {
-    expect(scaleCandle({ open: 10, high: 12, low: 9, close: 11, volume: 5 }, 1.1))
-      .toMatchObject({ open: 11, high: 13.200000000000001, low: 9.9, close: 12.100000000000001, volume: 5 });
+describe('manipulatedCandle', () => {
+  test('open usa mOpen e close usa mClose; high/low cobrem o corpo', () => {
+    const c = manipulatedCandle({ open: 100, high: 105, low: 95, close: 102, volume: 3 }, 1.0, 1.05, 1.1);
+    expect(c.open).toBeCloseTo(100, 5);     // 100 * 1.0
+    expect(c.close).toBeCloseTo(112.2, 5);  // 102 * 1.1
+    expect(c.high).toBeGreaterThanOrEqual(c.close);
+    expect(c.low).toBeLessThanOrEqual(c.open);
+    expect(c.volume).toBe(3);
+  });
+  test('SEM GAP: close da vela N = open da vela N+1 (real conecta + mesmo m no limite)', () => {
+    // vela N: real close=102 (= open da N+1); mClose_N = 1.05
+    const N = manipulatedCandle({ open: 100, high: 103, low: 99, close: 102, volume: 1 }, 1.0, 1.02, 1.05);
+    // vela N+1: real open=102 (= close N); mOpen_{N+1} = mClose_N = 1.05
+    const N1 = manipulatedCandle({ open: 102, high: 106, low: 101, close: 104, volume: 1 }, 1.05, 1.07, 1.1);
+    expect(N1.open).toBeCloseTo(N.close, 6); // 102*1.05 == 102*1.05 -> conecta, sem gap
   });
 });
 

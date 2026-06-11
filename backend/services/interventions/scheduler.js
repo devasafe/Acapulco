@@ -2,7 +2,7 @@ const Asset = require('../../models/Asset');
 const PriceIntervention = require('../../models/PriceIntervention');
 const PriceOverride = require('../../models/PriceOverride');
 const crypto = require('../marketData/cryptoProvider');
-const { shape, factorFor, multiplier, scaleCandle } = require('./windowMath');
+const { shape, factorFor, multiplier, manipulatedCandle } = require('./windowMath');
 
 const TICK_MS = Number(process.env.INTERVENTION_TICK_MS) || 15000;
 const bucket1m = (ts) => Math.floor(ts / 60000) * 60000;
@@ -40,8 +40,12 @@ async function generate(w, now) {
   for (let b = bucket1m(startMs); b <= until; b += 60000) {
     const realC = realByTime.get(b);
     if (!realC) continue; // sem candle real desse minuto (ainda)
-    const m = multiplier(w.factor, shape(b, startMs, endMs, rampMs));
-    const oc = scaleCandle(realC, m);
+    // m no início, meio e fim da vela: o fim de uma vela usa o mesmo m que o início da
+    // próxima (mesmo instante b+60000) -> velas encaixam sem gap.
+    const mOpen = multiplier(w.factor, shape(b, startMs, endMs, rampMs));
+    const mMid = multiplier(w.factor, shape(b + 30000, startMs, endMs, rampMs));
+    const mClose = multiplier(w.factor, shape(b + 60000, startMs, endMs, rampMs));
+    const oc = manipulatedCandle(realC, mOpen, mMid, mClose);
     await PriceOverride.findOneAndUpdate(
       { assetId: w.assetId, openTime: new Date(b) },
       { $set: { ...oc, interventionId: w._id } },

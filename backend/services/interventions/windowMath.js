@@ -16,12 +16,20 @@ function factorFor(mode, value, realAtStart) {
 // Multiplicador no instante: 1 (sem efeito) .. F (no topo).
 function multiplier(factor, shapeVal) { return 1 + (factor - 1) * shapeVal; }
 
-function scaleCandle(c, m) {
+// Vela manipulada SEM GAP entre velas: o open usa o multiplicador do INÍCIO da vela e o
+// close o do FIM. Como o fim de uma vela e o início da seguinte são o mesmo instante (mesmo
+// m) e o mercado real conecta (open ≈ close anterior), as velas encaixam sem degrau.
+// high/low usam o m do meio, sempre cobrindo o corpo (open/close).
+function manipulatedCandle(c, mOpen, mMid, mClose) {
+  const open = c.open * mOpen;
+  const close = c.close * mClose;
+  const high = Math.max(c.high * mMid, open, close);
+  const low = Math.min(c.low * mMid, open, close);
   return {
-    open: Math.max(c.open * m, MIN_PRICE),
-    high: Math.max(c.high * m, MIN_PRICE),
-    low: Math.max(c.low * m, MIN_PRICE),
-    close: Math.max(c.close * m, MIN_PRICE),
+    open: Math.max(open, MIN_PRICE),
+    high: Math.max(high, MIN_PRICE),
+    low: Math.max(low, MIN_PRICE),
+    close: Math.max(close, MIN_PRICE),
     volume: c.volume || 0,
   };
 }
@@ -63,4 +71,4 @@ function widenWithOverrides(candles, overrides) {
   return out;
 }
 
-module.exports = { MIN_PRICE, shape, factorFor, multiplier, scaleCandle, aggregateRange, mergeOverrides, widenWithOverrides };
+module.exports = { MIN_PRICE, shape, factorFor, multiplier, manipulatedCandle, aggregateRange, mergeOverrides, widenWithOverrides };
