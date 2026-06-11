@@ -27,8 +27,11 @@ exports.create = async (req, res) => {
     const { symbol, title, body, stance, startDate, endDate } = req.body;
     if (!symbol) return res.status(400).json({ error: 'Símbolo (moeda) é obrigatório' });
     if (!title || !body) return res.status(400).json({ error: 'Título e conteúdo são obrigatórios' });
+    const dateOnly = (s) => /^\d{4}-\d{2}-\d{2}$/.test(String(s));
     const start = startDate ? new Date(startDate) : null;
-    const end = endDate ? new Date(endDate) : null;
+    // Fim no formato data (YYYY-MM-DD) vale o DIA INTEIRO (até 23:59:59), não a meia-noite.
+    let end = endDate ? new Date(endDate) : null;
+    if (end && dateOnly(endDate)) end = new Date(`${endDate}T23:59:59.999Z`);
     if (start && isNaN(start.getTime())) return res.status(400).json({ error: 'Data de início inválida' });
     if (end && isNaN(end.getTime())) return res.status(400).json({ error: 'Data de fim inválida' });
     if (start && end && end < start) return res.status(400).json({ error: 'A data de fim deve ser ≥ início' });
