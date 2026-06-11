@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import ReactApexChart from 'react-apexcharts';
 import SiteNav from '../components/marketing/SiteNav';
+import ProChart from '../components/ProChart';
 import SiteFooter from '../components/marketing/SiteFooter';
 import { getAsset } from '../services/assetService';
 import { getCandles } from '../services/marketService';
@@ -102,25 +102,6 @@ export default function AssetPage() {
     return () => { if (socket) socket.off('price', onPrice); };
   }, [symbol]);
 
-  const dark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
-  const up = dark ? '#1fb57e' : '#2E7D32';
-  const down = dark ? '#ef5350' : '#d32f2f';
-  const axis = dark ? '#9fb0c0' : '#5b6b7a';
-  const gridC = dark ? 'rgba(230,237,243,0.08)' : 'rgba(11,34,57,0.08)';
-
-  const series = [{
-    data: candles.map((c) => ({ x: new Date(c.time), y: [c.open, c.high, c.low, c.close] })),
-  }];
-
-  const chartOptions = {
-    chart: { type: 'candlestick', height: 440, background: 'transparent', toolbar: { show: false }, fontFamily: 'Inter, sans-serif', animations: { enabled: false } },
-    xaxis: { type: 'datetime', labels: { style: { colors: axis } }, axisBorder: { color: gridC }, axisTicks: { color: gridC } },
-    yaxis: { tooltip: { enabled: true }, labels: { style: { colors: axis }, formatter: (v) => `$${fmt(v, 2)}` }, opposite: true },
-    grid: { borderColor: gridC, strokeDashArray: 3 },
-    tooltip: { theme: dark ? 'dark' : 'light' },
-    plotOptions: { candlestick: { colors: { upward: up, downward: down }, wick: { useFillColor: true } } },
-  };
-
   const handleTrade = async (side) => {
     setMsg(null);
     const quantity = Number(qty);
@@ -202,8 +183,8 @@ export default function AssetPage() {
                 ))}
               </div>
 
-              {series[0].data.length > 0 ? (
-                <ReactApexChart options={chartOptions} series={series} type="candlestick" height={440} />
+              {candles.length > 0 ? (
+                <ProChart candles={candles} interval={interval} />
               ) : (
                 <Spinner />
               )}
