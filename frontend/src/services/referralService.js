@@ -12,10 +12,8 @@ export const getReferralInfo = async (token) => {
 	});
 };
 
-export const getReferralStats = async (token) => {
-	return axios.get('/user/referral-stats', {
-		headers: { Authorization: `Bearer ${token}` }
-	});
+export const getReferralStats = async () => {
+	return axios.get('/referrals/stats');
 };
 
 export const getAdminReferralSettings = async (token) => {
