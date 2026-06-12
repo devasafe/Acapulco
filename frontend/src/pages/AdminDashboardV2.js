@@ -3,6 +3,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import AdminShell from '../components/admin/AdminShell';
 import RegistrationsCard from '../components/admin/RegistrationsCard';
 import CashflowCard from '../components/admin/CashflowCard';
+import MembersPyramidCard from '../components/admin/MembersPyramidCard';
 import api from '../api';
 
 const BRL = (v) => Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -125,6 +126,9 @@ export default function AdminDashboardV2() {
 
       {/* Gráfico entradas vs saídas */}
       <CashflowCard />
+
+      {/* Pirâmide membros novos vs antigos */}
+      <MembersPyramidCard />
 
       {/* Busca + perfil */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
