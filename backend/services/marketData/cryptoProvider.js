@@ -2,7 +2,9 @@
 // Símbolos no formato par, ex.: BTCUSDT, ETHUSDT, SOLUSDT.
 // Docs: https://binance-docs.github.io/apidocs/spot/en/
 
-const BASE = process.env.BINANCE_BASE || 'https://api.binance.com';
+// data-api.binance.vision = mirror público de market-data da Binance, SEM geo-bloqueio
+// (api.binance.com bloqueia IPs de datacenter US, ex.: Render). Mesma API /api/v3/*.
+const BASE = process.env.BINANCE_BASE || 'https://data-api.binance.vision';
 
 // Cache simples em memória para respeitar rate limit.
 let exchangeSymbolsCache = { at: 0, symbols: [] };

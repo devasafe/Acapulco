@@ -1,19 +1,7 @@
-import axios from '../api';
+import api from '../api';
 
-export const getWallet = async (token) => {
-	return axios.get('/wallet', {
-		headers: { Authorization: `Bearer ${token}` }
-	});
-};
-
-export const deposit = async (amount, token) => {
-	return axios.post('/wallet/deposit', { amount }, {
-		headers: { Authorization: `Bearer ${token}` }
-	});
-};
-
-export const withdraw = async (amount, token) => {
-	return axios.post('/wallet/withdraw', { amount }, {
-		headers: { Authorization: `Bearer ${token}` }
-	});
-};
+// O token é injetado automaticamente pelo interceptor em ../api.
+export const getWallet = () => api.get('/wallet');
+export const deposit = (amount) => api.post('/wallet/deposit', { amount });
+export const withdraw = (amount) => api.post('/wallet/withdraw', { amount });
+export const getWalletTransactions = () => api.get('/wallet/transactions');

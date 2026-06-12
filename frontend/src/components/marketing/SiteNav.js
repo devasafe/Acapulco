@@ -19,6 +19,8 @@ export default function SiteNav({ active = '' }) {
       ? [
           { label: 'Dashboard', to: '/dashboard' },
           { label: 'Mercados', to: '/markets' },
+          { label: 'Carteira', to: '/wallet' },
+          { label: 'Indicações', to: '/referrals' },
           { label: 'Perfil', to: '/profile' },
           ...(user?.isAdmin ? [{ label: 'Painel Admin', to: '/admin' }] : []),
         ]
