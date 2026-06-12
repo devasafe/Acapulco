@@ -2,6 +2,7 @@ const User = require('../models/User');
 const Transaction = require('../models/Transaction');
 const Setting = require('../models/Setting');
 const Investment = require('../models/Investment');
+const { UNITS, fillBuckets } = require('../services/analytics/registrationBuckets');
 
 // Get all users
 exports.getAllUsers = async (req, res) => {
@@ -212,6 +213,73 @@ exports.getReferralBonusDetails = async (req, res) => {
 
     res.json(details.sort((a, b) => b.bonusDate - a.bonusDate));
   } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const TZ = 'America/Sao_Paulo';
+
+// Parseia 'YYYY-MM-DD' para um Date date-only UTC. Retorna null se inválido.
+function parseDateOnly(s) {
+  if (typeof s !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(s)) return null;
+  const dt = new Date(`${s}T00:00:00.000Z`);
+  return Number.isNaN(dt.getTime()) ? null : dt;
+}
+
+// GET /api/admin/registrations?from&to&granularity
+// Novos usuários cadastrados agrupados por dia/semana/mês, com vazios = 0.
+exports.getRegistrations = async (req, res) => {
+  try {
+    const granularity = req.query.granularity || 'week';
+    if (!UNITS.includes(granularity)) {
+      return res.status(400).json({ error: `granularity inválida: use ${UNITS.join(' | ')}` });
+    }
+
+    // Defaults: últimos 6 meses até hoje.
+    const today = new Date();
+    const defaultTo = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));
+    const defaultFrom = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth() - 6, today.getUTCDate()));
+
+    const from = req.query.from ? parseDateOnly(req.query.from) : defaultFrom;
+    const to = req.query.to ? parseDateOnly(req.query.to) : defaultTo;
+    if (!from || !to) {
+      return res.status(400).json({ error: 'from/to devem estar no formato YYYY-MM-DD' });
+    }
+    if (from.getTime() > to.getTime()) {
+      return res.status(400).json({ error: 'from não pode ser maior que to' });
+    }
+
+    // Limite do match no fuso BR (UTC-3 fixo). from 00:00 local = +3h UTC; to fim do dia = +27h UTC.
+    const matchStart = new Date(from.getTime() + 3 * 3600 * 1000);
+    const matchEnd = new Date(to.getTime() + (24 + 3) * 3600 * 1000);
+
+    const rows = await User.aggregate([
+      { $match: { createdAt: { $gte: matchStart, $lte: matchEnd } } },
+      {
+        $group: {
+          _id: {
+            $dateToString: {
+              format: '%Y-%m-%d',
+              timezone: TZ,
+              date: {
+                $dateTrunc: {
+                  date: '$createdAt',
+                  unit: granularity,
+                  timezone: TZ,
+                  startOfWeek: 'monday',
+                },
+              },
+            },
+          },
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const counts = new Map(rows.map((r) => [r._id, r.count]));
+    res.json(fillBuckets(counts, from, to, granularity));
+  } catch (err) {
+    console.error('Erro em getRegistrations:', err);
     res.status(500).json({ error: err.message });
   }
 };
