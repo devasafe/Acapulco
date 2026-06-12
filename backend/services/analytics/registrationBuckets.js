@@ -38,4 +38,19 @@ function bucketKey(date) {
   return toUTCDateOnly(date).toISOString().slice(0, 10);
 }
 
-module.exports = { UNITS, startOfBucket, nextBucket, bucketKey };
+// Gera a grade completa de buckets de `from` até `to` (inclusive), preenchendo
+// com 0 onde `counts` (Map de YYYY-MM-DD -> número) não tiver valor.
+// Retorna [{ period: 'YYYY-MM-DD', count }] em ordem ascendente.
+function fillBuckets(counts, from, to, granularity) {
+  const end = startOfBucket(to, granularity);
+  const result = [];
+  let cursor = startOfBucket(from, granularity);
+  while (cursor.getTime() <= end.getTime()) {
+    const period = bucketKey(cursor);
+    result.push({ period, count: counts.get(period) || 0 });
+    cursor = nextBucket(cursor, granularity);
+  }
+  return result;
+}
+
+module.exports = { UNITS, startOfBucket, nextBucket, bucketKey, fillBuckets };

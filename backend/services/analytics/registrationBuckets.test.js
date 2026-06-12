@@ -44,3 +44,46 @@ describe('bucketKey', () => {
     expect(bucketKey(d('2026-06-08'))).toBe('2026-06-08');
   });
 });
+
+const { fillBuckets } = require('./registrationBuckets');
+
+describe('fillBuckets', () => {
+  const from = d('2026-06-08'); // segunda
+  const to = d('2026-06-22');   // segunda, 2 semanas depois
+
+  test('day: gera todos os dias do range, vazios com count 0', () => {
+    const counts = new Map([['2026-06-08', 2], ['2026-06-10', 5]]);
+    const out = fillBuckets(counts, from, to, 'day');
+    expect(out).toHaveLength(15); // 08..22 inclusive
+    expect(out[0]).toEqual({ period: '2026-06-08', count: 2 });
+    expect(out[1]).toEqual({ period: '2026-06-09', count: 0 });
+    expect(out[2]).toEqual({ period: '2026-06-10', count: 5 });
+    expect(out[14]).toEqual({ period: '2026-06-22', count: 0 });
+  });
+
+  test('week: 3 segundas (08, 15, 22)', () => {
+    const counts = new Map([['2026-06-15', 4]]);
+    const out = fillBuckets(counts, from, to, 'week');
+    expect(out.map((b) => b.period)).toEqual(['2026-06-08', '2026-06-15', '2026-06-22']);
+    expect(out.map((b) => b.count)).toEqual([0, 4, 0]);
+  });
+
+  test('month: alinha o início ao dia 1 mesmo se from for no meio do mês', () => {
+    const out = fillBuckets(new Map([['2026-07-01', 3]]), d('2026-06-12'), d('2026-08-20'), 'month');
+    expect(out.map((b) => b.period)).toEqual(['2026-06-01', '2026-07-01', '2026-08-01']);
+    expect(out.map((b) => b.count)).toEqual([0, 3, 0]);
+  });
+
+  test('range de um único bucket', () => {
+    const out = fillBuckets(new Map([['2026-06-08', 1]]), from, from, 'day');
+    expect(out).toEqual([{ period: '2026-06-08', count: 1 }]);
+  });
+
+  test('chave sem correspondência no Map conta 0', () => {
+    const out = fillBuckets(new Map(), from, d('2026-06-09'), 'day');
+    expect(out).toEqual([
+      { period: '2026-06-08', count: 0 },
+      { period: '2026-06-09', count: 0 },
+    ]);
+  });
+});
