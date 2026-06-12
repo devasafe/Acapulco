@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SiteShell from '../components/SiteShell';
-import RegistrationsCard from '../components/admin/RegistrationsCard';
 import { getStats, getPositions, getTrades } from '../services/tradeService';
 import { connectSocket } from '../services/socketService';
 import { getToken } from '../utils/auth';
@@ -34,7 +33,6 @@ function Kpi({ label, value, valueCls = 'text-on-surface' }) {
 
 export default function DashboardPage() {
   const navigate = useNavigate();
-  const isAdmin = JSON.parse(localStorage.getItem('user') || '{}').isAdmin;
   const [stats, setStats] = useState(null);
   const [positions, setPositions] = useState([]);
   const [trades, setTrades] = useState([]);
@@ -76,14 +74,6 @@ export default function DashboardPage() {
             Ir aos mercados
           </button>
         </div>
-
-        {/* Seção admin: visível apenas para administradores */}
-        {isAdmin && (
-          <section className="mb-8">
-            <p className="font-label-caps uppercase text-body-sm text-on-surface-variant mb-3">Administração</p>
-            <RegistrationsCard />
-          </section>
-        )}
 
         {loading ? (
           <Spinner />

@@ -10,6 +10,7 @@ import HomePage from './pages/HomePage';
 import DashboardPage from './pages/DashboardPage';
 import ProfilePage from './pages/ProfilePage';
 import AdminPage from './pages/AdminPage';
+import AdminDashboardV2 from './pages/AdminDashboardV2';
 import MarketsPage from './pages/MarketsPage';
 import AssetPage from './pages/AssetPage';
 import AssetAdminPage from './pages/AssetAdminPage';
@@ -57,6 +58,7 @@ function App() {
 
           {/* Admin */}
           <Route path="/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
+          <Route path="/admin/users" element={<ProtectedRoute adminOnly><AdminDashboardV2 /></ProtectedRoute>} />
           <Route path="/admin/assets" element={<ProtectedRoute><AssetAdminPage /></ProtectedRoute>} />
           <Route path="/admin/ideas" element={<ProtectedRoute><AdminIdeasPage /></ProtectedRoute>} />
           <Route path="/admin/market" element={<ProtectedRoute><MarketControlPage /></ProtectedRoute>} />

@@ -4,6 +4,12 @@ import AdminShell from '../components/admin/AdminShell';
 
 const SECTIONS = [
   {
+    title: 'Usuários & Métricas',
+    description: 'Visão geral de usuários: novos cadastros ao longo do tempo, saldos em carteira, depósitos, lucros e busca por usuário.',
+    icon: 'groups',
+    path: '/admin/users',
+  },
+  {
     title: 'Gerenciar ativos (watchlist)',
     description: 'Adicione ativos por símbolo (validados no provedor de mercado), ative/desative e remova.',
     icon: 'candlestick_chart',
