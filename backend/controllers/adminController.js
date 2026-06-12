@@ -2,7 +2,7 @@ const User = require('../models/User');
 const Transaction = require('../models/Transaction');
 const Setting = require('../models/Setting');
 const Investment = require('../models/Investment');
-const { UNITS, fillBuckets } = require('../services/analytics/registrationBuckets');
+const { UNITS, fillBuckets, fillSeries } = require('../services/analytics/registrationBuckets');
 
 // Get all users
 exports.getAllUsers = async (req, res) => {
@@ -280,6 +280,63 @@ exports.getRegistrations = async (req, res) => {
     res.json(fillBuckets(counts, from, to, granularity));
   } catch (err) {
     console.error('Erro em getRegistrations:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// GET /api/admin/cashflow?from&to&granularity
+// Entradas (deposit) vs saídas (withdrawal) somadas por dia/semana/mês, vazios = 0.
+exports.getCashflow = async (req, res) => {
+  try {
+    const granularity = req.query.granularity || 'week';
+    if (!UNITS.includes(granularity)) {
+      return res.status(400).json({ error: `granularity inválida: use ${UNITS.join(' | ')}` });
+    }
+
+    const today = new Date();
+    const defaultTo = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));
+    const defaultFrom = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth() - 6, today.getUTCDate()));
+
+    const from = req.query.from ? parseDateOnly(req.query.from) : defaultFrom;
+    const to = req.query.to ? parseDateOnly(req.query.to) : defaultTo;
+    if (!from || !to) {
+      return res.status(400).json({ error: 'from/to devem estar no formato YYYY-MM-DD' });
+    }
+    if (from.getTime() > to.getTime()) {
+      return res.status(400).json({ error: 'from não pode ser maior que to' });
+    }
+
+    const matchStart = new Date(from.getTime() + 3 * 3600 * 1000);
+    const matchEnd = new Date(to.getTime() + (24 + 3) * 3600 * 1000);
+
+    const rows = await Transaction.aggregate([
+      { $match: { type: { $in: ['deposit', 'withdrawal'] }, createdAt: { $gte: matchStart, $lte: matchEnd } } },
+      {
+        $group: {
+          _id: {
+            $dateToString: {
+              format: '%Y-%m-%d',
+              timezone: TZ,
+              date: {
+                $dateTrunc: {
+                  date: '$createdAt',
+                  unit: granularity,
+                  timezone: TZ,
+                  startOfWeek: 'monday',
+                },
+              },
+            },
+          },
+          deposits: { $sum: { $cond: [{ $eq: ['$type', 'deposit'] }, '$amount', 0] } },
+          withdrawals: { $sum: { $cond: [{ $eq: ['$type', 'withdrawal'] }, '$amount', 0] } },
+        },
+      },
+    ]);
+
+    const map = new Map(rows.map((r) => [r._id, { deposits: r.deposits, withdrawals: r.withdrawals }]));
+    res.json(fillSeries(map, from, to, granularity, ['deposits', 'withdrawals']));
+  } catch (err) {
+    console.error('Erro em getCashflow:', err);
     res.status(500).json({ error: err.message });
   }
 };
