@@ -4,6 +4,7 @@ import AdminShell from '../components/admin/AdminShell';
 import RegistrationsCard from '../components/admin/RegistrationsCard';
 import CashflowCard from '../components/admin/CashflowCard';
 import MembersPyramidCard from '../components/admin/MembersPyramidCard';
+import RetentionCard from '../components/admin/RetentionCard';
 import api from '../api';
 
 const BRL = (v) => Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -129,6 +130,9 @@ export default function AdminDashboardV2() {
 
       {/* Pirâmide membros novos vs antigos */}
       <MembersPyramidCard />
+
+      {/* Curva de retenção */}
+      <RetentionCard />
 
       {/* Busca + perfil */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
