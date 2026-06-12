@@ -22,6 +22,7 @@ export default function SiteNav({ active = '' }) {
           { label: 'Carteira', to: '/wallet' },
           { label: 'Indicações', to: '/referrals' },
           { label: 'Perfil', to: '/profile' },
+          { label: 'Suporte', to: '/support' },
           ...(user?.isAdmin ? [{ label: 'Painel Admin', to: '/admin' }] : []),
         ]
       : []),

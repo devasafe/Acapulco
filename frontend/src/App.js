@@ -18,6 +18,7 @@ import AdminIdeasPage from './pages/AdminIdeasPage';
 import MarketControlPage from './pages/MarketControlPage';
 import ReferralNetworkPage from './pages/ReferralNetworkPage';
 import WalletPage from './pages/WalletPage';
+import SupportPage from './pages/SupportPage';
 import ContactPage from './pages/ContactPage';
 import AboutPage from './pages/AboutPage';
 
@@ -55,6 +56,7 @@ function App() {
           <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
           <Route path="/referrals" element={<ProtectedRoute><ReferralNetworkPage /></ProtectedRoute>} />
           <Route path="/wallet" element={<ProtectedRoute><WalletPage /></ProtectedRoute>} />
+          <Route path="/support" element={<ProtectedRoute><SupportPage /></ProtectedRoute>} />
 
           {/* Admin */}
           <Route path="/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
