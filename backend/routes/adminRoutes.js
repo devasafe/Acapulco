@@ -12,6 +12,7 @@ router.get('/stats', ...adminAuth, adminController.getAdminStats);
 router.get('/registrations', ...adminAuth, adminController.getRegistrations);
 router.get('/cashflow', ...adminAuth, adminController.getCashflow);
 router.get('/members-split', ...adminAuth, adminController.getMembersSplit);
+router.get('/retention', ...adminAuth, adminController.getRetention);
 router.get('/referral-settings', ...adminAuth, adminController.getReferralSettings);
 router.put('/referral-settings', ...adminAuth, adminController.updateReferralSettings);
 router.get('/referral-profits', ...adminAuth, adminController.getReferralProfits);

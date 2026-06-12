@@ -2,7 +2,9 @@ const User = require('../models/User');
 const Transaction = require('../models/Transaction');
 const Setting = require('../models/Setting');
 const Investment = require('../models/Investment');
+const Trade = require('../models/Trade');
 const { UNITS, fillBuckets, fillSeries } = require('../services/analytics/registrationBuckets');
+const { computeRetention } = require('../services/analytics/retention');
 
 // Get all users
 exports.getAllUsers = async (req, res) => {
@@ -358,6 +360,40 @@ exports.getMembersSplit = async (req, res) => {
     res.json({ days, total, newCount, oldCount });
   } catch (err) {
     console.error('Erro em getMembersSplit:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const RETENTION_MILESTONES = [0, 1, 7, 14, 30, 60, 90];
+
+// GET /api/admin/retention
+// Curva de sobrevivência: % de usuários ativados (>= 1 trade) ainda ativos em D0..D90.
+exports.getRetention = async (req, res) => {
+  try {
+    const totalUsers = await User.countDocuments({});
+
+    // Último trade por usuário.
+    const lastTrades = await Trade.aggregate([
+      { $group: { _id: '$userId', lastTradeAt: { $max: '$createdAt' } } },
+    ]);
+
+    // Cruza com createdAt dos usuários existentes.
+    const userIds = lastTrades.map((t) => t._id);
+    const usersDocs = userIds.length
+      ? await User.find({ _id: { $in: userIds } }).select('createdAt').lean()
+      : [];
+    const createdById = new Map(usersDocs.map((u) => [String(u._id), u.createdAt]));
+
+    const users = [];
+    for (const t of lastTrades) {
+      const createdAt = createdById.get(String(t._id));
+      if (createdAt) users.push({ createdAt, lastTradeAt: t.lastTradeAt });
+    }
+
+    const points = computeRetention(users, RETENTION_MILESTONES, new Date());
+    res.json({ totalUsers, activatedUsers: users.length, points });
+  } catch (err) {
+    console.error('Erro em getRetention:', err);
     res.status(500).json({ error: err.message });
   }
 };
