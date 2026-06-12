@@ -340,3 +340,24 @@ exports.getCashflow = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+// GET /api/admin/members-split?days=N
+// Snapshot da proporção: membros novos (createdAt nos últimos N dias) vs antigos.
+exports.getMembersSplit = async (req, res) => {
+  try {
+    const days = req.query.days !== undefined ? Number(req.query.days) : 30;
+    if (!Number.isInteger(days) || days <= 0) {
+      return res.status(400).json({ error: 'days deve ser um inteiro positivo' });
+    }
+
+    const cutoff = new Date(Date.now() - days * 24 * 3600 * 1000);
+    const total = await User.countDocuments({});
+    const newCount = await User.countDocuments({ createdAt: { $gte: cutoff } });
+    const oldCount = total - newCount;
+
+    res.json({ days, total, newCount, oldCount });
+  } catch (err) {
+    console.error('Erro em getMembersSplit:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
