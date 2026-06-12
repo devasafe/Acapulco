@@ -53,4 +53,22 @@ function fillBuckets(counts, from, to, granularity) {
   return result;
 }
 
-module.exports = { UNITS, startOfBucket, nextBucket, bucketKey, fillBuckets };
+// Igual a fillBuckets, mas para múltiplos campos numéricos por bucket.
+// `map`: Map<'YYYY-MM-DD', object>; `fields`: nomes de campo a emitir.
+// Retorna [{ period, ...fields }] ascendente; campo ausente vira 0.
+function fillSeries(map, from, to, granularity, fields) {
+  const end = startOfBucket(to, granularity);
+  const result = [];
+  let cursor = startOfBucket(from, granularity);
+  while (cursor.getTime() <= end.getTime()) {
+    const period = bucketKey(cursor);
+    const row = map.get(period) || {};
+    const out = { period };
+    for (const f of fields) out[f] = row[f] || 0;
+    result.push(out);
+    cursor = nextBucket(cursor, granularity);
+  }
+  return result;
+}
+
+module.exports = { UNITS, startOfBucket, nextBucket, bucketKey, fillBuckets, fillSeries };

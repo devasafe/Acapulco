@@ -87,3 +87,32 @@ describe('fillBuckets', () => {
     ]);
   });
 });
+
+const { fillSeries } = require('./registrationBuckets');
+
+describe('fillSeries', () => {
+  const from = d('2026-06-08'); // segunda
+  const to = d('2026-06-22');   // segunda, 2 semanas depois
+
+  test('week: preenche a grade com múltiplos campos', () => {
+    const map = new Map([['2026-06-15', { deposits: 100, withdrawals: 30 }]]);
+    const out = fillSeries(map, from, to, 'week', ['deposits', 'withdrawals']);
+    expect(out).toEqual([
+      { period: '2026-06-08', deposits: 0, withdrawals: 0 },
+      { period: '2026-06-15', deposits: 100, withdrawals: 30 },
+      { period: '2026-06-22', deposits: 0, withdrawals: 0 },
+    ]);
+  });
+
+  test('campo ausente no objeto vira 0', () => {
+    const map = new Map([['2026-06-08', { deposits: 50 }]]);
+    const out = fillSeries(map, from, d('2026-06-08'), 'day', ['deposits', 'withdrawals']);
+    expect(out).toEqual([{ period: '2026-06-08', deposits: 50, withdrawals: 0 }]);
+  });
+
+  test('day: gera todos os dias do range, todos zerados quando o map é vazio', () => {
+    const out = fillSeries(new Map(), from, d('2026-06-10'), 'day', ['deposits']);
+    expect(out.map((b) => b.period)).toEqual(['2026-06-08', '2026-06-09', '2026-06-10']);
+    expect(out.every((b) => b.deposits === 0)).toBe(true);
+  });
+});
