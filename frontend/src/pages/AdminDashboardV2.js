@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import AdminShell from '../components/admin/AdminShell';
 import RegistrationsCard from '../components/admin/RegistrationsCard';
+import CashflowCard from '../components/admin/CashflowCard';
 import api from '../api';
 
 const BRL = (v) => Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -121,6 +122,9 @@ export default function AdminDashboardV2() {
 
       {/* Gráfico novos cadastros */}
       <RegistrationsCard />
+
+      {/* Gráfico entradas vs saídas */}
+      <CashflowCard />
 
       {/* Busca + perfil */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
