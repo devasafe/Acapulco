@@ -40,3 +40,6 @@ planos/
 CLAUDE.md
 AGENTS.md
 skills-lock.json
+
+# Estado efêmero dos scripts de seed (não versionar)
+backend/scripts/.seeded-*.json
