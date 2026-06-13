@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
+const analyticsController = require('../controllers/analyticsController');
 const { authenticateToken } = require('../middleware/auth');
 const isAdmin = require('../middleware/isAdmin');
 
@@ -8,6 +9,8 @@ const isAdmin = require('../middleware/isAdmin');
 const adminAuth = [authenticateToken, isAdmin];
 
 router.get('/users', ...adminAuth, adminController.getAllUsers);
+router.get('/users/:id/analytics', ...adminAuth, analyticsController.adminUserAnalytics);
+router.get('/users/:id/equity-curve', ...adminAuth, analyticsController.adminUserEquityCurve);
 router.get('/stats', ...adminAuth, adminController.getAdminStats);
 router.get('/registrations', ...adminAuth, adminController.getRegistrations);
 router.get('/cashflow', ...adminAuth, adminController.getCashflow);
