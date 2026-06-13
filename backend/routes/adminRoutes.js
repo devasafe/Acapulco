@@ -16,6 +16,7 @@ router.get('/retention', ...adminAuth, adminController.getRetention);
 router.get('/tickets', ...adminAuth, adminController.listTickets);
 router.patch('/tickets/:id', ...adminAuth, adminController.updateTicketStatus);
 router.post('/tickets/:id/responses', ...adminAuth, adminController.replyTicket);
+router.get('/tickets-series', ...adminAuth, adminController.getTicketsSeries);
 router.get('/referral-settings', ...adminAuth, adminController.getReferralSettings);
 router.put('/referral-settings', ...adminAuth, adminController.updateReferralSettings);
 router.get('/referral-profits', ...adminAuth, adminController.getReferralProfits);
