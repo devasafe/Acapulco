@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import AdminShell from '../components/admin/AdminShell';
 import RegistrationsCard from '../components/admin/RegistrationsCard';
@@ -27,6 +28,7 @@ function KPI({ title, value, icon, tone = 'text-on-surface' }) {
 
 export default function AdminDashboardV2() {
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
   const [error, setError] = useState(null);
   const [allUsers, setAllUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -199,6 +201,13 @@ export default function AdminDashboardV2() {
                   <p className="font-bold text-[20px] text-on-surface tabular-nums">{roi(selectedUser)}%</p>
                 </div>
               </div>
+              <button
+                onClick={() => navigate(`/admin/users/${selectedUser._id}`)}
+                className="mt-4 w-full bg-primary-container text-white px-4 py-2.5 rounded-lg font-label-caps uppercase hover:opacity-90 inline-flex items-center justify-center gap-2"
+              >
+                Ver perfil completo
+                <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+              </button>
             </div>
           ) : (
             <p className="text-on-surface-variant">Selecione um usuário para ver os detalhes.</p>

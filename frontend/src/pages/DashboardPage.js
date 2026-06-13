@@ -4,6 +4,8 @@ import SiteShell from '../components/SiteShell';
 import { getStats, getPositions, getTrades } from '../services/tradeService';
 import { connectSocket } from '../services/socketService';
 import { getToken } from '../utils/auth';
+import AnalyticsKpis from '../components/profile/AnalyticsKpis';
+import EquityCurveCard from '../components/profile/EquityCurveCard';
 
 const fmtUsd = (n) =>
   n == null ? '—' : `$${Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -95,6 +97,11 @@ export default function DashboardPage() {
                 valueCls={pnlCls(stats?.realizedPnl)}
               />
             </div>
+
+            {/* Minha evolução */}
+            <h2 className="font-headline-md text-[18px] text-on-surface mb-3">Minha evolução</h2>
+            <AnalyticsKpis basePath="/me" />
+            <EquityCurveCard basePath="/me" />
 
             {/* Posições abertas */}
             <section className={`${cardCls} p-5 mb-6`}>

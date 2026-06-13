@@ -11,6 +11,7 @@ import DashboardPage from './pages/DashboardPage';
 import ProfilePage from './pages/ProfilePage';
 import AdminPage from './pages/AdminPage';
 import AdminDashboardV2 from './pages/AdminDashboardV2';
+import AdminUserProfilePage from './pages/AdminUserProfilePage';
 import MarketsPage from './pages/MarketsPage';
 import AssetPage from './pages/AssetPage';
 import AssetAdminPage from './pages/AssetAdminPage';
@@ -62,6 +63,7 @@ function App() {
           {/* Admin */}
           <Route path="/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
           <Route path="/admin/users" element={<ProtectedRoute adminOnly><AdminDashboardV2 /></ProtectedRoute>} />
+          <Route path="/admin/users/:id" element={<ProtectedRoute adminOnly><AdminUserProfilePage /></ProtectedRoute>} />
           <Route path="/admin/tickets" element={<ProtectedRoute adminOnly><AdminTicketsPage /></ProtectedRoute>} />
           <Route path="/admin/assets" element={<ProtectedRoute><AssetAdminPage /></ProtectedRoute>} />
           <Route path="/admin/ideas" element={<ProtectedRoute><AdminIdeasPage /></ProtectedRoute>} />
