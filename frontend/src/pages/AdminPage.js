@@ -10,6 +10,12 @@ const SECTIONS = [
     path: '/admin/users',
   },
   {
+    title: 'Tickets de suporte',
+    description: 'Veja, responda e atualize o status dos chamados abertos pelos usuários.',
+    icon: 'support_agent',
+    path: '/admin/tickets',
+  },
+  {
     title: 'Gerenciar ativos (watchlist)',
     description: 'Adicione ativos por símbolo (validados no provedor de mercado), ative/desative e remova.',
     icon: 'candlestick_chart',

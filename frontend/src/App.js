@@ -15,6 +15,7 @@ import MarketsPage from './pages/MarketsPage';
 import AssetPage from './pages/AssetPage';
 import AssetAdminPage from './pages/AssetAdminPage';
 import AdminIdeasPage from './pages/AdminIdeasPage';
+import AdminTicketsPage from './pages/AdminTicketsPage';
 import MarketControlPage from './pages/MarketControlPage';
 import ReferralNetworkPage from './pages/ReferralNetworkPage';
 import WalletPage from './pages/WalletPage';
@@ -61,6 +62,7 @@ function App() {
           {/* Admin */}
           <Route path="/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
           <Route path="/admin/users" element={<ProtectedRoute adminOnly><AdminDashboardV2 /></ProtectedRoute>} />
+          <Route path="/admin/tickets" element={<ProtectedRoute adminOnly><AdminTicketsPage /></ProtectedRoute>} />
           <Route path="/admin/assets" element={<ProtectedRoute><AssetAdminPage /></ProtectedRoute>} />
           <Route path="/admin/ideas" element={<ProtectedRoute><AdminIdeasPage /></ProtectedRoute>} />
           <Route path="/admin/market" element={<ProtectedRoute><MarketControlPage /></ProtectedRoute>} />
