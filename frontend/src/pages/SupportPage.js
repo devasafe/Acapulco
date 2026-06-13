@@ -98,8 +98,18 @@ export default function SupportPage() {
                     <span className="font-semibold text-on-surface">{t.subject}</span>
                     <span className={`px-2 py-0.5 rounded font-label-caps uppercase text-[11px] ${meta.cls}`}>{meta.label}</span>
                   </div>
-                  <p className="text-on-surface-variant text-body-sm truncate">{t.message}</p>
+                  <p className="text-on-surface-variant text-body-sm whitespace-pre-wrap">{t.message}</p>
                   <p className="text-on-surface-variant text-[12px] mt-2">{fmtDate(t.createdAt)}</p>
+                  {(t.responses || []).length > 0 && (
+                    <div className="mt-3 space-y-2 border-t border-outline-variant/30 pt-3">
+                      {t.responses.map((r, i) => (
+                        <div key={i} className={`rounded-lg p-3 ${r.author === 'admin' ? 'bg-primary-container/10' : 'bg-surface-container'}`}>
+                          <p className="text-label-caps uppercase text-[11px] text-on-surface-variant mb-1">{r.author === 'admin' ? 'Suporte' : 'Você'} · {fmtDate(r.createdAt)}</p>
+                          <p className="text-on-surface text-body-sm whitespace-pre-wrap">{r.message}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               );
             })}
