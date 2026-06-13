@@ -3,6 +3,7 @@ const Transaction = require('../models/Transaction');
 const Setting = require('../models/Setting');
 const Investment = require('../models/Investment');
 const Trade = require('../models/Trade');
+const SupportTicket = require('../models/SupportTicket');
 const { UNITS, fillBuckets, fillSeries } = require('../services/analytics/registrationBuckets');
 const { computeRetention } = require('../services/analytics/retention');
 
@@ -394,6 +395,67 @@ exports.getRetention = async (req, res) => {
     res.json({ totalUsers, activatedUsers: users.length, points });
   } catch (err) {
     console.error('Erro em getRetention:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const TICKET_STATUSES = ['open', 'in_progress', 'resolved', 'closed'];
+
+// GET /api/admin/tickets?status=  — lista todos os tickets (filtro opcional por status).
+exports.listTickets = async (req, res) => {
+  try {
+    const filter = {};
+    if (req.query.status && TICKET_STATUSES.includes(req.query.status)) {
+      filter.status = req.query.status;
+    }
+    const tickets = await SupportTicket.find(filter)
+      .populate('userId', 'name email')
+      .sort({ createdAt: -1 })
+      .lean();
+    res.json(tickets);
+  } catch (err) {
+    console.error('Erro em listTickets:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// PATCH /api/admin/tickets/:id  { status } — muda o status.
+exports.updateTicketStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+    if (!TICKET_STATUSES.includes(status)) {
+      return res.status(400).json({ error: `status inválido: use ${TICKET_STATUSES.join(' | ')}` });
+    }
+    const ticket = await SupportTicket.findByIdAndUpdate(
+      req.params.id,
+      { status, updatedAt: new Date() },
+      { new: true }
+    ).populate('userId', 'name email');
+    if (!ticket) return res.status(404).json({ error: 'Ticket não encontrado' });
+    res.json(ticket);
+  } catch (err) {
+    console.error('Erro em updateTicketStatus:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// POST /api/admin/tickets/:id/responses  { message } — admin responde (e abre p/ in_progress).
+exports.replyTicket = async (req, res) => {
+  try {
+    const { message } = req.body;
+    if (!message || !String(message).trim()) {
+      return res.status(400).json({ error: 'Mensagem é obrigatória' });
+    }
+    const ticket = await SupportTicket.findById(req.params.id);
+    if (!ticket) return res.status(404).json({ error: 'Ticket não encontrado' });
+    ticket.responses.push({ message: String(message).trim(), author: 'admin' });
+    if (ticket.status === 'open') ticket.status = 'in_progress';
+    ticket.updatedAt = new Date();
+    await ticket.save();
+    await ticket.populate('userId', 'name email');
+    res.json(ticket);
+  } catch (err) {
+    console.error('Erro em replyTicket:', err);
     res.status(500).json({ error: err.message });
   }
 };

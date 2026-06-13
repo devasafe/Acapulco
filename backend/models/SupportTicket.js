@@ -9,6 +9,11 @@ const supportTicketSchema = new mongoose.Schema({
     enum: ['open', 'in_progress', 'resolved', 'closed'],
     default: 'open',
   },
+  responses: [{
+    message: { type: String, required: true },
+    author: { type: String, enum: ['admin', 'user'], default: 'admin' },
+    createdAt: { type: Date, default: Date.now },
+  }],
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
