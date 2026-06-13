@@ -6,7 +6,7 @@ const pnlCls = (v) => ((v ?? 0) >= 0 ? 'text-success' : 'text-danger');
 
 function Kpi({ label, value, valueCls = 'text-on-surface' }) {
   return (
-    <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-5 shadow-sm">
+    <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 shadow-sm">
       <p className="font-label-caps uppercase text-body-sm text-on-surface-variant">{label}</p>
       <p className={`font-headline-md text-headline-md mt-1 tabular-nums ${valueCls}`}>{value}</p>
     </div>

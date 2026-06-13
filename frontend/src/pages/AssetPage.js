@@ -25,7 +25,7 @@ const fmtDate = (d) => (d ? new Date(d).toLocaleDateString('pt-BR') : '');
 const STANCE = {
   bullish: { label: 'Alta', cls: 'bg-success/15 text-success' },
   bearish: { label: 'Baixa', cls: 'bg-danger/15 text-danger' },
-  neutral: { label: 'Neutro', cls: 'bg-outline-variant/20 text-on-surface-variant' },
+  neutral: { label: 'Neutro', cls: 'bg-outline-variant text-on-surface-variant' },
 };
 
 function Shell({ children }) {
@@ -157,7 +157,7 @@ export default function AssetPage() {
   const livePnl = position && price != null ? (price - position.avgEntryPrice) * position.netUnits : null;
   const livePnlPct = livePnl != null && invested > 0 ? (livePnl / invested) * 100 : null;
 
-  const cardCls = 'bg-surface-container-lowest border border-outline-variant/30 rounded-xl shadow-sm';
+  const cardCls = 'bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm';
   const pillBase = 'px-3 py-1.5 rounded-lg text-body-sm font-label-caps transition-colors';
 
   return (
@@ -237,7 +237,7 @@ export default function AssetPage() {
                     <span className="text-on-surface-variant">$</span>
                     <input
                       type="number" min="1" step="1" value={usd} onChange={(e) => setUsd(e.target.value)}
-                      className="flex-1 w-full bg-background border border-outline-variant/40 rounded-lg px-3 py-2 text-on-surface tabular-nums focus:outline-none focus:border-primary-container"
+                      className="flex-1 w-full bg-background border border-outline-variant rounded-lg px-3 py-2 text-on-surface tabular-nums focus:outline-none focus:border-primary-container"
                     />
                   </div>
                 </label>
@@ -299,7 +299,7 @@ export default function AssetPage() {
                     </div>
                     <button
                       disabled={busy} onClick={handleClose}
-                      className="w-full mt-3 bg-surface-container border border-outline-variant/40 text-on-surface py-2.5 rounded-lg font-label-caps uppercase hover:border-primary-container/60 disabled:opacity-40 transition-colors"
+                      className="w-full mt-3 bg-surface-container border border-outline-variant text-on-surface py-2.5 rounded-lg font-label-caps uppercase hover:border-primary-container/60 disabled:opacity-40 transition-colors"
                     >
                       Fechar posição
                     </button>
@@ -316,7 +316,7 @@ export default function AssetPage() {
               <h2 className="font-headline-md text-[18px] text-on-surface mb-4">Ideias &amp; Análises</h2>
               <div className="space-y-4">
                 {ideas.map((idea) => (
-                  <article key={idea._id} className="border border-outline-variant/30 rounded-xl p-4">
+                  <article key={idea._id} className="border border-outline-variant rounded-xl p-4">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
                       <span className={`text-[11px] uppercase px-2 py-0.5 rounded font-label-caps ${STANCE[idea.stance]?.cls || STANCE.neutral.cls}`}>
                         {STANCE[idea.stance]?.label || idea.stance}

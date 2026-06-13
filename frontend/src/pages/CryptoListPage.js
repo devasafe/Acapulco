@@ -78,7 +78,7 @@ export default function CryptoListPage() {
 
       <main className="pt-20 flex-1">
         {/* Cabeçalho */}
-        <section className="border-b border-outline-variant/20 bg-surface-container-low">
+        <section className="border-b border-outline-variant bg-surface-container-low">
           <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-12">
             <span className="font-label-caps text-label-caps text-on-primary-container mb-3 block">CATÁLOGO</span>
             <h1 className="font-headline-xl text-headline-xl text-on-surface mb-3">Criptoativos disponíveis</h1>
@@ -111,20 +111,20 @@ export default function CryptoListPage() {
               <div className="w-10 h-10 rounded-full border-4 border-outline-variant border-t-primary-container animate-spin" />
             </div>
           ) : error ? (
-            <div className="bg-surface-container-lowest border border-outline-variant/40 rounded-xl p-12 text-center">
+            <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-12 text-center">
               <p className="text-on-surface-variant mb-4">{error}</p>
               <button onClick={loadCryptos} className="bg-primary-container text-white px-5 py-2.5 rounded-lg font-label-caps uppercase hover:opacity-90">Tentar novamente</button>
             </div>
           ) : list.length === 0 ? (
-            <div className="bg-surface-container-lowest border border-outline-variant/40 rounded-xl p-12 text-center">
+            <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-12 text-center">
               <p className="text-on-surface-variant">Nenhum criptoativo encontrado.</p>
             </div>
           ) : (
-            <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl overflow-hidden shadow-sm">
+            <div className="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-sm">
               {/* Tabela desktop */}
               <table className="w-full text-left hidden md:table">
                 <thead>
-                  <tr className="bg-surface-container border-b border-outline-variant/30 text-label-caps text-on-surface-variant">
+                  <tr className="bg-surface-container border-b border-outline-variant text-label-caps text-on-surface-variant">
                     <th className="px-6 py-4 w-10">#</th>
                     <th className="px-6 py-4">ATIVO</th>
                     <th className="px-6 py-4 text-right">PREÇO</th>
@@ -133,7 +133,7 @@ export default function CryptoListPage() {
                     <th className="px-6 py-4"></th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-outline-variant/20">
+                <tbody className="divide-y divide-outline-variant">
                   {list.map((c, i) => {
                     const plan = bestPlan(c.plans);
                     return (
@@ -165,7 +165,7 @@ export default function CryptoListPage() {
               </table>
 
               {/* Cards mobile */}
-              <div className="md:hidden divide-y divide-outline-variant/20">
+              <div className="md:hidden divide-y divide-outline-variant">
                 {list.map((c) => {
                   const plan = bestPlan(c.plans);
                   return (

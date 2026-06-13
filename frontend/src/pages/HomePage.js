@@ -92,7 +92,7 @@ export default function HomePage() {
                   </svg>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4 border-t border-outline-variant/30 pt-6">
+                <div className="grid grid-cols-3 gap-4 border-t border-outline-variant pt-6">
                   {[['BTC', '$61.8k', '+2.1%', true], ['ETH', '$2.4k', '+1.5%', true], ['SOL', '$142', '-0.4%', false]].map(([t, p, v, up]) => (
                     <div key={t} className="text-center">
                       <p className="text-label-caps text-on-surface-variant mb-1">{t}</p>
@@ -144,7 +144,7 @@ export default function HomePage() {
             <h2 className="font-headline-lg text-headline-lg text-on-surface mb-12">O que você encontra aqui</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter">
               {products.map(([icon, title, desc, cta, highlight]) => (
-                <div key={title} className={`bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/30 hover:shadow-lg transition-all group ${highlight ? 'border-t-2 border-t-primary-container' : ''}`}>
+                <div key={title} className={`bg-surface-container-lowest p-8 rounded-xl border border-outline-variant hover:shadow-lg transition-all group ${highlight ? 'border-t-2 border-t-primary-container' : ''}`}>
                   <span className="material-symbols-outlined text-primary text-[32px] mb-6">{icon}</span>
                   <h3 className="font-headline-md text-[20px] mb-4">{title}</h3>
                   <p className="text-body-sm text-on-surface-variant mb-6 leading-relaxed">{desc}</p>
@@ -190,7 +190,7 @@ export default function HomePage() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
               {testimonials.map(([quote, name, role]) => (
-                <div key={name} className="bg-surface-container-lowest p-6 rounded-xl shadow-sm border border-outline-variant/20">
+                <div key={name} className="bg-surface-container-lowest p-6 rounded-xl shadow-sm border border-outline-variant">
                   <div className="flex items-center gap-1 mb-4" style={{ color: '#FFB300' }}>
                     {[0, 1, 2, 3, 4].map((s) => (
                       <span key={s} className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
@@ -223,7 +223,7 @@ export default function HomePage() {
             <h2 className="font-headline-lg text-headline-lg text-on-surface text-center mb-12">Perguntas Frequentes</h2>
             <div className="space-y-4">
               {faqs.map(([q, a]) => (
-                <details key={q} className="group border-b border-outline-variant/30 pb-4">
+                <details key={q} className="group border-b border-outline-variant pb-4">
                   <summary className="flex justify-between items-center cursor-pointer list-none font-headline-md text-[18px] py-2 text-on-surface">
                     {q}
                     <span className="material-symbols-outlined group-open:rotate-180 transition-transform">expand_more</span>

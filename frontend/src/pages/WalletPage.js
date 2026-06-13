@@ -55,8 +55,8 @@ export default function WalletPage() {
     run(() => withdraw(v), `Saque de ${fmtUsd(v)} realizado.`).then(() => setWithdrawAmt(''));
   };
 
-  const card = 'bg-surface-container-lowest border border-outline-variant/30 rounded-xl shadow-sm p-5';
-  const inputCls = 'flex-1 w-full bg-background border border-outline-variant/40 rounded-lg px-3 py-2 text-on-surface tabular-nums focus:outline-none focus:border-primary-container';
+  const card = 'bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-5';
+  const inputCls = 'flex-1 w-full bg-background border border-outline-variant rounded-lg px-3 py-2 text-on-surface tabular-nums focus:outline-none focus:border-primary-container';
 
   return (
     <SiteShell active="Carteira">

@@ -130,14 +130,14 @@ export default function CryptoAdminPage() {
 
   return (
     <AdminShell title="Gerenciar criptomoedas" subtitle="Crie, edite e controle os criptoativos e seus planos." actions={addBtn}>
-      <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl shadow-sm overflow-hidden">
+      <div className="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden">
         {cryptos.length === 0 ? (
           <p className="text-on-surface-variant text-center py-12">Nenhuma criptomoeda cadastrada.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left min-w-[720px]">
               <thead>
-                <tr className="bg-surface-container border-b border-outline-variant/30 text-label-caps text-on-surface-variant">
+                <tr className="bg-surface-container border-b border-outline-variant text-label-caps text-on-surface-variant">
                   <th className="px-6 py-4">ATIVO</th>
                   <th className="px-6 py-4 text-right">PREÇO</th>
                   <th className="px-6 py-4">PLANOS</th>
@@ -145,7 +145,7 @@ export default function CryptoAdminPage() {
                   <th className="px-6 py-4 text-right">AÇÕES</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-outline-variant/20">
+              <tbody className="divide-y divide-outline-variant">
                 {cryptos.map((c) => {
                   const url = imageUrl(c.image);
                   return (
@@ -203,8 +203,8 @@ export default function CryptoAdminPage() {
       {/* Modal */}
       {dialogOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setDialogOpen(false)}>
-          <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between px-6 py-4 border-b border-outline-variant/30 sticky top-0 bg-surface-container-lowest">
+          <div className="bg-surface-container-lowest border border-outline-variant rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-6 py-4 border-b border-outline-variant sticky top-0 bg-surface-container-lowest">
               <h2 className="font-headline-md text-[18px]">{editingId ? 'Editar cripto' : 'Nova cripto'}</h2>
               <button onClick={() => setDialogOpen(false)} className="text-on-surface-variant hover:text-on-surface">
                 <span className="material-symbols-outlined">close</span>
@@ -260,7 +260,7 @@ export default function CryptoAdminPage() {
                   </button>
                 </div>
                 {formData.plans.map((plan, index) => (
-                  <div key={index} className="flex items-end gap-3 bg-surface-container-low border border-outline-variant/40 rounded-lg p-3">
+                  <div key={index} className="flex items-end gap-3 bg-surface-container-low border border-outline-variant rounded-lg p-3">
                     <div className="flex-1 space-y-1">
                       <label className="text-label-caps text-on-surface-variant">PERÍODO (DIAS)</label>
                       <input type="number" value={plan.period} onChange={(e) => handlePlanChange(index, 'period', e.target.value)} className={inputCls} />
@@ -277,7 +277,7 @@ export default function CryptoAdminPage() {
               </div>
             </div>
 
-            <div className="flex justify-end gap-3 px-6 py-4 border-t border-outline-variant/30 sticky bottom-0 bg-surface-container-lowest">
+            <div className="flex justify-end gap-3 px-6 py-4 border-t border-outline-variant sticky bottom-0 bg-surface-container-lowest">
               <button onClick={() => setDialogOpen(false)} className="text-on-surface-variant font-label-caps uppercase px-4 py-2 hover:text-on-surface">Cancelar</button>
               <button onClick={handleSave} className="bg-primary-container text-white px-5 py-2 rounded-lg font-label-caps uppercase hover:opacity-90">Salvar</button>
             </div>

@@ -39,7 +39,7 @@ export default function SiteNav({ active = '' }) {
       : 'text-on-surface-variant hover:text-on-surface transition-colors';
 
   return (
-    <nav className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 shadow-sm">
+    <nav className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant shadow-sm">
       <div className="flex justify-between items-center h-20 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
         <Link to="/" className="text-headline-md font-headline-lg font-bold tracking-tight text-on-surface">
           Acapulco <span className="text-on-surface-variant font-normal text-body-sm">· Simulador</span>
@@ -79,11 +79,11 @@ export default function SiteNav({ active = '' }) {
 
       {/* Menu mobile */}
       {open && (
-        <div className="md:hidden border-t border-outline-variant/30 bg-surface px-margin-mobile py-4 space-y-1">
+        <div className="md:hidden border-t border-outline-variant bg-surface px-margin-mobile py-4 space-y-1">
           {links.map((l) => (
             <Link key={l.label} to={l.to} onClick={() => setOpen(false)} className="block px-2 py-2.5 rounded-lg text-on-surface hover:bg-surface-container">{l.label}</Link>
           ))}
-          <div className="pt-3 mt-2 border-t border-outline-variant/30 flex flex-col gap-2">
+          <div className="pt-3 mt-2 border-t border-outline-variant flex flex-col gap-2">
             {loggedIn ? (
               <button onClick={() => { setOpen(false); logout(); }} className="text-left px-2 py-2.5 rounded-lg text-danger font-semibold hover:bg-surface-container">Sair</button>
             ) : (

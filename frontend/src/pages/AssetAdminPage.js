@@ -39,9 +39,9 @@ export default function AssetAdminPage() {
   const handleToggle = async (id) => { await toggleAsset(id); load(); };
   const handleRemove = async (id) => { await removeAsset(id); load(); };
 
-  const inputCls = 'bg-background border border-outline-variant/40 rounded-lg px-3 py-2 text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-primary-container';
+  const inputCls = 'bg-background border border-outline-variant rounded-lg px-3 py-2 text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-primary-container';
   const primaryBtn = 'bg-primary-container text-on-primary-container px-4 py-2 rounded-lg font-label-caps uppercase hover:opacity-90 transition-opacity disabled:opacity-40';
-  const ghostBtn = 'bg-surface-container-lowest text-on-surface border border-outline-variant/40 px-4 py-2 rounded-lg font-label-caps uppercase hover:border-primary-container/60 transition-colors disabled:opacity-40';
+  const ghostBtn = 'bg-surface-container-lowest text-on-surface border border-outline-variant px-4 py-2 rounded-lg font-label-caps uppercase hover:border-primary-container/60 transition-colors disabled:opacity-40';
 
   return (
     <AdminShell
@@ -61,7 +61,7 @@ export default function AssetAdminPage() {
       )}
 
       {/* Busca / adição */}
-      <section className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-5 mb-6">
+      <section className="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 mb-6">
         <h2 className="font-headline-md text-[18px] text-on-surface mb-3">Adicionar ativo</h2>
         <div className="flex flex-col sm:flex-row gap-2">
           <div className="relative flex-1">
@@ -102,7 +102,7 @@ export default function AssetAdminPage() {
       </section>
 
       {/* Lista */}
-      <section className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-5">
+      <section className="bg-surface-container-lowest border border-outline-variant rounded-xl p-5">
         <h2 className="font-headline-md text-[18px] text-on-surface mb-3">Watchlist atual</h2>
 
         {assets.length === 0 ? (
@@ -113,7 +113,7 @@ export default function AssetAdminPage() {
             <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-body-sm">
                 <thead>
-                  <tr className="text-left border-b border-outline-variant/20">
+                  <tr className="text-left border-b border-outline-variant">
                     {['Símbolo', 'Nome', 'Tipo', 'Status', 'Ações'].map((h) => (
                       <th key={h} className="font-label-caps text-[12px] uppercase text-on-surface-variant py-2 px-2">{h}</th>
                     ))}
@@ -121,7 +121,7 @@ export default function AssetAdminPage() {
                 </thead>
                 <tbody>
                   {assets.map((a) => (
-                    <tr key={a._id} className="border-b border-outline-variant/10 last:border-0">
+                    <tr key={a._id} className="border-b border-outline-variant last:border-0">
                       <td className="py-2.5 px-2 font-label-caps text-on-surface">{a.symbol}</td>
                       <td className="py-2.5 px-2 text-on-surface-variant">{a.name}</td>
                       <td className="py-2.5 px-2 text-on-surface-variant">{a.assetType}</td>
@@ -132,7 +132,7 @@ export default function AssetAdminPage() {
                           className={`inline-flex items-center gap-1 text-[11px] uppercase px-2 py-0.5 rounded transition-opacity hover:opacity-80 ${
                             a.isActive
                               ? 'bg-success/15 text-success'
-                              : 'bg-outline-variant/20 text-on-surface-variant'
+                              : 'bg-outline-variant text-on-surface-variant'
                           }`}
                         >
                           <span className="material-symbols-outlined text-[16px]">{a.isActive ? 'toggle_on' : 'toggle_off'}</span>
@@ -171,7 +171,7 @@ export default function AssetAdminPage() {
                       className={`inline-flex items-center gap-1 text-[11px] uppercase px-2 py-0.5 rounded shrink-0 ${
                         a.isActive
                           ? 'bg-success/15 text-success'
-                          : 'bg-outline-variant/20 text-on-surface-variant'
+                          : 'bg-outline-variant text-on-surface-variant'
                       }`}
                     >
                       <span className="material-symbols-outlined text-[16px]">{a.isActive ? 'toggle_on' : 'toggle_off'}</span>

@@ -71,7 +71,7 @@ export default function AdminTicketsPage() {
     }
   };
 
-  const card = 'bg-surface-container-lowest border border-outline-variant/30 rounded-xl shadow-sm';
+  const card = 'bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm';
 
   return (
     <AdminShell title="Tickets de suporte" subtitle="Acompanhe, responda e atualize o status dos chamados.">

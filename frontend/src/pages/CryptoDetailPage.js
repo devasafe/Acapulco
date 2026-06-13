@@ -121,7 +121,7 @@ export default function CryptoDetailPage() {
         )}
 
         {/* Hero */}
-        <div className="relative rounded-2xl overflow-hidden border border-outline-variant/40 shadow-sm mb-6 h-[300px] flex items-center justify-center bg-primary-container">
+        <div className="relative rounded-2xl overflow-hidden border border-outline-variant shadow-sm mb-6 h-[300px] flex items-center justify-center bg-primary-container">
           {heroImg && (
             <img src={heroImg} alt={crypto.name} className="absolute inset-0 w-full h-full object-cover opacity-40" />
           )}
@@ -138,18 +138,18 @@ export default function CryptoDetailPage() {
 
         {/* Descrição */}
         {crypto.description && (
-          <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-6 mb-6 shadow-sm">
+          <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 mb-6 shadow-sm">
             <p className="text-on-surface-variant leading-relaxed text-center">{crypto.description}</p>
           </div>
         )}
 
         {/* Gráfico */}
-        <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-4 mb-6 shadow-sm">
+        <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 mb-6 shadow-sm">
           <CryptoChart symbol={crypto.symbol} />
         </div>
 
         {/* Planos */}
-        <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-6 mb-6 shadow-sm">
+        <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 mb-6 shadow-sm">
           <h2 className="font-headline-md text-[16px] mb-4">Selecione o plano</h2>
           <div className="space-y-2">
             {(crypto.plans || []).map((plan, idx) => {
@@ -159,7 +159,7 @@ export default function CryptoDetailPage() {
                   key={idx}
                   onClick={() => setInvestmentPlan(String(plan.period))}
                   className={`w-full flex items-center gap-3 p-3.5 rounded-lg border text-left transition-all ${
-                    active ? 'border-primary-container bg-primary-container/10' : 'border-outline-variant/50 hover:border-primary-container/60'
+                    active ? 'border-primary-container bg-primary-container/10' : 'border-outline-variant hover:border-primary-container/60'
                   }`}
                 >
                   <span className={`w-5 h-5 rounded-full border-2 grid place-items-center shrink-0 ${active ? 'border-primary-container' : 'border-outline-variant'}`}>

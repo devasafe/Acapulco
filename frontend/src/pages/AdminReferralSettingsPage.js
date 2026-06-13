@@ -75,7 +75,7 @@ const AdminReferralSettingsPage = () => {
       {success && <div className="bg-success/10 border border-success/30 text-success rounded-lg px-4 py-3 mb-4 text-body-sm">{success}</div>}
 
       {/* Percentual */}
-      <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-6 shadow-sm mb-6">
+      <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm mb-6">
         <h2 className="font-headline-md text-[18px] mb-4">Percentual de bônus por referência</h2>
         <div className="flex items-end gap-3 max-w-md">
           <div className="flex-1 space-y-1.5">
@@ -108,22 +108,22 @@ const AdminReferralSettingsPage = () => {
 
       {/* Estatísticas */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-        <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-5 shadow-sm">
+        <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 shadow-sm">
           <p className="text-label-caps text-on-surface-variant mb-1">USUÁRIOS COM BÔNUS</p>
           <p className="font-headline-md text-headline-md text-primary-container tabular-nums">{profits.length}</p>
         </div>
-        <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-5 shadow-sm">
+        <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 shadow-sm">
           <p className="text-label-caps text-on-surface-variant mb-1">TOTAL DISTRIBUÍDO</p>
           <p className="font-headline-md text-headline-md text-success tabular-nums">{BRL(totalBonus)}</p>
         </div>
-        <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-5 shadow-sm">
+        <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 shadow-sm">
           <p className="text-label-caps text-on-surface-variant mb-1">BÔNUS MÉDIO</p>
           <p className="font-headline-md text-headline-md text-gold tabular-nums">{BRL(avgBonus)}</p>
         </div>
       </div>
 
       {/* Top 10 */}
-      <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl shadow-sm overflow-hidden">
+      <div className="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden">
         <h2 className="font-headline-md text-[18px] px-6 pt-6 pb-4">Top 10 referenciadores</h2>
         {profits.length === 0 ? (
           <p className="text-on-surface-variant text-center py-10">Nenhum bônus de referência distribuído ainda.</p>
@@ -131,7 +131,7 @@ const AdminReferralSettingsPage = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left min-w-[640px]">
               <thead>
-                <tr className="bg-surface-container border-y border-outline-variant/30 text-label-caps text-on-surface-variant">
+                <tr className="bg-surface-container border-y border-outline-variant text-label-caps text-on-surface-variant">
                   <th className="px-6 py-3">NOME</th>
                   <th className="px-6 py-3">E-MAIL</th>
                   <th className="px-6 py-3">CÓDIGO</th>
@@ -139,7 +139,7 @@ const AdminReferralSettingsPage = () => {
                   <th className="px-6 py-3 text-right">REFERÊNCIAS</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-outline-variant/20">
+              <tbody className="divide-y divide-outline-variant">
                 {profits.slice(0, 10).map((p) => (
                   <tr key={p.userId} className="hover:bg-surface-container/40 transition-colors">
                     <td className="px-6 py-3 font-semibold">{p.name}</td>

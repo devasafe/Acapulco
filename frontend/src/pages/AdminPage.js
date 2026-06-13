@@ -45,7 +45,7 @@ export default function AdminPage() {
           <button
             key={s.path}
             onClick={() => navigate(s.path)}
-            className="group text-left bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-6 shadow-sm hover:border-primary-container/60 hover:shadow-md transition-all"
+            className="group text-left bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm hover:border-primary-container/60 hover:shadow-md transition-all"
           >
             <div className="w-12 h-12 rounded-lg bg-primary-container/10 text-primary-container grid place-items-center mb-4">
               <span className="material-symbols-outlined text-[26px]">{s.icon}</span>

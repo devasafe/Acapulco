@@ -13,7 +13,7 @@ const fmtUnits = (n) => (n == null ? '—' : Number(n).toLocaleString('en-US', {
 const fmtPct = (n) => (n == null ? '—' : `${Number(n).toFixed(2)}%`);
 const fmtDate = (d) => (d ? new Date(d).toLocaleString('pt-BR') : '—');
 
-const cardCls = 'bg-surface-container-lowest border border-outline-variant/30 rounded-xl shadow-sm';
+const cardCls = 'bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm';
 const pnlCls = (v) => ((v ?? 0) >= 0 ? 'text-success' : 'text-danger');
 
 function Spinner() {
@@ -114,7 +114,7 @@ export default function DashboardPage() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-body-sm">
                     <thead>
-                      <tr className="text-left font-label-caps uppercase text-on-surface-variant border-b border-outline-variant/30">
+                      <tr className="text-left font-label-caps uppercase text-on-surface-variant border-b border-outline-variant">
                         <th className="py-2 pr-4 font-medium">Ativo</th>
                         <th className="py-2 pr-4 font-medium">Direção</th>
                         <th className="py-2 pr-4 font-medium text-right">Unidades</th>
@@ -129,7 +129,7 @@ export default function DashboardPage() {
                         <tr
                           key={p.symbol}
                           onClick={() => navigate(`/asset/${p.symbol}`)}
-                          className="border-b border-outline-variant/20 last:border-0 cursor-pointer hover:bg-surface-container/50 transition-colors"
+                          className="border-b border-outline-variant last:border-0 cursor-pointer hover:bg-surface-container/50 transition-colors"
                         >
                           <td className="py-2.5 pr-4 font-semibold text-on-surface">{p.symbol}</td>
                           <td className="py-2.5 pr-4">
@@ -162,7 +162,7 @@ export default function DashboardPage() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-body-sm">
                     <thead>
-                      <tr className="text-left font-label-caps uppercase text-on-surface-variant border-b border-outline-variant/30">
+                      <tr className="text-left font-label-caps uppercase text-on-surface-variant border-b border-outline-variant">
                         <th className="py-2 pr-4 font-medium">Data</th>
                         <th className="py-2 pr-4 font-medium">Tipo</th>
                         <th className="py-2 pr-4 font-medium">Ativo</th>
@@ -177,7 +177,7 @@ export default function DashboardPage() {
                         <tr
                           key={t._id}
                           onClick={() => navigate(`/asset/${t.symbol}`)}
-                          className="border-b border-outline-variant/20 last:border-0 cursor-pointer hover:bg-surface-container/50 transition-colors"
+                          className="border-b border-outline-variant last:border-0 cursor-pointer hover:bg-surface-container/50 transition-colors"
                         >
                           <td className="py-2.5 pr-4 text-on-surface-variant whitespace-nowrap">{fmtDate(t.createdAt)}</td>
                           <td className="py-2.5 pr-4">

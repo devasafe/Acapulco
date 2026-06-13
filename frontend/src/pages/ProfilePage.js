@@ -88,7 +88,7 @@ export default function ProfilePage() {
           </div>
 
           {/* Dados da conta */}
-          <section className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-6 shadow-sm">
+          <section className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-6">
               <h2 className="font-headline-md text-[18px]">Dados da conta</h2>
               {!editMode ? (
@@ -151,12 +151,12 @@ export default function ProfilePage() {
           </section>
 
           {/* Indicados */}
-          <section className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-6 shadow-sm">
+          <section className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm">
             <h2 className="font-headline-md text-[18px] mb-4">Meus indicados</h2>
             {referrals.length === 0 ? (
               <p className="text-on-surface-variant text-body-sm">Você ainda não indicou ninguém. Compartilhe seu link acima.</p>
             ) : (
-              <ul className="divide-y divide-outline-variant/20">
+              <ul className="divide-y divide-outline-variant">
                 {referrals.map((r, i) => (
                   <li key={i} className="flex items-center justify-between py-3">
                     <div className="flex items-center gap-3 min-w-0">

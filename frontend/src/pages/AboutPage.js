@@ -24,7 +24,7 @@ export default function AboutPage() {
 
       <main className="pt-20">
         {/* Hero */}
-        <section className="relative py-24 overflow-hidden border-b border-outline-variant/20">
+        <section className="relative py-24 overflow-hidden border-b border-outline-variant">
           <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
             <div className="max-w-3xl">
               <span className="inline-block px-3 py-1 mb-6 rounded-full bg-secondary-container/40 text-on-secondary-container font-label-caps">SOBRE O PROJETO</span>
@@ -65,7 +65,7 @@ export default function AboutPage() {
         </section>
 
         {/* É / Não é */}
-        <section className="py-24 border-y border-outline-variant/20">
+        <section className="py-24 border-y border-outline-variant">
           <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop grid grid-cols-1 lg:grid-cols-2 gap-10">
             <div className="bg-surface-container-lowest p-8 rounded-xl border border-success/30">
               <h3 className="text-headline-md font-bold text-success mb-4 flex items-center gap-2">
@@ -98,7 +98,7 @@ export default function AboutPage() {
             <h2 className="text-headline-lg font-headline-lg text-on-surface mb-12">Nossos princípios</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter">
               {principles.map(([icon, title, desc]) => (
-                <div key={title} className="bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/30">
+                <div key={title} className="bg-surface-container-lowest p-8 rounded-xl border border-outline-variant">
                   <span className="material-symbols-outlined text-primary text-[32px] mb-4">{icon}</span>
                   <h4 className="font-headline-md text-[18px] mb-2">{title}</h4>
                   <p className="text-body-sm text-on-surface-variant">{desc}</p>

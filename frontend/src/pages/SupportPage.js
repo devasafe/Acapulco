@@ -13,7 +13,7 @@ const STATUS_META = {
 
 const fmtDate = (d) => (d ? new Date(d).toLocaleString('pt-BR') : '—');
 const inputCls = 'w-full bg-surface-container-low border border-outline-variant text-on-surface px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-container/20';
-const cardCls = 'bg-surface-container-lowest border border-outline-variant/30 rounded-xl shadow-sm';
+const cardCls = 'bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm';
 
 export default function SupportPage() {
   const [subject, setSubject] = useState(SUBJECTS[0]);
@@ -101,7 +101,7 @@ export default function SupportPage() {
                   <p className="text-on-surface-variant text-body-sm whitespace-pre-wrap">{t.message}</p>
                   <p className="text-on-surface-variant text-[12px] mt-2">{fmtDate(t.createdAt)}</p>
                   {(t.responses || []).length > 0 && (
-                    <div className="mt-3 space-y-2 border-t border-outline-variant/30 pt-3">
+                    <div className="mt-3 space-y-2 border-t border-outline-variant pt-3">
                       {t.responses.map((r, i) => (
                         <div key={i} className={`rounded-lg p-3 ${r.author === 'admin' ? 'bg-primary-container/10' : 'bg-surface-container'}`}>
                           <p className="text-label-caps uppercase text-[11px] text-on-surface-variant mb-1">{r.author === 'admin' ? 'Suporte' : 'Você'} · {fmtDate(r.createdAt)}</p>

@@ -115,7 +115,7 @@ export default function ProChart({ candles }) {
         {INDICATORS.map(([n, label, main]) => (
           <button key={n} onClick={() => toggle(n, main)} className={pill(on[n])}>{label}</button>
         ))}
-        <span className="w-px h-5 bg-outline-variant/40 mx-1" />
+        <span className="w-px h-5 bg-outline-variant mx-1" />
         {DRAWINGS.map(([name, label]) => (
           <button key={name} onClick={() => chartRef.current?.createOverlay(name)} className={ghost}>{label}</button>
         ))}

@@ -45,7 +45,7 @@ export default function ReferralNetworkPage() {
     window.open(`https://wa.me/?text=${text}`, '_blank');
   };
 
-  const card = 'bg-surface-container-lowest border border-outline-variant/30 rounded-xl shadow-sm p-5';
+  const card = 'bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-5';
 
   return (
     <SiteShell active="Indicações">
@@ -115,7 +115,7 @@ export default function ReferralNetworkPage() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-body-sm">
                     <thead>
-                      <tr className="text-on-surface-variant text-left border-b border-outline-variant/30">
+                      <tr className="text-on-surface-variant text-left border-b border-outline-variant">
                         <th className="py-2 pr-3 font-label-caps">Nome</th>
                         <th className="py-2 pr-3 font-label-caps">Email</th>
                         <th className="py-2 pr-3 font-label-caps text-right">Saldo</th>
@@ -125,13 +125,13 @@ export default function ReferralNetworkPage() {
                     </thead>
                     <tbody>
                       {data.referrals.map((ref) => (
-                        <tr key={ref._id} className="border-b border-outline-variant/15">
+                        <tr key={ref._id} className="border-b border-outline-variant">
                           <td className="py-2 pr-3 text-on-surface">{ref.name}</td>
                           <td className="py-2 pr-3 text-on-surface-variant">{ref.email}</td>
                           <td className="py-2 pr-3 text-right text-success tabular-nums">{fmtBRL(ref.wallet)}</td>
                           <td className="py-2 pr-3 text-on-surface-variant tabular-nums">{fmtDate(ref.createdAt)}</td>
                           <td className="py-2">
-                            <span className={`text-[11px] uppercase px-2 py-0.5 rounded font-label-caps ${ref.isActive ? 'bg-success/15 text-success' : 'bg-outline-variant/20 text-on-surface-variant'}`}>
+                            <span className={`text-[11px] uppercase px-2 py-0.5 rounded font-label-caps ${ref.isActive ? 'bg-success/15 text-success' : 'bg-outline-variant text-on-surface-variant'}`}>
                               {ref.isActive ? 'Ativo' : 'Inativo'}
                             </span>
                           </td>

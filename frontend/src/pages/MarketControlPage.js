@@ -91,7 +91,7 @@ export default function MarketControlPage() {
     }
   };
 
-  const inputCls = 'bg-background border border-outline-variant/40 rounded-lg px-3 py-2 text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-primary-container';
+  const inputCls = 'bg-background border border-outline-variant rounded-lg px-3 py-2 text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-primary-container';
   const primaryBtn = 'bg-primary-container text-on-primary-container px-4 py-2 rounded-lg font-label-caps uppercase hover:opacity-90 transition-opacity disabled:opacity-40';
 
   return (
@@ -120,7 +120,7 @@ export default function MarketControlPage() {
             className={`px-4 py-2 rounded-lg border transition-colors ${
               selected === a._id
                 ? 'bg-primary-container text-on-primary-container border-primary-container'
-                : 'bg-surface-container-lowest text-on-surface border-outline-variant/40 hover:border-primary-container/60'
+                : 'bg-surface-container-lowest text-on-surface border-outline-variant hover:border-primary-container/60'
             }`}
           >
             <span className="font-label-caps">{a.symbol}</span>
@@ -136,7 +136,7 @@ export default function MarketControlPage() {
       {selected && (
         <div className="grid gap-6 lg:grid-cols-2">
           {/* Agendar */}
-          <section className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-5">
+          <section className="bg-surface-container-lowest border border-outline-variant rounded-xl p-5">
             <h2 className="font-headline-md text-[18px] text-on-surface mb-3">Agendar janela</h2>
             <div className="grid gap-3 mb-3">
               <div className="grid gap-3 sm:grid-cols-2">
@@ -183,7 +183,7 @@ export default function MarketControlPage() {
           </section>
 
           {/* Lista */}
-          <section className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-5">
+          <section className="bg-surface-container-lowest border border-outline-variant rounded-xl p-5">
             <h2 className="font-headline-md text-[18px] text-on-surface mb-3">Intervenções</h2>
             <div className="space-y-2">
               {items.length === 0 && <p className="text-on-surface-variant text-body-sm">Nenhuma intervenção.</p>}
@@ -203,7 +203,7 @@ export default function MarketControlPage() {
                           : iv.status === 'done'
                             ? 'bg-success/20 text-success'
                             : iv.status === 'cancelled'
-                              ? 'bg-outline-variant/20 text-on-surface-variant'
+                              ? 'bg-outline-variant text-on-surface-variant'
                               : 'bg-primary-container/20 text-on-surface'
                       }`}>{STATUS[iv.status]}</span>
                       {(iv.status === 'pending' || iv.status === 'active') && (

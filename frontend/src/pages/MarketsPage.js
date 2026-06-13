@@ -69,7 +69,7 @@ export default function MarketsPage() {
             placeholder="Filtrar por símbolo ou nome..."
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            className="w-full bg-background border border-outline-variant/40 rounded-lg pl-10 pr-3 py-2.5 text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-primary-container"
+            className="w-full bg-background border border-outline-variant rounded-lg pl-10 pr-3 py-2.5 text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-primary-container"
           />
         </label>
 
@@ -88,7 +88,7 @@ export default function MarketsPage() {
                   key={a.symbol}
                   type="button"
                   onClick={() => navigate(`/asset/${a.symbol}`)}
-                  className="text-left bg-surface-container-lowest border border-outline-variant/30 rounded-xl shadow-sm p-5 transition-all hover:-translate-y-1 hover:border-primary-container/60 focus:outline-none focus:border-primary-container"
+                  className="text-left bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-5 transition-all hover:-translate-y-1 hover:border-primary-container/60 focus:outline-none focus:border-primary-container"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">

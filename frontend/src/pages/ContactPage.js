@@ -47,7 +47,7 @@ export default function ContactPage() {
         <section className="py-24 max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
             {/* Form */}
-            <div className="lg:col-span-7 bg-surface-container-lowest p-8 md:p-12 rounded-xl border border-outline-variant/30 shadow-sm">
+            <div className="lg:col-span-7 bg-surface-container-lowest p-8 md:p-12 rounded-xl border border-outline-variant shadow-sm">
               <h2 className="font-headline-lg text-headline-lg text-on-surface mb-8">Envie uma mensagem</h2>
               <form className="space-y-6" onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -98,7 +98,7 @@ export default function ContactPage() {
                 </div>
               </div>
 
-              <hr className="border-outline-variant/30" />
+              <hr className="border-outline-variant" />
 
               <div className="bg-primary-container text-white p-8 rounded-xl">
                 <h4 className="font-headline-md text-headline-md mb-6">Detalhes Operacionais</h4>
@@ -122,7 +122,7 @@ export default function ContactPage() {
         <section className="h-[400px] w-full relative grayscale hover:grayscale-0 transition-all duration-700">
           <img alt="Localização Acapulco Financial" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6awH52vPeO03DrYeyq_az4AB4ylwOPLRLtckhOXrJbs6HgfPHCXWw1DhZbQM5CayUhKyzA1IJg-zgHEeQ8LJDC5LND_ZUYecTo5Udnvbs182Ya_a6gYbZun_5pl1AtjkwaiZ0osgH3MOh5rBvKPmYtZbRDTS1oAdxkflO7vkp_dw8xtf-DgIAJLqhjB_JxWQ1hKvsjEqVqUJ21y0TGj8oj-N45LFNff1BkLvIQUjCu4WJgb87c4UVGw4-SobiiCG6XUkm3xts0b8" />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
-            <div className="bg-surface-container-lowest p-6 rounded-xl shadow-xl flex items-center gap-4 border border-outline-variant/30">
+            <div className="bg-surface-container-lowest p-6 rounded-xl shadow-xl flex items-center gap-4 border border-outline-variant">
               <div className="bg-primary-container w-10 h-10 rounded-full flex items-center justify-center text-white">
                 <span className="material-symbols-outlined">apartment</span>
               </div>

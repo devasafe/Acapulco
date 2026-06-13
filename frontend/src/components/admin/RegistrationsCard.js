@@ -39,7 +39,7 @@ export default function RegistrationsCard() {
   const regTotal = useMemo(() => regData.reduce((s, b) => s + b.count, 0), [regData]);
 
   return (
-    <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-6 shadow-sm mb-8">
+    <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm mb-8">
       <div className="flex flex-col gap-4 mb-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h2 className="font-headline-md text-[18px]">Novos cadastros</h2>

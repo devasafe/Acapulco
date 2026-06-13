@@ -39,7 +39,7 @@ export default function EquityCurveCard({ basePath }) {
   );
 
   return (
-    <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-6 shadow-sm mb-8">
+    <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm mb-8">
       <div className="flex flex-col gap-4 mb-4 lg:flex-row lg:items-center lg:justify-between">
         <h2 className="font-headline-md text-[18px]">Evolução do patrimônio</h2>
         <PeriodControls granularity={granularity} from={from} to={to} onGranularity={setGranularity} onFrom={setFrom} onTo={setTo} />

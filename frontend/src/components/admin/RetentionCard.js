@@ -38,7 +38,7 @@ export default function RetentionCard() {
   }));
 
   return (
-    <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-6 shadow-sm mb-8">
+    <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm mb-8">
       <div className="mb-4">
         <h2 className="font-headline-md text-[18px]">Curva de retenção</h2>
         <p className="text-on-surface-variant text-body-sm">

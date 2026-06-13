@@ -19,7 +19,7 @@ export default function AdminShell({ title, subtitle, actions, children }) {
 
       <main className="pt-20 flex-1">
         {/* Cabeçalho */}
-        <section className="border-b border-outline-variant/20 bg-surface-container-low">
+        <section className="border-b border-outline-variant bg-surface-container-low">
           <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop pt-10 pb-0">
             <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
               <div>

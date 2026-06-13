@@ -6,7 +6,7 @@ import { getAllAssetsAdmin } from '../services/assetService';
 const STANCE = {
   bullish: { label: 'Alta', cls: 'bg-success/15 text-success' },
   bearish: { label: 'Baixa', cls: 'bg-danger/15 text-danger' },
-  neutral: { label: 'Neutro', cls: 'bg-outline-variant/20 text-on-surface-variant' },
+  neutral: { label: 'Neutro', cls: 'bg-outline-variant text-on-surface-variant' },
 };
 
 const fmtDate = (d) => (d ? new Date(d).toLocaleDateString('pt-BR') : '—');
@@ -40,7 +40,7 @@ export default function AdminIdeasPage() {
 
   const handleRemove = async (id) => { await removeIdea(id); load(); };
 
-  const inputCls = 'bg-background border border-outline-variant/40 rounded-lg px-3 py-2 text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-primary-container';
+  const inputCls = 'bg-background border border-outline-variant rounded-lg px-3 py-2 text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-primary-container';
   const primaryBtn = 'bg-primary-container text-on-primary-container px-4 py-2 rounded-lg font-label-caps uppercase hover:opacity-90 transition-opacity disabled:opacity-40';
 
   return (
@@ -67,7 +67,7 @@ export default function AdminIdeasPage() {
       )}
 
       {/* Form */}
-      <section className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-5 mb-6">
+      <section className="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 mb-6">
         <h2 className="font-headline-md text-[18px] text-on-surface mb-3">Publicar ideia</h2>
         <div className="grid gap-3 mb-4">
           <div className="grid gap-3 sm:grid-cols-2">
@@ -123,7 +123,7 @@ export default function AdminIdeasPage() {
           return (
             <div
               key={idea._id}
-              className="flex items-start justify-between gap-4 bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-5"
+              className="flex items-start justify-between gap-4 bg-surface-container-lowest border border-outline-variant rounded-xl p-5"
             >
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2 mb-1.5">

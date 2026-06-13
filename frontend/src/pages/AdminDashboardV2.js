@@ -14,7 +14,7 @@ const roi = (u) => (u?.totalInvested > 0 ? ((u.profit / u.totalInvested) * 100).
 
 function KPI({ title, value, icon, tone = 'text-on-surface' }) {
   return (
-    <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-5 shadow-sm">
+    <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 shadow-sm">
       <div className="flex items-start justify-between">
         <div>
           <p className="text-label-caps text-on-surface-variant mb-1">{title}</p>
@@ -105,7 +105,7 @@ export default function AdminDashboardV2() {
 
       {/* Gráfico carteiras */}
       {walletChartData.length > 0 && (
-        <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-6 shadow-sm mb-8">
+        <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm mb-8">
           <h2 className="font-headline-md text-[18px] mb-4">Saldo em carteira por usuário (Top 10)</h2>
           <div className="h-[320px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -143,7 +143,7 @@ export default function AdminDashboardV2() {
       {/* Busca + perfil */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         {/* Lista filtrada */}
-        <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-6 shadow-sm flex flex-col">
+        <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm flex flex-col">
           <h2 className="font-headline-md text-[18px] mb-4">Buscar usuário</h2>
           <div className="relative mb-4">
             <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
@@ -154,7 +154,7 @@ export default function AdminDashboardV2() {
               className="w-full bg-surface-container-low border border-outline-variant text-on-surface pl-11 pr-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-container/20"
             />
           </div>
-          <div className="flex-1 overflow-y-auto max-h-[280px] divide-y divide-outline-variant/20">
+          <div className="flex-1 overflow-y-auto max-h-[280px] divide-y divide-outline-variant">
             {filteredUsers.length === 0 ? (
               <p className="text-on-surface-variant text-body-sm text-center py-8">Nenhum usuário encontrado</p>
             ) : filteredUsers.map((u, idx) => (
@@ -174,11 +174,11 @@ export default function AdminDashboardV2() {
         </div>
 
         {/* Perfil selecionado */}
-        <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-6 shadow-sm">
+        <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm">
           <h2 className="font-headline-md text-[18px] mb-4">Perfil do usuário selecionado</h2>
           {selectedUser ? (
             <div>
-              <div className="pb-4 mb-4 border-b border-outline-variant/30">
+              <div className="pb-4 mb-4 border-b border-outline-variant">
                 <p className="text-label-caps text-on-surface-variant">NOME</p>
                 <p className="font-headline-md text-[20px]">{selectedUser.name || 'N/A'}</p>
                 <p className="text-on-surface-variant font-data-mono text-body-sm mt-1">{selectedUser.email || 'N/A'}</p>
@@ -216,7 +216,7 @@ export default function AdminDashboardV2() {
       </div>
 
       {/* Tabela completa */}
-      <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl shadow-sm overflow-hidden">
+      <div className="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden">
         <h2 className="font-headline-md text-[18px] px-6 pt-6 pb-4">Lista completa de usuários</h2>
         {allUsers.length === 0 ? (
           <p className="text-on-surface-variant text-center py-10">Nenhum usuário encontrado</p>
@@ -224,7 +224,7 @@ export default function AdminDashboardV2() {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-body-sm min-w-[760px]">
               <thead>
-                <tr className="bg-surface-container border-y border-outline-variant/30 text-label-caps text-on-surface-variant">
+                <tr className="bg-surface-container border-y border-outline-variant text-label-caps text-on-surface-variant">
                   <th className="px-6 py-3 w-10">#</th>
                   <th className="px-6 py-3">NOME</th>
                   <th className="px-6 py-3">E-MAIL</th>
@@ -236,7 +236,7 @@ export default function AdminDashboardV2() {
                   <th className="px-6 py-3 text-center">ROI</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-outline-variant/20">
+              <tbody className="divide-y divide-outline-variant">
                 {allUsers.map((u, idx) => (
                   <tr
                     key={u._id || idx}

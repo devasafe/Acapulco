@@ -59,21 +59,21 @@ const AdminReferralProfitsPage = () => {
 
       {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-        <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-5 shadow-sm flex items-center justify-between">
+        <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 shadow-sm flex items-center justify-between">
           <div>
             <p className="text-label-caps text-on-surface-variant mb-1">REFERENCIADORES</p>
             <p className="font-headline-md text-headline-md text-primary-container tabular-nums">{profits.length}</p>
           </div>
           <span className="material-symbols-outlined text-[34px] text-primary-container/30">groups</span>
         </div>
-        <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-5 shadow-sm flex items-center justify-between">
+        <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 shadow-sm flex items-center justify-between">
           <div>
             <p className="text-label-caps text-on-surface-variant mb-1">TOTAL DISTRIBUÍDO</p>
             <p className="font-headline-md text-headline-md text-success tabular-nums">{BRL(totalBonus)}</p>
           </div>
           <span className="material-symbols-outlined text-[34px] text-success/30">trending_up</span>
         </div>
-        <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-5 shadow-sm flex items-center justify-between">
+        <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 shadow-sm flex items-center justify-between">
           <div>
             <p className="text-label-caps text-on-surface-variant mb-1">BÔNUS MÉDIO</p>
             <p className="font-headline-md text-headline-md text-gold tabular-nums">{BRL(avgBonus)}</p>
@@ -83,7 +83,7 @@ const AdminReferralProfitsPage = () => {
       </div>
 
       {/* Histórico */}
-      <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl shadow-sm overflow-hidden">
+      <div className="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-6 pt-6 pb-4">
           <h2 className="font-headline-md text-[18px]">Histórico de bônus pagos ({filtered.length})</h2>
           <div className="relative w-full sm:w-72">
@@ -105,7 +105,7 @@ const AdminReferralProfitsPage = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left min-w-[820px]">
               <thead>
-                <tr className="bg-surface-container border-y border-outline-variant/30 text-label-caps text-on-surface-variant">
+                <tr className="bg-surface-container border-y border-outline-variant text-label-caps text-on-surface-variant">
                   <th className="px-6 py-3">QUEM RECEBEU</th>
                   <th className="px-6 py-3">E-MAIL</th>
                   <th className="px-6 py-3">CONTA CRIADA</th>
@@ -114,7 +114,7 @@ const AdminReferralProfitsPage = () => {
                   <th className="px-6 py-3 text-right">DATA</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-outline-variant/20">
+              <tbody className="divide-y divide-outline-variant">
                 {filtered.map((d) => (
                   <tr key={d.transactionId} className="hover:bg-surface-container/40 transition-colors">
                     <td className="px-6 py-3 font-semibold">
