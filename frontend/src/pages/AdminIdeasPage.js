@@ -11,10 +11,17 @@ const STANCE = {
 
 const fmtDate = (d) => (d ? new Date(d).toLocaleDateString('pt-BR') : '—');
 
+// Data de hoje (horário local) no formato YYYY-MM-DD para <input type="date">.
+const todayLocal = () => {
+  const d = new Date();
+  const p = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+};
+
 export default function AdminIdeasPage() {
   const [ideas, setIdeas] = useState([]);
   const [assets, setAssets] = useState([]);
-  const [form, setForm] = useState({ symbol: '', title: '', body: '', stance: 'neutral', startDate: '', endDate: '' });
+  const [form, setForm] = useState({ symbol: '', title: '', body: '', stance: 'neutral', startDate: todayLocal(), endDate: '' });
   const [msg, setMsg] = useState(null);
 
   const load = () => listIdeas().then((r) => setIdeas(r.data)).catch(() => {});
@@ -31,7 +38,7 @@ export default function AdminIdeasPage() {
     try {
       await createIdea(form);
       setMsg({ type: 'success', text: 'Ideia publicada.' });
-      setForm({ symbol: '', title: '', body: '', stance: 'neutral', startDate: '', endDate: '' });
+      setForm({ symbol: '', title: '', body: '', stance: 'neutral', startDate: todayLocal(), endDate: '' });
       load();
     } catch (err) {
       setMsg({ type: 'error', text: err.response?.data?.error || 'Erro ao publicar.' });

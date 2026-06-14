@@ -15,12 +15,23 @@ const TF = [
 const STATUS = { pending: 'Pendente', active: 'Ativa', done: 'Concluída', cancelled: 'Cancelada' };
 const fmt = (d) => new Date(d).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
 
+// Valor para <input type="datetime-local"> no horário local (YYYY-MM-DDTHH:mm).
+const toLocalInput = (d) => {
+  const p = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+};
+// Janela padrão: já preenchida com hoje (começa agora, termina daqui 1h).
+const defaultWindow = () => {
+  const now = new Date();
+  return { startAt: toLocalInput(now), endAt: toLocalInput(new Date(now.getTime() + 3600000)) };
+};
+
 export default function MarketControlPage() {
   const [assets, setAssets] = useState([]);
   const [selected, setSelected] = useState(null);
   const [items, setItems] = useState([]);
   const [form, setForm] = useState({
-    startAt: '', endAt: '', mode: 'percent', value: '', rampCandles: '3', rampTimeframeMs: '300000',
+    ...defaultWindow(), mode: 'percent', value: '', rampCandles: '3', rampTimeframeMs: '300000',
   });
   const [msg, setMsg] = useState(null); // { type: 'error' | 'success', text }
 
@@ -75,7 +86,7 @@ export default function MarketControlPage() {
         rampTimeframeMs: Number(form.rampTimeframeMs),
       });
       setMsg({ type: 'success', text: 'Janela agendada.' });
-      setForm((f) => ({ ...f, startAt: '', endAt: '', value: '' }));
+      setForm((f) => ({ ...f, ...defaultWindow(), value: '' }));
       loadItems(selected);
     } catch (err) {
       setMsg({ type: 'error', text: err.response?.data?.error || err.message });
